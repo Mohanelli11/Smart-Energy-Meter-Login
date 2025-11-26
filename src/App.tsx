@@ -96,7 +96,7 @@ export function App() {
     // Find meter by account number
     const meter = allMeters.find(m => m.accountNo === accountNo);
     if (!meter) {
-      alert('Meter not found. Please check the account number.');
+      alert('Mete r not found. Please check the account number.');
       return;
     }
     if (password !== '@Testing') {

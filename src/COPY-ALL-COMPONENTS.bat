@@ -5,7 +5,7 @@ echo.
 
 REM Create src\components directory
 if not exist "src" mkdir src
-if not exist "src\components" mkdir src\components
+if not exist "rc\components" mkdir src\components
 
 REM Copy all component files
 echo Copying component files...

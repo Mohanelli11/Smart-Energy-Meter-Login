@@ -11,6 +11,7 @@ import { EditMeterModal } from './EditMeterModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
+import { savePrepaidMeters, loadPrepaidMeters, savePostpaidMeters, loadPostpaidMeters, generateMeterReport, Meter } from '../utils/meterStorage';
 // Generate realistic data
 const generatePrepaidMeters = () => {
   const names = ['John Mwangi', 'Sarah Wambui', 'David Omondi', 'Grace Njeri', 'Peter Kamau', 'Mary Auma', 'James Otieno', 'Jane Wanjiku', 'Paul Kariuki', 'Lucy Nyambura', 'Michael Kipchoge', 'Anne Chebet', 'Daniel Mutua', 'Faith Wanjiru', 'Samuel Ochieng', 'Rose Akinyi', 'Joseph Maina', 'Catherine Wairimu', 'Patrick Kimani', 'Elizabeth Moraa', 'Francis Kibet', 'Margaret Njoki', 'Stephen Owino', 'Joyce Wangari', 'Anthony Mwenda', 'Esther Chepkoech', 'Robert Karanja', 'Alice Adhiambo', 'George Njenga', 'Susan Jepkorir', 'Charles Wafula', 'Hannah Mumbi', 'Benjamin Koech', 'Mercy Achieng', 'Isaac Gitau', 'Beatrice Cheptoo', 'Dennis Macharia', 'Lydia Kerubo', 'Victor Onyango', 'Priscilla Wambui', 'Edwin Kiplagat', 'Agnes Wanjiru', 'Kevin Ouma', 'Eunice Chepkemoi', 'Martin Njoroge', 'Christine Nyokabi', 'Simon Tanui', 'Purity Wangui', 'Andrew Kiprono', 'Josephine Muthoni'];
@@ -23,6 +24,8 @@ const generatePrepaidMeters = () => {
     const balance = Math.random() * 200;
     let status: 'Active' | 'Low Balance' | 'Disconnected';
     if (balance > 50) status = 'Active';else if (balance > 0) status = 'Low Balance';else status = 'Disconnected';
+    // Generate last report for 80% of meters (simulating GSM connectivity)
+    const hasReport = Math.random() > 0.2;
     meters.push({
       accountNo: `MET-${accountNum}-2023`,
       customerName: names[i % names.length],
@@ -30,7 +33,8 @@ const generatePrepaidMeters = () => {
       location: locations[i % locations.length],
       consumption: consumption,
       balance: balance.toFixed(2),
-      status: status
+      status: status,
+      lastReport: hasReport ? generateMeterReport() : undefined
     });
   }
   return meters;
@@ -45,6 +49,8 @@ const generatePostpaidMeters = () => {
     const consumption = (Math.random() * 15 + 15).toFixed(2);
     const billAmount = (Math.random() * 1500 + 500).toFixed(2);
     const status = statuses[Math.floor(Math.random() * statuses.length)];
+    // Generate last report for 80% of meters
+    const hasReport = Math.random() > 0.2;
     meters.push({
       accountNo: `MET-${accountNum}-2023`,
       customerName: names[i % names.length],
@@ -52,7 +58,8 @@ const generatePostpaidMeters = () => {
       location: locations[i % locations.length],
       consumption: consumption,
       balance: billAmount,
-      status: status
+      status: status,
+      lastReport: hasReport ? generateMeterReport() : undefined
     });
   }
   return meters;
@@ -110,9 +117,22 @@ export function Dashboard({
     token: '',
     amount: ''
   });
-  // Meter state
-  const [prepaidMetersState, setPrepaidMetersState] = useState(generatePrepaidMeters());
-  const [postpaidMetersState, setPostpaidMetersState] = useState(generatePostpaidMeters());
+  // Meter state with localStorage persistence
+  const [prepaidMetersState, setPrepaidMetersState] = useState<Meter[]>(() => {
+    const stored = loadPrepaidMeters();
+    return stored || generatePrepaidMeters();
+  });
+  const [postpaidMetersState, setPostpaidMetersState] = useState<Meter[]>(() => {
+    const stored = loadPostpaidMeters();
+    return stored || generatePostpaidMeters();
+  });
+  // Save to localStorage whenever meters change
+  useEffect(() => {
+    savePrepaidMeters(prepaidMetersState);
+  }, [prepaidMetersState]);
+  useEffect(() => {
+    savePostpaidMeters(postpaidMetersState);
+  }, [postpaidMetersState]);
   const [paymentTransactionsState] = useState(generatePaymentTransactions());
   // Consumption graph data
   const [consumptionGraphData, setConsumptionGraphData] = useState<any[]>([]);

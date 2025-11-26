@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { MeterLoginPage } from './components/MeterLoginPage';
 import { IndividualMeterView } from './components/IndividualMeterView';
+import { getAllMeters } from './utils/meterStorage';
 export function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -20,46 +21,14 @@ export function App() {
     name: 'Hydrobox Kenya',
     role: 'user'
   }]);
-  // Generate all meters (prepaid + postpaid) for meter login
-  const [allMeters] = useState(() => {
-    const meters = [];
-    // Prepaid meters
-    const prepaidNames = ['John Mwangi', 'Sarah Wambui', 'David Omondi', 'Grace Njeri', 'Peter Kamau', 'Mary Auma', 'James Otieno', 'Jane Wanjiku', 'Paul Kariuki', 'Lucy Nyambura'];
-    const locations = ['Nairobi West', 'Kasarani', 'Ruiru', 'Thika', 'Juja', 'Kiambu', 'Kikuyu', 'Limuru'];
-    for (let i = 0; i < 856; i++) {
-      const accountNum = 1000 + i;
-      const consumption = (Math.random() * 15 + 10).toFixed(2);
-      const balance = Math.random() * 200;
-      meters.push({
-        accountNo: `MET-${accountNum}-2023`,
-        customerName: prepaidNames[i % prepaidNames.length],
-        meterNo: `ESP-${accountNum}-001`,
-        location: locations[i % locations.length],
-        consumption: consumption,
-        balance: balance.toFixed(2),
-        status: balance > 50 ? 'Active' : balance > 0 ? 'Low Balance' : 'Disconnected',
-        type: 'prepaid'
-      });
+  // Load all meters from localStorage instead of generating
+  const [allMeters, setAllMeters] = useState(() => getAllMeters());
+  // Refresh meters from storage when returning to admin view
+  useEffect(() => {
+    if (viewMode === 'admin') {
+      setAllMeters(getAllMeters());
     }
-    // Postpaid meters
-    const postpaidNames = ['James Kamau', 'Grace Njeri', 'Michael Otieno', 'Nancy Wanjiru', 'David Kipchoge'];
-    for (let i = 0; i < 392; i++) {
-      const accountNum = 5000 + i;
-      const consumption = (Math.random() * 15 + 15).toFixed(2);
-      const billAmount = (Math.random() * 1500 + 500).toFixed(2);
-      meters.push({
-        accountNo: `MET-${accountNum}-2023`,
-        customerName: postpaidNames[i % postpaidNames.length],
-        meterNo: `ESP-${accountNum}-001`,
-        location: locations[i % locations.length],
-        consumption: consumption,
-        balance: billAmount,
-        status: ['Active', 'Pending Bill', 'Overdue'][Math.floor(Math.random() * 3)],
-        type: 'postpaid'
-      });
-    }
-    return meters;
-  });
+  }, [viewMode]);
   const handleLogin = userData => {
     // Find user in accounts
     const account = userAccounts.find(acc => acc.email.toLowerCase() === userData.email.toLowerCase() && acc.password === userData.password);
