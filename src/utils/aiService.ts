@@ -214,3 +214,123 @@ export const runDiagnostics = (meters: Meter[]): DiagnosticIssue[] => {
     return severityWeight[b.severity] - severityWeight[a.severity];
   });
 };
+
+// 4. Natural Language Query Processing
+export const processAIQuery = (query: string, meters: Meter[], transactions: any[]): string => {
+  const lowerQuery = query.toLowerCase();
+
+  // Consumption queries
+  if (lowerQuery.includes('consumption') || lowerQuery.includes('usage')) {
+    const totalConsumption = meters.reduce((sum, m) => sum + parseFloat(m.consumption || '0'), 0);
+    const avgConsumption = totalConsumption / (meters.length || 1);
+    if (lowerQuery.includes('total')) {
+      return `The total consumption across all ${meters.length} meters is ${totalConsumption.toFixed(2)} kWh. The average consumption per meter is ${avgConsumption.toFixed(2)} kWh.`;
+    }
+    if (lowerQuery.includes('predict') || lowerQuery.includes('forecast')) {
+      const trends = analyzeConsumption(meters);
+      const predictions = trends.filter(t => t.predicted);
+      const totalPredicted = predictions.reduce((sum, t) => sum + (t.predicted || 0), 0);
+      return `Based on current trends, I predict a total consumption of ${totalPredicted.toFixed(2)} kWh over the next 7 days. This represents a ${((totalPredicted / totalConsumption - 1) * 100).toFixed(1)}% change from current levels.`;
+    }
+    return `Current total consumption is ${totalConsumption.toFixed(2)} kWh across ${meters.length} meters. Average per meter: ${avgConsumption.toFixed(2)} kWh.`;
+  }
+
+  // Revenue queries
+  if (lowerQuery.includes('revenue') || lowerQuery.includes('payment') || lowerQuery.includes('money')) {
+    const revenueData = analyzeRevenue(meters, transactions);
+    if (lowerQuery.includes('highest') || lowerQuery.includes('top')) {
+      const topCustomer = revenueData.topCustomers[0];
+      return `The highest revenue customer is ${topCustomer.name} with Ksh ${topCustomer.amount.toLocaleString()}. The top 5 customers are:\n\n${revenueData.topCustomers.map((c, i) => `${i + 1}. ${c.name}: Ksh ${c.amount.toLocaleString()}`).join('\n')}`;
+    }
+    if (lowerQuery.includes('average')) {
+      return `The average revenue per customer is Ksh ${revenueData.averagePerCustomer.toLocaleString(undefined, {
+        maximumFractionDigits: 0
+      })}. Total revenue: Ksh ${revenueData.totalRevenue.toLocaleString()}.`;
+    }
+    if (lowerQuery.includes('total')) {
+      return `Total revenue from all transactions is Ksh ${revenueData.totalRevenue.toLocaleString()}. Projected revenue for next period: Ksh ${revenueData.projectedRevenue.toLocaleString(undefined, {
+        maximumFractionDigits: 0
+      })} (${revenueData.growthRate}% growth).`;
+    }
+    return `Total revenue: Ksh ${revenueData.totalRevenue.toLocaleString()}. Average per customer: Ksh ${revenueData.averagePerCustomer.toLocaleString(undefined, {
+      maximumFractionDigits: 0
+    })}. Growth rate: ${revenueData.growthRate}%.`;
+  }
+
+  // Meter status queries
+  if (lowerQuery.includes('meter') || lowerQuery.includes('status') || lowerQuery.includes('offline') || lowerQuery.includes('active')) {
+    const activeMeters = meters.filter(m => m.status === 'Active').length;
+    const lowBalance = meters.filter(m => m.status === 'Low Balance').length;
+    const disconnected = meters.filter(m => m.status === 'Disconnected').length;
+    const offline = meters.filter(m => !m.lastReport).length;
+    if (lowerQuery.includes('offline') || lowerQuery.includes('not working')) {
+      return `There are ${offline} meters currently offline (not reporting). ${disconnected} meters are disconnected. I recommend checking communication modules for offline meters.`;
+    }
+    if (lowerQuery.includes('active')) {
+      return `${activeMeters} meters are currently active and operating normally. ${lowBalance} meters have low balance warnings.`;
+    }
+    return `Meter Status Summary:\n- Active: ${activeMeters}\n- Low Balance: ${lowBalance}\n- Disconnected: ${disconnected}\n- Offline (no reports): ${offline}\n\nTotal meters: ${meters.length}`;
+  }
+
+  // Diagnostics queries
+  if (lowerQuery.includes('issue') || lowerQuery.includes('problem') || lowerQuery.includes('critical') || lowerQuery.includes('diagnostic')) {
+    const diagnostics = runDiagnostics(meters);
+    const critical = diagnostics.filter(d => d.severity === 'critical');
+    const warnings = diagnostics.filter(d => d.severity === 'warning');
+    if (critical.length > 0) {
+      return `⚠️ Found ${critical.length} critical issues requiring immediate attention:\n\n${critical.slice(0, 3).map(d => `• ${d.issue} at ${d.location}\n  Recommendation: ${d.recommendation}`).join('\n\n')}${critical.length > 3 ? `\n\n...and ${critical.length - 3} more critical issues.` : ''}`;
+    }
+    if (diagnostics.length > 0) {
+      return `Found ${diagnostics.length} issues:\n- Critical: ${critical.length}\n- Warnings: ${warnings.length}\n\nMost urgent: ${diagnostics[0].issue} at ${diagnostics[0].location}. Recommendation: ${diagnostics[0].recommendation}`;
+    }
+    return `✅ All systems operational! No critical issues detected across ${meters.length} meters.`;
+  }
+
+  // Location queries
+  if (lowerQuery.includes('location') || lowerQuery.includes('where')) {
+    const locationCounts = new Map<string, number>();
+    meters.forEach(m => {
+      locationCounts.set(m.location, (locationCounts.get(m.location) || 0) + 1);
+    });
+    const topLocations = Array.from(locationCounts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    return `Top 5 locations by meter count:\n\n${topLocations.map((l, i) => `${i + 1}. ${l[0]}: ${l[1]} meters`).join('\n')}`;
+  }
+
+  // Prepaid vs Postpaid
+  if (lowerQuery.includes('prepaid') || lowerQuery.includes('postpaid')) {
+    const prepaid = meters.filter(m => m.type === 'prepaid').length;
+    const postpaid = meters.filter(m => m.type === 'postpaid').length;
+    return `Meter Distribution:\n- Prepaid: ${prepaid} meters\n- Postpaid: ${postpaid} meters\n- Total: ${meters.length} meters`;
+  }
+
+  // Default response
+  return `I can help you with:\n\n• Consumption analysis and predictions\n• Revenue insights and top customers\n• Meter status and diagnostics\n• Location-based statistics\n• Prepaid vs Postpaid breakdown\n\nTry asking: "What's the total consumption?" or "Show me critical issues"`;
+};
+
+// Export functions for reports
+export const exportConsumptionReport = (trends: ConsumptionTrend[]): void => {
+  const csv = ['Date,Actual (kWh),Predicted (kWh),Lower Bound,Upper Bound', ...trends.map(t => `${t.date},${t.actual || ''},${t.predicted || ''},${t.lowerBound || ''},${t.upperBound || ''}`)].join('\n');
+  downloadCSV(csv, 'consumption-forecast-report.csv');
+};
+export const exportRevenueReport = (insights: RevenueInsight): void => {
+  const csv = ['Metric,Value', `Total Revenue,Ksh ${insights.totalRevenue.toLocaleString()}`, `Average Per Customer,Ksh ${insights.averagePerCustomer.toLocaleString()}`, `Projected Revenue,Ksh ${insights.projectedRevenue.toLocaleString()}`, `Growth Rate,${insights.growthRate}%`, '', 'Top Customers', 'Rank,Name,Amount (Ksh),Type', ...insights.topCustomers.map((c, i) => `${i + 1},${c.name},${c.amount.toLocaleString()},${c.type}`)].join('\n');
+  downloadCSV(csv, 'revenue-analytics-report.csv');
+};
+export const exportDiagnosticsReport = (issues: DiagnosticIssue[]): void => {
+  const csv = ['Meter ID,Customer,Location,Severity,Issue,Recommendation,Timestamp', ...issues.map(i => `${i.meterId},${i.customerName},${i.location},${i.severity},${i.issue},"${i.recommendation}",${new Date(i.timestamp).toLocaleString()}`)].join('\n');
+  downloadCSV(csv, 'diagnostics-report.csv');
+};
+const downloadCSV = (content: string, filename: string): void => {
+  const blob = new Blob([content], {
+    type: 'text/csv;charset=utf-8;'
+  });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};

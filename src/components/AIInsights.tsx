@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { BrainCircuitIcon, TrendingUpIcon, DollarSignIcon, ActivityIcon, RefreshCwIcon, DownloadIcon } from 'lucide-react';
+import { BrainCircuitIcon, TrendingUpIcon, DollarSignIcon, ActivityIcon, RefreshCwIcon, MessageSquareIcon } from 'lucide-react';
 import { ConsumptionPrediction } from './ConsumptionPrediction';
 import { RevenueAnalytics } from './RevenueAnalytics';
 import { MeterDiagnostics } from './MeterDiagnostics';
+import { AIChat } from './AIChat';
 import { analyzeConsumption, analyzeRevenue, runDiagnostics, AIAnalysisResult } from '../utils/aiService';
 import { Meter } from '../utils/meterStorage';
 interface AIInsightsProps {
@@ -13,7 +14,7 @@ export function AIInsights({
   meters,
   transactions
 }: AIInsightsProps) {
-  const [activeTab, setActiveTab] = useState<'consumption' | 'revenue' | 'diagnostics'>('consumption');
+  const [activeTab, setActiveTab] = useState<'consumption' | 'revenue' | 'diagnostics' | 'chat'>('chat');
   const [isAnalyzing, setIsAnalyzing] = useState(true);
   const [analysisResult, setAnalysisResult] = useState<AIAnalysisResult | null>(null);
   useEffect(() => {
@@ -86,15 +87,15 @@ export function AIInsights({
           <button onClick={refreshAnalysis} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors" title="Refresh Analysis">
             <RefreshCwIcon className="h-5 w-5" />
           </button>
-          <button className="flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
-            <DownloadIcon className="h-4 w-4 mr-2" />
-            Export Report
-          </button>
         </div>
       </div>
 
       {/* Navigation Tabs */}
       <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+        <button onClick={() => setActiveTab('chat')} className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'chat' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
+          <MessageSquareIcon className="h-4 w-4 mr-2" />
+          AI Assistant
+        </button>
         <button onClick={() => setActiveTab('consumption')} className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'consumption' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
           <TrendingUpIcon className="h-4 w-4 mr-2" />
           Consumption & Trends
@@ -114,6 +115,7 @@ export function AIInsights({
 
       {/* Content Area */}
       <div className="min-h-[500px]">
+        {activeTab === 'chat' && <AIChat meters={meters} transactions={transactions} />}
         {activeTab === 'consumption' && <ConsumptionPrediction data={analysisResult.consumptionTrends} />}
         {activeTab === 'revenue' && <RevenueAnalytics data={analysisResult.revenueInsights} />}
         {activeTab === 'diagnostics' && <MeterDiagnostics issues={analysisResult.diagnostics} />}

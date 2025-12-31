@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AlertTriangleIcon, CheckCircleIcon, InfoIcon, WrenchIcon, ChevronDownIcon, ChevronUpIcon, ActivityIcon } from 'lucide-react';
-import { DiagnosticIssue } from '../utils/aiService';
+import { AlertTriangleIcon, CheckCircleIcon, InfoIcon, WrenchIcon, ChevronDownIcon, ChevronUpIcon, ActivityIcon, DownloadIcon } from 'lucide-react';
+import { DiagnosticIssue, exportDiagnosticsReport } from '../utils/aiService';
 interface MeterDiagnosticsProps {
   issues: DiagnosticIssue[];
 }
@@ -38,6 +38,9 @@ export function MeterDiagnostics({
         return <InfoIcon className="h-5 w-5 text-gray-600" />;
     }
   };
+  const handleExport = () => {
+    exportDiagnosticsReport(issues);
+  };
   return <div className="space-y-6">
       {/* Health Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -74,9 +77,15 @@ export function MeterDiagnostics({
           <h3 className="font-semibold text-gray-900">
             Detected Anomalies & Recommendations
           </h3>
-          <span className="text-xs text-gray-500">
-            {issues.length} issues found
-          </span>
+          <div className="flex items-center space-x-3">
+            <span className="text-xs text-gray-500">
+              {issues.length} issues found
+            </span>
+            {issues.length > 0 && <button onClick={handleExport} className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+                <DownloadIcon className="h-4 w-4 mr-1" />
+                Export CSV
+              </button>}
+          </div>
         </div>
 
         {issues.length === 0 ? <div className="p-8 text-center">

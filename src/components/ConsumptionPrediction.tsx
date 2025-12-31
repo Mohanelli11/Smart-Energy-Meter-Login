@@ -1,7 +1,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { TrendingUpIcon, CalendarIcon, AlertTriangleIcon } from 'lucide-react';
-import { ConsumptionTrend } from '../utils/aiService';
+import { TrendingUpIcon, CalendarIcon, AlertTriangleIcon, DownloadIcon } from 'lucide-react';
+import { ConsumptionTrend, exportConsumptionReport } from '../utils/aiService';
 interface ConsumptionPredictionProps {
   data: ConsumptionTrend[];
 }
@@ -13,6 +13,9 @@ export function ConsumptionPrediction({
   const currentUsage = historicalData[historicalData.length - 1]?.actual || 0;
   const predictedUsage = forecastData[0]?.predicted || 0;
   const trend = (predictedUsage - currentUsage) / currentUsage * 100;
+  const handleExport = () => {
+    exportConsumptionReport(data);
+  };
   return <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -69,15 +72,21 @@ export function ConsumptionPrediction({
               Historical data (30 days) vs. Predictive Analysis (7 days)
             </p>
           </div>
-          <div className="flex items-center space-x-2 text-sm">
-            <span className="flex items-center">
-              <span className="w-3 h-3 bg-blue-500 rounded-full mr-1"></span>{' '}
-              Actual
-            </span>
-            <span className="flex items-center">
-              <span className="w-3 h-3 bg-purple-500 rounded-full mr-1"></span>{' '}
-              Predicted
-            </span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 text-sm">
+              <span className="flex items-center">
+                <span className="w-3 h-3 bg-blue-500 rounded-full mr-1"></span>{' '}
+                Actual
+              </span>
+              <span className="flex items-center">
+                <span className="w-3 h-3 bg-purple-500 rounded-full mr-1"></span>{' '}
+                Predicted
+              </span>
+            </div>
+            <button onClick={handleExport} className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+              <DownloadIcon className="h-4 w-4 mr-1" />
+              Export CSV
+            </button>
           </div>
         </div>
 

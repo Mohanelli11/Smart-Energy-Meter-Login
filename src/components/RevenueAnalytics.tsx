@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { DollarSignIcon, UsersIcon, TrendingUpIcon } from 'lucide-react';
-import { RevenueInsight } from '../utils/aiService';
+import { DollarSignIcon, UsersIcon, TrendingUpIcon, DownloadIcon } from 'lucide-react';
+import { RevenueInsight, exportRevenueReport } from '../utils/aiService';
 interface RevenueAnalyticsProps {
   data: RevenueInsight;
 }
@@ -14,6 +14,9 @@ export function RevenueAnalytics({
     value: c.amount,
     fullName: c.name
   }));
+  const handleExport = () => {
+    exportRevenueReport(data);
+  };
   return <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
@@ -59,9 +62,15 @@ export function RevenueAnalytics({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Top Revenue Generators
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Top Revenue Generators
+            </h3>
+            <button onClick={handleExport} className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+              <DownloadIcon className="h-4 w-4 mr-1" />
+              Export CSV
+            </button>
+          </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={topCustomerData} layout="vertical" margin={{
