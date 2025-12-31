@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, createElement } from 'react';
-import { MenuIcon, ZapIcon, LayoutDashboardIcon, CoinsIcon, FileTextIcon, CreditCardIcon, PlusCircleIcon, BoltIcon, BarChart3Icon, SettingsIcon, SearchIcon, BellIcon, HelpCircleIcon, LogOutIcon, FilterIcon, DownloadIcon, UserPlusIcon, KeyIcon } from 'lucide-react';
+import { MenuIcon, ZapIcon, LayoutDashboardIcon, CoinsIcon, FileTextIcon, CreditCardIcon, PlusCircleIcon, BoltIcon, BarChart3Icon, SettingsIcon, SearchIcon, BellIcon, HelpCircleIcon, LogOutIcon, FilterIcon, DownloadIcon, UserPlusIcon, KeyIcon, BrainCircuitIcon } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { MeterTable } from './MeterTable';
 import { AddMeterForm } from './AddMeterForm';
@@ -11,6 +11,7 @@ import { EditMeterModal } from './EditMeterModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
+import { AIInsights } from './AIInsights'; // Added import
 import { savePrepaidMeters, loadPrepaidMeters, savePostpaidMeters, loadPostpaidMeters, generateMeterReport, Meter } from '../utils/meterStorage';
 // Generate realistic data
 const generatePrepaidMeters = () => {
@@ -458,6 +459,9 @@ export function Dashboard({
               </div>
             </div>
           </div>;
+      case 'ai-insights':
+        // New Case
+        return <AIInsights meters={[...prepaidMetersState, ...postpaidMetersState]} transactions={paymentTransactionsState} />;
       case 'prepaid':
         return <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
@@ -677,6 +681,10 @@ export function Dashboard({
               <LayoutDashboardIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
             </button>
+            <button onClick={() => setActiveSection('ai-insights')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'ai-insights' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              <BrainCircuitIcon className="h-5 w-5" />
+              {!sidebarCollapsed && <span className="ml-3">AI Insights</span>}
+            </button>
             <button onClick={() => setActiveSection('prepaid')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'prepaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               <CoinsIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Prepaid Meters</span>}
@@ -722,7 +730,7 @@ export function Dashboard({
       <div className="flex-1 overflow-auto">
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            {activeSection.charAt(0).toUpperCase() + activeSection.slice(1).replace('-', ' ')}
+            {activeSection === 'ai-insights' ? 'AI Insights' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1).replace('-', ' ')}
           </h1>
           <div className="flex items-center space-x-4">
             <div className="relative">
