@@ -12,6 +12,8 @@ import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
 import { AIInsights } from './AIInsights'; // Added import
+import { APIManagement } from './APIManagement';
+import { APIAccessRequest } from './APIAccessRequest';
 import { savePrepaidMeters, loadPrepaidMeters, savePostpaidMeters, loadPostpaidMeters, generateMeterReport, Meter } from '../utils/meterStorage';
 // Generate realistic data
 const generatePrepaidMeters = () => {
@@ -484,7 +486,7 @@ export function Dashboard({
                 </button>
               </div>
             </div>
-            <MeterTable meters={prepaidMeters} type="prepaid" onView={meter => handleViewMeter(meter, 'prepaid')} onEdit={meter => handleEditMeter(meter, 'prepaid')} onDelete={meter => handleDeleteMeter(meter, 'prepaid')} />
+            <MeterTable meters={prepaidMeters} type="prepaid" onView={meter => handleViewMeter(meter, 'prepaid')} onEdit={meter => handleEditMeter(meter, 'prepaid')} onDelete={meter => handleDeleteMeter(meter, 'prepaid')} userEmail={user?.email} />
             {renderPagination(prepaidPage, filteredPrepaidMeters.length, setPrepaidPage)}
           </div>;
       case 'postpaid':
@@ -509,7 +511,7 @@ export function Dashboard({
                 </button>
               </div>
             </div>
-            <MeterTable meters={postpaidMeters} type="postpaid" onView={meter => handleViewMeter(meter, 'postpaid')} onEdit={meter => handleEditMeter(meter, 'postpaid')} onDelete={meter => handleDeleteMeter(meter, 'postpaid')} />
+            <MeterTable meters={postpaidMeters} type="postpaid" onView={meter => handleViewMeter(meter, 'postpaid')} onEdit={meter => handleEditMeter(meter, 'postpaid')} onDelete={meter => handleDeleteMeter(meter, 'postpaid')} userEmail={user?.email} />
             {renderPagination(postpaidPage, filteredPostpaidMeters.length, setPostpaidPage)}
           </div>;
       case 'payments':
@@ -657,6 +659,9 @@ export function Dashboard({
               </p>
             </div>
           </div>;
+      case 'api':
+        // API Management section - Admin only, others see request interface
+        return isAdmin ? <APIManagement userEmail={user?.email} userId={user?.email} /> : <APIAccessRequest userId={user?.email} userEmail={user?.email} userName={user?.name} />;
       default:
         return null;
     }
@@ -713,6 +718,12 @@ export function Dashboard({
               <SettingsIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Settings</span>}
             </button>
+            <button onClick={() => setActiveSection('api')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              <KeyIcon className="h-5 w-5" />
+              {!sidebarCollapsed && <span className="ml-3">
+                  {isAdmin ? 'API Management' : 'API Access'}
+                </span>}
+            </button>
           </nav>
         </div>
 
@@ -730,7 +741,7 @@ export function Dashboard({
       <div className="flex-1 overflow-auto">
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            {activeSection === 'ai-insights' ? 'AI Insights' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1).replace('-', ' ')}
+            {activeSection === 'ai-insights' ? 'AI Insights' : activeSection === 'api' ? isAdmin ? 'API Management' : 'API Access' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1).replace('-', ' ')}
           </h1>
           <div className="flex items-center space-x-4">
             <div className="relative">
