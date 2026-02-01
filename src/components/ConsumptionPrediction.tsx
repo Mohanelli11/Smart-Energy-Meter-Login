@@ -1,22 +1,37 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { TrendingUpIcon, CalendarIcon, AlertTriangleIcon, DownloadIcon } from 'lucide-react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  AreaChart,
+  Area } from
+'recharts';
+import {
+  TrendingUpIcon,
+  CalendarIcon,
+  AlertTriangleIcon,
+  DownloadIcon } from
+'lucide-react';
 import { ConsumptionTrend, exportConsumptionReport } from '../utils/aiService';
 interface ConsumptionPredictionProps {
   data: ConsumptionTrend[];
 }
-export function ConsumptionPrediction({
-  data
-}: ConsumptionPredictionProps) {
-  const historicalData = data.filter(d => d.predicted === undefined);
-  const forecastData = data.filter(d => d.predicted !== undefined);
+export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
+  const historicalData = data.filter((d) => d.predicted === undefined);
+  const forecastData = data.filter((d) => d.predicted !== undefined);
   const currentUsage = historicalData[historicalData.length - 1]?.actual || 0;
   const predictedUsage = forecastData[0]?.predicted || 0;
   const trend = (predictedUsage - currentUsage) / currentUsage * 100;
   const handleExport = () => {
     exportConsumptionReport(data);
   };
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
@@ -39,7 +54,9 @@ export function ConsumptionPrediction({
             <CalendarIcon className="h-4 w-4 text-purple-500" />
           </div>
           <p className="text-2xl font-bold text-gray-900">
-            {forecastData.reduce((sum, d) => sum + (d.predicted || 0), 0).toFixed(1)}{' '}
+            {forecastData.
+            reduce((sum, d) => sum + (d.predicted || 0), 0).
+            toFixed(1)}{' '}
             kWh
           </p>
           <p className="text-xs text-gray-500 mt-1">
@@ -52,9 +69,13 @@ export function ConsumptionPrediction({
             <h3 className="text-sm font-medium text-gray-500">
               Trend Analysis
             </h3>
-            <div className={`h-2 w-2 rounded-full ${trend >= 0 ? 'bg-green-500' : 'bg-red-500'}`} />
+            <div
+              className={`h-2 w-2 rounded-full ${trend >= 0 ? 'bg-green-500' : 'bg-red-500'}`} />
+
           </div>
-          <p className={`text-2xl font-bold ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p
+            className={`text-2xl font-bold ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+
             {trend > 0 ? '+' : ''}
             {trend.toFixed(1)}%
           </p>
@@ -83,7 +104,10 @@ export function ConsumptionPrediction({
                 Predicted
               </span>
             </div>
-            <button onClick={handleExport} className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+            <button
+              onClick={handleExport}
+              className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+
               <DownloadIcon className="h-4 w-4 mr-1" />
               Export CSV
             </button>
@@ -92,12 +116,15 @@ export function ConsumptionPrediction({
 
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{
-            top: 10,
-            right: 30,
-            left: 0,
-            bottom: 0
-          }}>
+            <AreaChart
+              data={data}
+              margin={{
+                top: 10,
+                right: 30,
+                left: 0,
+                bottom: 0
+              }}>
+
               <defs>
                 <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
@@ -108,31 +135,74 @@ export function ConsumptionPrediction({
                   <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-              <XAxis dataKey="date" tick={{
-              fontSize: 12,
-              fill: '#6B7280'
-            }} axisLine={false} tickLine={false} />
-              <YAxis tick={{
-              fontSize: 12,
-              fill: '#6B7280'
-            }} axisLine={false} tickLine={false} label={{
-              value: 'kWh',
-              angle: -90,
-              position: 'insideLeft',
-              style: {
-                fill: '#9CA3AF'
-              }
-            }} />
-              <Tooltip contentStyle={{
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              border: '1px solid #E5E7EB',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-            }} formatter={(value: number) => [`${value.toFixed(2)} kWh`, 'Consumption']} />
-              <Area type="monotone" dataKey="actual" stroke="#3B82F6" fillOpacity={1} fill="url(#colorActual)" strokeWidth={2} name="Actual Usage" />
-              <Area type="monotone" dataKey="predicted" stroke="#8B5CF6" strokeDasharray="5 5" fillOpacity={1} fill="url(#colorPredicted)" strokeWidth={2} name="Forecast" />
-              <Area type="monotone" dataKey="upperBound" stroke="transparent" fill="#8B5CF6" fillOpacity={0.1} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#E5E7EB" />
+
+              <XAxis
+                dataKey="date"
+                tick={{
+                  fontSize: 12,
+                  fill: '#6B7280'
+                }}
+                axisLine={false}
+                tickLine={false} />
+
+              <YAxis
+                tick={{
+                  fontSize: 12,
+                  fill: '#6B7280'
+                }}
+                axisLine={false}
+                tickLine={false}
+                label={{
+                  value: 'kWh',
+                  angle: -90,
+                  position: 'insideLeft',
+                  style: {
+                    fill: '#9CA3AF'
+                  }
+                }} />
+
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: '#fff',
+                  borderRadius: '8px',
+                  border: '1px solid #E5E7EB',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+                formatter={(value: number) => [
+                `${value.toFixed(2)} kWh`,
+                'Consumption']
+                } />
+
+              <Area
+                type="monotone"
+                dataKey="actual"
+                stroke="#3B82F6"
+                fillOpacity={1}
+                fill="url(#colorActual)"
+                strokeWidth={2}
+                name="Actual Usage" />
+
+              <Area
+                type="monotone"
+                dataKey="predicted"
+                stroke="#8B5CF6"
+                strokeDasharray="5 5"
+                fillOpacity={1}
+                fill="url(#colorPredicted)"
+                strokeWidth={2}
+                name="Forecast" />
+
+              <Area
+                type="monotone"
+                dataKey="upperBound"
+                stroke="transparent"
+                fill="#8B5CF6"
+                fillOpacity={0.1} />
+
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -147,5 +217,6 @@ export function ConsumptionPrediction({
           </p>
         </div>
       </div>
-    </div>;
+    </div>);
+
 }

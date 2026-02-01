@@ -4,6 +4,7 @@
  */
 
 import { logSecurityEvent } from './security';
+
 export interface APIKey {
   id: string;
   userId: string;
@@ -16,6 +17,7 @@ export interface APIKey {
   expiresAt?: string;
   permissions: string[];
 }
+
 export interface APIAccessRequest {
   id: string;
   userId: string;
@@ -27,6 +29,7 @@ export interface APIAccessRequest {
   reviewedAt?: string;
   reviewedBy?: string;
 }
+
 const API_KEYS_STORAGE_KEY = 'hydrobox_api_keys';
 const API_REQUESTS_STORAGE_KEY = 'hydrobox_api_requests';
 
@@ -38,7 +41,9 @@ export function generateAPIKey(): string {
   const length = 32;
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  const key = Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  const key = Array.from(array, (byte) =>
+  byte.toString(16).padStart(2, '0')
+  ).join('');
   return prefix + key;
 }
 
@@ -60,13 +65,20 @@ export function getAllAPIKeys(): APIKey[] {
  */
 export function getUserAPIKeys(userId: string): APIKey[] {
   const allKeys = getAllAPIKeys();
-  return allKeys.filter(key => key.userId === userId && key.status === 'active');
+  return allKeys.filter(
+    (key) => key.userId === userId && key.status === 'active'
+  );
 }
 
 /**
  * Create a new API key
  */
-export function createAPIKey(userId: string, userEmail: string, name: string, permissions: string[] = ['read']): APIKey {
+export function createAPIKey(
+userId: string,
+userEmail: string,
+name: string,
+permissions: string[] = ['read'])
+: APIKey {
   const apiKey: APIKey = {
     id: crypto.randomUUID(),
     userId,
@@ -77,14 +89,17 @@ export function createAPIKey(userId: string, userEmail: string, name: string, pe
     createdAt: new Date().toISOString(),
     permissions
   };
+
   const allKeys = getAllAPIKeys();
   allKeys.push(apiKey);
   localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(allKeys));
+
   logSecurityEvent('API_KEY_CREATED', {
     userId,
     keyId: apiKey.id,
     name
   });
+
   return apiKey;
 }
 
@@ -93,14 +108,18 @@ export function createAPIKey(userId: string, userEmail: string, name: string, pe
  */
 export function revokeAPIKey(keyId: string): boolean {
   const allKeys = getAllAPIKeys();
-  const keyIndex = allKeys.findIndex(k => k.id === keyId);
+  const keyIndex = allKeys.findIndex((k) => k.id === keyId);
+
   if (keyIndex === -1) return false;
+
   allKeys[keyIndex].status = 'revoked';
   localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(allKeys));
+
   logSecurityEvent('API_KEY_REVOKED', {
     keyId,
     userId: allKeys[keyIndex].userId
   });
+
   return true;
 }
 
@@ -109,12 +128,14 @@ export function revokeAPIKey(keyId: string): boolean {
  */
 export function deleteAPIKey(keyId: string): boolean {
   const allKeys = getAllAPIKeys();
-  const filteredKeys = allKeys.filter(k => k.id !== keyId);
+  const filteredKeys = allKeys.filter((k) => k.id !== keyId);
+
   if (filteredKeys.length === allKeys.length) return false;
+
   localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(filteredKeys));
-  logSecurityEvent('API_KEY_DELETED', {
-    keyId
-  });
+
+  logSecurityEvent('API_KEY_DELETED', { keyId });
+
   return true;
 }
 
@@ -123,7 +144,8 @@ export function deleteAPIKey(keyId: string): boolean {
  */
 export function updateAPIKeyLastUsed(keyId: string): void {
   const allKeys = getAllAPIKeys();
-  const keyIndex = allKeys.findIndex(k => k.id === keyId);
+  const keyIndex = allKeys.findIndex((k) => k.id === keyId);
+
   if (keyIndex !== -1) {
     allKeys[keyIndex].lastUsed = new Date().toISOString();
     localStorage.setItem(API_KEYS_STORAGE_KEY, JSON.stringify(allKeys));
@@ -148,7 +170,7 @@ export function getAllAPIRequests(): APIAccessRequest[] {
  */
 export function getPendingAPIRequests(): APIAccessRequest[] {
   const allRequests = getAllAPIRequests();
-  return allRequests.filter(req => req.status === 'pending');
+  return allRequests.filter((req) => req.status === 'pending');
 }
 
 /**
@@ -156,13 +178,18 @@ export function getPendingAPIRequests(): APIAccessRequest[] {
  */
 export function getUserAPIRequests(userId: string): APIAccessRequest[] {
   const allRequests = getAllAPIRequests();
-  return allRequests.filter(req => req.userId === userId);
+  return allRequests.filter((req) => req.userId === userId);
 }
 
 /**
  * Create an API access request
  */
-export function createAPIRequest(userId: string, userEmail: string, userName: string, reason: string): APIAccessRequest {
+export function createAPIRequest(
+userId: string,
+userEmail: string,
+userName: string,
+reason: string)
+: APIAccessRequest {
   const request: APIAccessRequest = {
     id: crypto.randomUUID(),
     userId,
@@ -172,56 +199,79 @@ export function createAPIRequest(userId: string, userEmail: string, userName: st
     status: 'pending',
     requestedAt: new Date().toISOString()
   };
+
   const allRequests = getAllAPIRequests();
   allRequests.push(request);
   localStorage.setItem(API_REQUESTS_STORAGE_KEY, JSON.stringify(allRequests));
+
   logSecurityEvent('API_ACCESS_REQUESTED', {
     userId,
     requestId: request.id
   });
+
   return request;
 }
 
 /**
  * Approve an API access request
  */
-export function approveAPIRequest(requestId: string, reviewerId: string, keyName: string): APIKey | null {
+export function approveAPIRequest(
+requestId: string,
+reviewerId: string,
+keyName: string)
+: APIKey | null {
   const allRequests = getAllAPIRequests();
-  const requestIndex = allRequests.findIndex(r => r.id === requestId);
+  const requestIndex = allRequests.findIndex((r) => r.id === requestId);
+
   if (requestIndex === -1) return null;
+
   const request = allRequests[requestIndex];
   request.status = 'approved';
   request.reviewedAt = new Date().toISOString();
   request.reviewedBy = reviewerId;
+
   localStorage.setItem(API_REQUESTS_STORAGE_KEY, JSON.stringify(allRequests));
 
   // Create API key for the user
-  const apiKey = createAPIKey(request.userId, request.userEmail, keyName, ['read', 'write']);
+  const apiKey = createAPIKey(request.userId, request.userEmail, keyName, [
+  'read',
+  'write']
+  );
+
   logSecurityEvent('API_ACCESS_APPROVED', {
     requestId,
     userId: request.userId,
     reviewerId,
     keyId: apiKey.id
   });
+
   return apiKey;
 }
 
 /**
  * Reject an API access request
  */
-export function rejectAPIRequest(requestId: string, reviewerId: string): boolean {
+export function rejectAPIRequest(
+requestId: string,
+reviewerId: string)
+: boolean {
   const allRequests = getAllAPIRequests();
-  const requestIndex = allRequests.findIndex(r => r.id === requestId);
+  const requestIndex = allRequests.findIndex((r) => r.id === requestId);
+
   if (requestIndex === -1) return false;
+
   allRequests[requestIndex].status = 'rejected';
   allRequests[requestIndex].reviewedAt = new Date().toISOString();
   allRequests[requestIndex].reviewedBy = reviewerId;
+
   localStorage.setItem(API_REQUESTS_STORAGE_KEY, JSON.stringify(allRequests));
+
   logSecurityEvent('API_ACCESS_REJECTED', {
     requestId,
     userId: allRequests[requestIndex].userId,
     reviewerId
   });
+
   return true;
 }
 
@@ -238,5 +288,5 @@ export function hasAPIAccess(userId: string): boolean {
  */
 export function hasPendingRequest(userId: string): boolean {
   const userRequests = getUserAPIRequests(userId);
-  return userRequests.some(req => req.status === 'pending');
+  return userRequests.some((req) => req.status === 'pending');
 }

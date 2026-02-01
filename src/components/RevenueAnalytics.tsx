@@ -1,15 +1,30 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { DollarSignIcon, UsersIcon, TrendingUpIcon, DownloadIcon } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell } from
+'recharts';
+import {
+  DollarSignIcon,
+  UsersIcon,
+  TrendingUpIcon,
+  DownloadIcon } from
+'lucide-react';
 import { RevenueInsight, exportRevenueReport } from '../utils/aiService';
 interface RevenueAnalyticsProps {
   data: RevenueInsight;
 }
-export function RevenueAnalytics({
-  data
-}: RevenueAnalyticsProps) {
+export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
   const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-  const topCustomerData = data.topCustomers.map(c => ({
+  const topCustomerData = data.topCustomers.map((c) => ({
     name: c.name.split(' ')[0],
     value: c.amount,
     fullName: c.name
@@ -17,7 +32,8 @@ export function RevenueAnalytics({
   const handleExport = () => {
     exportRevenueReport(data);
   };
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
@@ -40,8 +56,8 @@ export function RevenueAnalytics({
           <p className="text-2xl font-bold text-gray-900">
             Ksh{' '}
             {data.averagePerCustomer.toLocaleString(undefined, {
-            maximumFractionDigits: 0
-          })}
+              maximumFractionDigits: 0
+            })}
           </p>
           <p className="text-xs text-gray-500 mt-1">Revenue per active meter</p>
         </div>
@@ -66,29 +82,61 @@ export function RevenueAnalytics({
             <h3 className="text-lg font-semibold text-gray-900">
               Top Revenue Generators
             </h3>
-            <button onClick={handleExport} className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+            <button
+              onClick={handleExport}
+              className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
+
               <DownloadIcon className="h-4 w-4 mr-1" />
               Export CSV
             </button>
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={topCustomerData} layout="vertical" margin={{
-              top: 5,
-              right: 30,
-              left: 40,
-              bottom: 5
-            }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+              <BarChart
+                data={topCustomerData}
+                layout="vertical"
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 40,
+                  bottom: 5
+                }}>
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  horizontal={true}
+                  vertical={false} />
+
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" width={80} tick={{
-                fontSize: 12
-              }} />
-                <Tooltip formatter={(value: number) => [`Ksh ${value.toLocaleString()}`, 'Revenue']} cursor={{
-                fill: '#F3F4F6'
-              }} />
-                <Bar dataKey="value" fill="#3B82F6" radius={[0, 4, 4, 0]} barSize={30}>
-                  {topCustomerData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={80}
+                  tick={{
+                    fontSize: 12
+                  }} />
+
+                <Tooltip
+                  formatter={(value: number) => [
+                  `Ksh ${value.toLocaleString()}`,
+                  'Revenue']
+                  }
+                  cursor={{
+                    fill: '#F3F4F6'
+                  }} />
+
+                <Bar
+                  dataKey="value"
+                  fill="#3B82F6"
+                  radius={[0, 4, 4, 0]}
+                  barSize={30}>
+
+                  {topCustomerData.map((entry, index) =>
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]} />
+
+                  )}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -102,10 +150,26 @@ export function RevenueAnalytics({
           <div className="h-[300px] w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={topCustomerData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} fill="#8884d8" paddingAngle={5} dataKey="value">
-                  {topCustomerData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                <Pie
+                  data={topCustomerData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  fill="#8884d8"
+                  paddingAngle={5}
+                  dataKey="value">
+
+                  {topCustomerData.map((entry, index) =>
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]} />
+
+                  )}
                 </Pie>
-                <Tooltip formatter={(value: number) => `Ksh ${value.toLocaleString()}`} />
+                <Tooltip
+                  formatter={(value: number) => `Ksh ${value.toLocaleString()}`} />
+
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -116,12 +180,13 @@ export function RevenueAnalytics({
               <span className="font-bold text-gray-900">
                 Ksh{' '}
                 {data.projectedRevenue.toLocaleString(undefined, {
-                maximumFractionDigits: 0
-              })}
+                  maximumFractionDigits: 0
+                })}
               </span>
             </p>
           </div>
         </div>
       </div>
-    </div>;
+    </div>);
+
 }

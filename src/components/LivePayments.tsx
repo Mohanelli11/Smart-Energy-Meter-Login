@@ -10,22 +10,33 @@ interface Payment {
 export function LivePayments() {
   const [payments, setPayments] = useState<Payment[]>([]);
   useEffect(() => {
-    const accounts = [{
+    const accounts = [
+    {
       id: 'MET-1234-2023',
       name: 'Jane Wanjiku'
-    }, {
+    },
+    {
       id: 'MET-5678-2023',
       name: 'Paul Otieno'
-    }, {
+    },
+    {
       id: 'MET-9012-2023',
       name: 'Mary Auma'
-    }, {
+    },
+    {
       id: 'MET-3456-2023',
       name: 'Peter Mwangi'
     }];
-    const phones = ['254712345678', '254723456789', '254734567890', '254745678901'];
+
+    const phones = [
+    '254712345678',
+    '254723456789',
+    '254734567890',
+    '254745678901'];
+
     const interval = setInterval(() => {
-      const randomAccount = accounts[Math.floor(Math.random() * accounts.length)];
+      const randomAccount =
+      accounts[Math.floor(Math.random() * accounts.length)];
       const randomPhone = phones[Math.floor(Math.random() * phones.length)];
       const randomAmount = Math.floor(Math.random() * 5000) + 500;
       const now = new Date();
@@ -39,11 +50,12 @@ export function LivePayments() {
         timestamp: `${dateString}, ${timeString}`,
         status: 'Processed'
       };
-      setPayments(prev => [newPayment, ...prev].slice(0, 10));
+      setPayments((prev) => [newPayment, ...prev].slice(0, 10));
     }, 10000);
     return () => clearInterval(interval);
   }, []);
-  return <div className="bg-white p-6 rounded-lg shadow">
+  return (
+    <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Live Payments</h2>
         <div className="flex items-center">
@@ -78,7 +90,8 @@ export function LivePayments() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {payments.map((payment, index) => <tr key={index}>
+            {payments.map((payment, index) =>
+            <tr key={index}>
                 <td className="px-6 py-4 whitespace-nowrap">
                   {payment.transactionId}
                 </td>
@@ -97,9 +110,11 @@ export function LivePayments() {
                     {payment.status}
                   </span>
                 </td>
-              </tr>)}
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
-    </div>;
+    </div>);
+
 }

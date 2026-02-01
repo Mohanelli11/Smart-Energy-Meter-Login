@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { UserIcon, LockIcon, LogInIcon, AlertTriangleIcon } from 'lucide-react';
-import { validateEmail, validatePassword, sanitizeString } from '../utils/validation';
+import {
+  validateEmail,
+  validatePassword,
+  sanitizeString } from
+'../utils/validation';
 import { checkLoginRateLimit, resetRateLimit } from '../utils/rateLimiter';
 import { logSecurityEvent } from '../utils/security';
 interface LoginFormProps {
@@ -12,10 +16,7 @@ interface LoginFormProps {
     role: string;
   }>;
 }
-export function LoginForm({
-  onLogin,
-  userAccounts
-}: LoginFormProps) {
+export function LoginForm({ onLogin, userAccounts }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -49,10 +50,14 @@ export function LoginForm({
       return;
     }
     // Find user account
-    const account = userAccounts.find(acc => acc.email.toLowerCase() === sanitizedEmail.toLowerCase());
+    const account = userAccounts.find(
+      (acc) => acc.email.toLowerCase() === sanitizedEmail.toLowerCase()
+    );
     // Check if email exists
     if (!account) {
-      setError('Access denied. This email is not authorized to access the system.');
+      setError(
+        'Access denied. This email is not authorized to access the system.'
+      );
       logSecurityEvent('LOGIN_FAILED', {
         email: sanitizedEmail,
         reason: 'email_not_found'
@@ -83,7 +88,8 @@ export function LoginForm({
       accountType: Math.random() > 0.5 ? 'prepaid' : 'postpaid'
     });
   };
-  return <div className="max-w-md w-full">
+  return (
+    <div className="max-w-md w-full">
       <div className="text-center mb-10">
         <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
         <p className="text-gray-600 mt-2">
@@ -92,7 +98,8 @@ export function LoginForm({
       </div>
 
       {/* Rate Limit Warning */}
-      {isRateLimited && <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+      {isRateLimited &&
+      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
           <div className="flex items-start">
             <AlertTriangleIcon className="h-5 w-5 text-red-600 mr-2 mt-0.5" />
             <div>
@@ -102,49 +109,89 @@ export function LoginForm({
               <p className="text-sm text-red-700 mt-1">{rateLimitMessage}</p>
             </div>
           </div>
-        </div>}
+        </div>
+      }
 
       {/* Error Message */}
-      {error && !isRateLimited && <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+      {error && !isRateLimited &&
+      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
           <p className="text-sm text-red-800">{error}</p>
-        </div>}
+        </div>
+      }
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <UserIcon className="h-5 w-5 text-gray-400" />
           </div>
-          <input type="email" value={email} onChange={e => {
-          setEmail(e.target.value);
-          setError('');
-          setIsRateLimited(false);
-        }} className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Email Address" required maxLength={254} disabled={isRateLimited} autoComplete="email" />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError('');
+              setIsRateLimited(false);
+            }}
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Email Address"
+            required
+            maxLength={254}
+            disabled={isRateLimited}
+            autoComplete="email" />
+
         </div>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <LockIcon className="h-5 w-5 text-gray-400" />
           </div>
-          <input type="password" value={password} onChange={e => {
-          setPassword(e.target.value);
-          setError('');
-          setIsRateLimited(false);
-        }} className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Password" required maxLength={128} disabled={isRateLimited} autoComplete="current-password" />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError('');
+              setIsRateLimited(false);
+            }}
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Password"
+            required
+            maxLength={128}
+            disabled={isRateLimited}
+            autoComplete="current-password" />
+
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" disabled={isRateLimited} />
-            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              disabled={isRateLimited} />
+
+            <label
+              htmlFor="remember-me"
+              className="ml-2 block text-sm text-gray-700">
+
               Remember me
             </label>
           </div>
           <div className="text-sm">
-            <a href="#" className="font-medium text-blue-600 hover:text-blue-500" onClick={e => e.preventDefault()}>
+            <a
+              href="#"
+              className="font-medium text-blue-600 hover:text-blue-500"
+              onClick={(e) => e.preventDefault()}>
+
               Forgot your password?
             </a>
           </div>
         </div>
         <div>
-          <button type="submit" disabled={isRateLimited} className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
+          <button
+            type="submit"
+            disabled={isRateLimited}
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
+
             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
               <LogInIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
             </span>
@@ -177,5 +224,6 @@ export function LoginForm({
           security.
         </p>
       </div>
-    </div>;
+    </div>);
+
 }

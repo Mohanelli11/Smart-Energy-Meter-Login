@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { KeyIcon, SendIcon, ClockIcon, CheckCircleIcon, XCircleIcon, AlertCircleIcon } from 'lucide-react';
-import { getUserAPIRequests, getUserAPIKeys, createAPIRequest, hasPendingRequest, APIAccessRequest as APIRequest, APIKey } from '../utils/apiKeyStorage';
+import {
+  KeyIcon,
+  SendIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  AlertCircleIcon } from
+'lucide-react';
+import {
+  getUserAPIRequests,
+  getUserAPIKeys,
+  createAPIRequest,
+  hasPendingRequest,
+  APIAccessRequest as APIRequest,
+  APIKey } from
+'../utils/apiKeyStorage';
 interface APIAccessRequestProps {
   userId: string;
   userEmail: string;
@@ -58,7 +72,8 @@ export function APIAccessRequest({
         return 'bg-gray-100 text-gray-800';
     }
   };
-  return <div className="space-y-6">
+  return (
+    <div className="space-y-6">
       {/* Header */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <div className="flex items-center justify-between">
@@ -71,20 +86,30 @@ export function APIAccessRequest({
               Request API access to integrate with the Hydrobox platform
             </p>
           </div>
-          {apiKeys.length === 0 && !hasPending && <button onClick={() => setShowRequestForm(true)} className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          {apiKeys.length === 0 && !hasPending &&
+          <button
+            onClick={() => setShowRequestForm(true)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+
               <SendIcon className="h-5 w-5 mr-2" />
               Request Access
-            </button>}
+            </button>
+          }
         </div>
       </div>
 
       {/* Active API Keys */}
-      {apiKeys.length > 0 && <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      {apiKeys.length > 0 &&
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Your API Keys
           </h3>
           <div className="space-y-4">
-            {apiKeys.map(key => <div key={key.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+            {apiKeys.map((key) =>
+          <div
+            key={key.id}
+            className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-gray-900">{key.name}</h4>
                   <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
@@ -98,25 +123,35 @@ export function APIAccessRequest({
                   <span>
                     Created: {new Date(key.createdAt).toLocaleDateString()}
                   </span>
-                  {key.lastUsed && <span>
+                  {key.lastUsed &&
+              <span>
                       Last used: {new Date(key.lastUsed).toLocaleDateString()}
-                    </span>}
+                    </span>
+              }
                 </div>
-              </div>)}
+              </div>
+          )}
           </div>
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
               📚 Check out the{' '}
-              <a href="/api/README.md" target="_blank" rel="noopener noreferrer" className="font-medium underline">
+              <a
+              href="/api/README.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium underline">
+
                 API Documentation
               </a>{' '}
               to learn how to use your API key.
             </p>
           </div>
-        </div>}
+        </div>
+      }
 
       {/* Pending Request Notice */}
-      {hasPending && apiKeys.length === 0 && <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+      {hasPending && apiKeys.length === 0 &&
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
           <div className="flex items-start">
             <ClockIcon className="h-6 w-6 text-yellow-600 mr-3 mt-0.5" />
             <div>
@@ -129,22 +164,28 @@ export function APIAccessRequest({
               </p>
             </div>
           </div>
-        </div>}
+        </div>
+      }
 
       {/* Request History */}
-      {requests.length > 0 && <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {requests.length > 0 &&
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
               Request History
             </h3>
           </div>
           <div className="divide-y divide-gray-200">
-            {requests.map(request => <div key={request.id} className="p-6">
+            {requests.map((request) =>
+          <div key={request.id} className="p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(request.status)}
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
-                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                    <span
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
+
+                      {request.status.charAt(0).toUpperCase() +
+                  request.status.slice(1)}
                     </span>
                   </div>
                   <span className="text-sm text-gray-500">
@@ -156,16 +197,21 @@ export function APIAccessRequest({
                     <strong>Reason:</strong> {request.reason}
                   </p>
                 </div>
-                {request.reviewedAt && <p className="text-sm text-gray-500 mt-2">
+                {request.reviewedAt &&
+            <p className="text-sm text-gray-500 mt-2">
                     Reviewed:{' '}
                     {new Date(request.reviewedAt).toLocaleDateString()}
-                  </p>}
-              </div>)}
+                  </p>
+            }
+              </div>
+          )}
           </div>
-        </div>}
+        </div>
+      }
 
       {/* No Access State */}
-      {apiKeys.length === 0 && !hasPending && requests.length === 0 && <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+      {apiKeys.length === 0 && !hasPending && requests.length === 0 &&
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
           <KeyIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
             No API Access Yet
@@ -174,13 +220,18 @@ export function APIAccessRequest({
             Request API access to start building integrations with the Hydrobox
             SmartMeter platform. An administrator will review your request.
           </p>
-          <button onClick={() => setShowRequestForm(true)} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+          onClick={() => setShowRequestForm(true)}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+
             Request API Access
           </button>
-        </div>}
+        </div>
+      }
 
       {/* Request Form Modal */}
-      {showRequestForm && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      {showRequestForm &&
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
             <h3 className="text-xl font-bold text-gray-900 mb-4">
               Request API Access
@@ -189,7 +240,14 @@ export function APIAccessRequest({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Why do you need API access?
               </label>
-              <textarea value={reason} onChange={e => setReason(e.target.value)} placeholder="Please describe your use case and what you plan to build..." className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" rows={4} maxLength={500} />
+              <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Please describe your use case and what you plan to build..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={4}
+              maxLength={500} />
+
               <p className="text-xs text-gray-500 mt-1">
                 {reason.length}/500 characters
               </p>
@@ -201,17 +259,26 @@ export function APIAccessRequest({
               </p>
             </div>
             <div className="flex justify-end space-x-3">
-              <button onClick={() => {
-            setShowRequestForm(false);
-            setReason('');
-          }} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <button
+              onClick={() => {
+                setShowRequestForm(false);
+                setReason('');
+              }}
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+
                 Cancel
               </button>
-              <button onClick={handleSubmitRequest} disabled={!reason.trim()} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+              <button
+              onClick={handleSubmitRequest}
+              disabled={!reason.trim()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+
                 Submit Request
               </button>
             </div>
           </div>
-        </div>}
-    </div>;
+        </div>
+      }
+    </div>);
+
 }

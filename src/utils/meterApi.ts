@@ -29,11 +29,18 @@ export interface MeterReading {
   signalStrength?: number;
   batteryLevel?: number;
 }
+
 export interface MeterCommand {
-  command: 'disconnect' | 'reconnect' | 'update_tariff' | 'update_config' | 'reboot';
+  command:
+  'disconnect' |
+  'reconnect' |
+  'update_tariff' |
+  'update_config' |
+  'reboot';
   params?: Record<string, any>;
   scheduledAt?: string;
 }
+
 export interface MeterStatus {
   deviceId: string;
   status: 'online' | 'offline' | 'error';
@@ -42,6 +49,7 @@ export interface MeterStatus {
   batteryLevel?: number;
   uptime: number;
 }
+
 export interface APIResponse<T = any> {
   success: boolean;
   data?: T;
@@ -75,6 +83,7 @@ class MeterAPIClient {
     this.apiKey = config.apiKey || null;
     this.authToken = config.authToken || null;
     this.deviceId = config.deviceId || null;
+
     logSecurityEvent('API_CLIENT_INITIALIZED', {
       hasApiKey: !!this.apiKey,
       hasAuthToken: !!this.authToken,
@@ -85,22 +94,31 @@ class MeterAPIClient {
   /**
    * Generate request signature for authentication
    */
-  private async generateSignature(method: string, path: string, body: string, timestamp: string, nonce: string): Promise<string> {
+  private async generateSignature(
+  method: string,
+  path: string,
+  body: string,
+  timestamp: string,
+  nonce: string)
+  : Promise<string> {
     const message = `${timestamp}${method}${path}${body}${nonce}`;
     const encoder = new TextEncoder();
     const data = encoder.encode(message);
     const keyData = encoder.encode(this.apiKey || '');
 
     // Import key
-    const key = await crypto.subtle.importKey('raw', keyData, {
-      name: 'HMAC',
-      hash: 'SHA-256'
-    }, false, ['sign']);
+    const key = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
 
     // Generate signature
     const signature = await crypto.subtle.sign('HMAC', key, data);
     const hashArray = Array.from(new Uint8Array(signature));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   /**
@@ -109,24 +127,26 @@ class MeterAPIClient {
   private generateNonce(): string {
     const array = new Uint8Array(16);
     crypto.getRandomValues(array);
-    return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+      ''
+    );
   }
 
   /**
    * Make authenticated API request
    */
-  private async request<T = any>(method: string, endpoint: string, data?: any, options: {
-    isDeviceRequest?: boolean;
-    retry?: number;
-  } = {}): Promise<APIResponse<T>> {
-    const {
-      isDeviceRequest = false,
-      retry = 0
-    } = options;
+  private async request<T = any>(
+  method: string,
+  endpoint: string,
+  data?: any,
+  options: {isDeviceRequest?: boolean;retry?: number;} = {})
+  : Promise<APIResponse<T>> {
+    const { isDeviceRequest = false, retry = 0 } = options;
     const url = `${API_CONFIG.baseURL}${endpoint}`;
     const timestamp = new Date().toISOString();
     const nonce = this.generateNonce();
     const body = data ? JSON.stringify(data) : '';
+
     try {
       // Build headers
       const headers: Record<string, string> = {
@@ -134,6 +154,7 @@ class MeterAPIClient {
         'X-Request-ID': nonce,
         'X-Timestamp': timestamp
       };
+
       if (isDeviceRequest && this.deviceId && this.apiKey) {
         // Device authentication
         headers['X-Device-ID'] = this.deviceId;
@@ -141,7 +162,13 @@ class MeterAPIClient {
         headers['X-Nonce'] = nonce;
 
         // Generate signature
-        const signature = await this.generateSignature(method, endpoint, body, timestamp, nonce);
+        const signature = await this.generateSignature(
+          method,
+          endpoint,
+          body,
+          timestamp,
+          nonce
+        );
         headers['X-Signature'] = signature;
       } else if (this.authToken) {
         // User authentication
@@ -153,12 +180,14 @@ class MeterAPIClient {
       // Make request with timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeout);
+
       const response = await fetch(url, {
         method,
         headers,
         body: data ? body : undefined,
         signal: controller.signal
       });
+
       clearTimeout(timeoutId);
 
       // Parse response
@@ -172,7 +201,10 @@ class MeterAPIClient {
           retryAfter,
           remaining: response.headers.get('X-RateLimit-Remaining')
         });
-        throw new Error(`Rate limit exceeded. Retry after ${retryAfter} seconds.`);
+
+        throw new Error(
+          `Rate limit exceeded. Retry after ${retryAfter} seconds.`
+        );
       }
 
       // Handle errors
@@ -182,6 +214,7 @@ class MeterAPIClient {
           status: response.status,
           error: responseData.error
         });
+
         return {
           success: false,
           error: responseData.error || {
@@ -190,11 +223,13 @@ class MeterAPIClient {
           }
         };
       }
+
       logSecurityEvent('API_REQUEST_SUCCESS', {
         endpoint,
         method,
         status: response.status
       });
+
       return responseData;
     } catch (error: any) {
       // Retry logic for network errors
@@ -204,17 +239,22 @@ class MeterAPIClient {
           attempt: retry + 1,
           error: error.message
         });
-        await new Promise(resolve => setTimeout(resolve, API_CONFIG.retryDelay * (retry + 1)));
+
+        await new Promise((resolve) =>
+        setTimeout(resolve, API_CONFIG.retryDelay * (retry + 1))
+        );
         return this.request<T>(method, endpoint, data, {
           ...options,
           retry: retry + 1
         });
       }
+
       logSecurityEvent('API_REQUEST_ERROR', {
         endpoint,
         error: error.message,
         stack: error.stack
       });
+
       return {
         success: false,
         error: {
@@ -234,10 +274,7 @@ class MeterAPIClient {
     meterNumber: string;
     firmwareVersion: string;
     hardwareVersion: string;
-    location?: {
-      latitude: number;
-      longitude: number;
-    };
+    location?: {latitude: number;longitude: number;};
   }): Promise<APIResponse> {
     return this.request('POST', '/meters/register', data, {
       isDeviceRequest: true
@@ -247,7 +284,10 @@ class MeterAPIClient {
   /**
    * Send meter reading to server
    */
-  async sendReading(deviceId: string, reading: MeterReading): Promise<APIResponse> {
+  async sendReading(
+  deviceId: string,
+  reading: MeterReading)
+  : Promise<APIResponse> {
     // Validate reading data
     const validation = validateMeterReading(reading);
     if (!validation.valid) {
@@ -255,6 +295,7 @@ class MeterAPIClient {
         deviceId,
         errors: validation.errors
       });
+
       return {
         success: false,
         error: {
@@ -264,6 +305,7 @@ class MeterAPIClient {
         }
       };
     }
+
     return this.request('POST', `/meters/${deviceId}/readings`, reading, {
       isDeviceRequest: true
     });
@@ -272,7 +314,10 @@ class MeterAPIClient {
   /**
    * Send heartbeat/health check
    */
-  async sendHeartbeat(deviceId: string, status: Partial<MeterStatus>): Promise<APIResponse> {
+  async sendHeartbeat(
+  deviceId: string,
+  status: Partial<MeterStatus>)
+  : Promise<APIResponse> {
     return this.request('POST', `/meters/${deviceId}/heartbeat`, status, {
       isDeviceRequest: true
     });
@@ -290,11 +335,14 @@ class MeterAPIClient {
   /**
    * Report meter event (tamper, error, etc.)
    */
-  async reportEvent(deviceId: string, event: {
+  async reportEvent(
+  deviceId: string,
+  event: {
     eventType: string;
     severity: 'info' | 'warning' | 'critical';
     details: any;
-  }): Promise<APIResponse> {
+  })
+  : Promise<APIResponse> {
     return this.request('POST', `/meters/${deviceId}/events`, event, {
       isDeviceRequest: true
     });
@@ -309,7 +357,9 @@ class MeterAPIClient {
     status?: string;
     location?: string;
   }): Promise<APIResponse> {
-    const queryString = params ? '?' + new URLSearchParams(params as any).toString() : '';
+    const queryString = params ?
+    '?' + new URLSearchParams(params as any).toString() :
+    '';
     return this.request('GET', `/dashboard/meters${queryString}`);
   }
 
@@ -323,19 +373,26 @@ class MeterAPIClient {
   /**
    * Get meter readings (Dashboard)
    */
-  async getMeterReadings(meterId: string, params?: {
-    from?: string;
-    to?: string;
-    limit?: number;
-  }): Promise<APIResponse> {
-    const queryString = params ? '?' + new URLSearchParams(params as any).toString() : '';
-    return this.request('GET', `/dashboard/meters/${meterId}/readings${queryString}`);
+  async getMeterReadings(
+  meterId: string,
+  params?: {from?: string;to?: string;limit?: number;})
+  : Promise<APIResponse> {
+    const queryString = params ?
+    '?' + new URLSearchParams(params as any).toString() :
+    '';
+    return this.request(
+      'GET',
+      `/dashboard/meters/${meterId}/readings${queryString}`
+    );
   }
 
   /**
    * Send command to meter (Dashboard)
    */
-  async sendCommand(meterId: string, command: MeterCommand): Promise<APIResponse> {
+  async sendCommand(
+  meterId: string,
+  command: MeterCommand)
+  : Promise<APIResponse> {
     // Validate command
     const validation = validateMeterCommand(command);
     if (!validation.valid) {
@@ -344,6 +401,7 @@ class MeterAPIClient {
         command: command.command,
         errors: validation.errors
       });
+
       return {
         success: false,
         error: {
@@ -353,7 +411,12 @@ class MeterAPIClient {
         }
       };
     }
-    return this.request('POST', `/dashboard/meters/${meterId}/commands`, command);
+
+    return this.request(
+      'POST',
+      `/dashboard/meters/${meterId}/commands`,
+      command
+    );
   }
 
   /**

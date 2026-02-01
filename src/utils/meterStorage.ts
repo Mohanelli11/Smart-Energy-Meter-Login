@@ -10,6 +10,7 @@ export interface MeterReport {
   signalStrength: string;
   status: 'online' | 'offline';
 }
+
 export interface Meter {
   accountNo: string;
   customerName: string;
@@ -26,6 +27,7 @@ export interface Meter {
   comments?: string;
   lastReport?: MeterReport;
 }
+
 const PREPAID_STORAGE_KEY = 'hydrobox_prepaid_meters';
 const POSTPAID_STORAGE_KEY = 'hydrobox_postpaid_meters';
 
@@ -39,7 +41,9 @@ export function generateMeterReport(): MeterReport {
     powerFactor: 0.85 + Math.random() * 0.15,
     frequency: 49.8 + Math.random() * 0.4,
     consumption: 10 + Math.random() * 15,
-    signalStrength: ['Excellent', 'Good', 'Fair', 'Poor'][Math.floor(Math.random() * 4)],
+    signalStrength: ['Excellent', 'Good', 'Fair', 'Poor'][
+    Math.floor(Math.random() * 4)],
+
     status: Math.random() > 0.1 ? 'online' : 'offline'
   };
 }

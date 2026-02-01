@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { ZapIcon, LogOutIcon, TrendingUpIcon, BoltIcon, DollarSignIcon, ClockIcon, ActivityIcon } from 'lucide-react';
+import {
+  ZapIcon,
+  LogOutIcon,
+  TrendingUpIcon,
+  BoltIcon,
+  DollarSignIcon,
+  ClockIcon,
+  ActivityIcon } from
+'lucide-react';
 import { ConsumptionGraph } from './ConsumptionGraph';
 interface MeterReading {
   timestamp: Date;
@@ -22,7 +30,9 @@ export function IndividualMeterView({
   meter,
   onLogout
 }: IndividualMeterViewProps) {
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
   const [currentReading, setCurrentReading] = useState<MeterReading>({
     timestamp: new Date(),
     voltage: 230 + Math.random() * 10,
@@ -33,35 +43,42 @@ export function IndividualMeterView({
   const [readings, setReadings] = useState<MeterReading[]>([]);
   const [consumptionData, setConsumptionData] = useState<any[]>([]);
   // Generate payment history
-  const paymentHistory: Payment[] = [{
+  const paymentHistory: Payment[] = [
+  {
     date: '10 Jan 2025',
     amount: '1,500.00',
     units: '96.77',
     transactionId: 'TXN-001'
-  }, {
+  },
+  {
     date: '25 Dec 2024',
     amount: '2,000.00',
     units: '129.03',
     transactionId: 'TXN-002'
-  }, {
+  },
+  {
     date: '15 Dec 2024',
     amount: '1,200.00',
     units: '77.42',
     transactionId: 'TXN-003'
   }];
+
   // Simulate meter readings every 10 minutes
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newReading: MeterReading = {
-        timestamp: new Date(),
-        voltage: 220 + Math.random() * 20,
-        current: 5 + Math.random() * 15,
-        units: currentReading.units + Math.random() * 0.5,
-        balance: currentReading.balance - Math.random() * 2 // Decrease balance
-      };
-      setCurrentReading(newReading);
-      setReadings(prev => [...prev, newReading].slice(-144)); // Keep last 24 hours (144 readings)
-    }, 10 * 60 * 1000); // 10 minutes
+    const interval = setInterval(
+      () => {
+        const newReading: MeterReading = {
+          timestamp: new Date(),
+          voltage: 220 + Math.random() * 20,
+          current: 5 + Math.random() * 15,
+          units: currentReading.units + Math.random() * 0.5,
+          balance: currentReading.balance - Math.random() * 2 // Decrease balance
+        };
+        setCurrentReading(newReading);
+        setReadings((prev) => [...prev, newReading].slice(-144)); // Keep last 24 hours (144 readings)
+      },
+      10 * 60 * 1000
+    ); // 10 minutes
     return () => clearInterval(interval);
   }, [currentReading]);
   // Generate consumption data for selected date
@@ -71,7 +88,7 @@ export function IndividualMeterView({
     const isToday = selected.toDateString() === new Date().toDateString();
     if (isToday && readings.length > 0) {
       // Use actual readings for today
-      readings.forEach(reading => {
+      readings.forEach((reading) => {
         data.push({
           time: reading.timestamp.toLocaleTimeString('en-US', {
             hour: '2-digit',
@@ -94,11 +111,13 @@ export function IndividualMeterView({
     setConsumptionData(data);
   }, [selectedDate, readings]);
   const getMeterStatus = () => {
-    if (currentReading.balance > 50) return {
+    if (currentReading.balance > 50)
+    return {
       text: 'Active',
       color: 'bg-green-100 text-green-800'
     };
-    if (currentReading.balance > 0) return {
+    if (currentReading.balance > 0)
+    return {
       text: 'Low Balance',
       color: 'bg-yellow-100 text-yellow-800'
     };
@@ -108,7 +127,8 @@ export function IndividualMeterView({
     };
   };
   const status = getMeterStatus();
-  return <div className="min-h-screen bg-gray-100">
+  return (
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -124,7 +144,10 @@ export function IndividualMeterView({
                 <p className="text-sm text-gray-600">{meter.accountNo}</p>
               </div>
             </div>
-            <button onClick={onLogout} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <button
+              onClick={onLogout}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+
               <LogOutIcon className="h-4 w-4 mr-2" />
               Logout
             </button>
@@ -157,7 +180,9 @@ export function IndividualMeterView({
             </div>
             <div>
               <p className="text-sm text-gray-600">Status</p>
-              <span className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${status.color}`}>
+              <span
+                className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${status.color}`}>
+
                 {status.text}
               </span>
             </div>
@@ -204,7 +229,9 @@ export function IndividualMeterView({
               <p className="text-sm text-gray-600">Balance</p>
               <DollarSignIcon className="h-5 w-5 text-purple-500" />
             </div>
-            <p className={`text-2xl font-bold ${currentReading.balance > 50 ? 'text-green-600' : 'text-red-600'}`}>
+            <p
+              className={`text-2xl font-bold ${currentReading.balance > 50 ? 'text-green-600' : 'text-red-600'}`}>
+
               Ksh {currentReading.balance.toFixed(2)}
             </p>
             <p className="text-xs text-gray-500 mt-1">Remaining credit</p>
@@ -229,13 +256,25 @@ export function IndividualMeterView({
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold">Consumption Overview</h3>
-              <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} max={new Date().toISOString().split('T')[0]} className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
             </div>
-            <ConsumptionGraph data={consumptionData} title={`Energy Consumption - ${new Date(selectedDate).toLocaleDateString('en-US', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric'
-          })}`} height={350} />
+            <ConsumptionGraph
+              data={consumptionData}
+              title={`Energy Consumption - ${new Date(
+                selectedDate
+              ).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}`}
+              height={350} />
+
           </div>
         </div>
 
@@ -262,7 +301,8 @@ export function IndividualMeterView({
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {paymentHistory.map((payment, index) => <tr key={index}>
+                  {paymentHistory.map((payment, index) =>
+                  <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {payment.date}
                       </td>
@@ -275,12 +315,14 @@ export function IndividualMeterView({
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {payment.units}
                       </td>
-                    </tr>)}
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </main>
-    </div>;
+    </div>);
+
 }

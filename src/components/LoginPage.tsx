@@ -9,11 +9,9 @@ interface LoginPageProps {
     role: string;
   }>;
 }
-export function LoginPage({
-  onLogin,
-  userAccounts
-}: LoginPageProps) {
-  return <div className="flex flex-col md:flex-row w-full min-h-screen bg-gray-50">
+export function LoginPage({ onLogin, userAccounts }: LoginPageProps) {
+  return (
+    <div className="flex flex-col md:flex-row w-full min-h-screen bg-gray-50">
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
         <LoginForm onLogin={onLogin} userAccounts={userAccounts} />
       </div>
@@ -29,7 +27,16 @@ export function LoginPage({
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
             <div className="flex items-center mb-4">
               <div className="bg-blue-100 p-3 rounded-full">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-blue-600"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+
                   <path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"></path>
                   <path d="m6 17 3.93-4.73c.3-.36.25-.92-.08-1.23L6.4 8.2a2 2 0 0 1-.69-2.65L7 3"></path>
                   <path d="M9 19h6"></path>
@@ -53,19 +60,46 @@ export function LoginPage({
               </div>
               <ul className="text-sm text-gray-600 space-y-2">
                 <li className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-green-500 mr-2"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                   Prepaid meter token recharge
                 </li>
                 <li className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-green-500 mr-2"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                   Postpaid billing management
                 </li>
                 <li className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-green-500 mr-2"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                   Real-time usage monitoring
@@ -75,5 +109,6 @@ export function LoginPage({
           </div>
         </div>
       </div>
-    </div>;
+    </div>);
+
 }
