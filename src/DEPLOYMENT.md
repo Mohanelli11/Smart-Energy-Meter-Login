@@ -1,4 +1,3 @@
-
 # Deployment Guide
 
 ## Prerequisites
@@ -20,21 +19,21 @@ git add .
 
 3. **Commit your changes**:
 ```bash
-git commit -m "Initial commit: Hydrobox SmartMeter System"
+git commit -m "Initial commit: MoTech Electrical and Electronics Engineering Solutions SmartMeter System"
 ```
 
 ## Step 2: Push to GitHub
 
 1. **Create a new repository on GitHub**:
    - Go to https://github.com/new
-   - Name: `hydrobox-smartmeter`
+   - Name: `motech-smartmeter`
    - Description: "Smart metering system for energy monitoring"
    - Keep it Private or Public (your choice)
    - Do NOT initialize with README (we already have one)
 
 2. **Add remote and push**:
 ```bash
-git remote add origin https://github.com/YOUR_USERNAME/hydrobox-smartmeter.git
+git remote add origin https://github.com/YOUR_USERNAME/motech-smartmeter.git
 git branch -M main
 git push -u origin main
 ```
@@ -51,7 +50,7 @@ git push -u origin main
    - Click "Add new site" → "Import an existing project"
    - Choose "Deploy with GitHub"
    - Authorize Netlify to access your repositories
-   - Select `hydrobox-smartmeter` repository
+   - Select `motech-smartmeter` repository
 
 3. **Configure Build Settings**:
    - **Branch to deploy**: main
@@ -147,7 +146,7 @@ If something goes wrong:
 2. In Netlify:
    - Go to Domain settings
    - Click "Add custom domain"
-   - Enter your domain (e.g., hydroboxsmartmeter.com)
+   - Enter your domain (e.g., motechsmartmeter.com)
 3. **Configure DNS**:
    - Add Netlify's nameservers to your domain registrar
    - Or add A/CNAME records as instructed
@@ -192,4 +191,4 @@ If you encounter issues:
 - [ ] Mobile responsive
 - [ ] HTTPS enabled
 
-Your Hydrobox SmartMeter System is now live! 🎉
+Your MoTech Electrical and Electronics Engineering Solutions SmartMeter System is now live! 🎉

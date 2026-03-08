@@ -1,333 +1,193 @@
 /**
- * Command Queue Management
- * Handles remote meter control commands with queue system
+ * Command Queue Utilities for NB-IoT Meter Control
+ * Handles serial execution of commands and persistence
  */
 
-import { logSecurityEvent } from './security';
+export type CommandType = 'SWITCH_ON' | 'SWITCH_OFF';
 
 export interface MeterCommand {
   id: string;
-  meterId: string;
-  meterNumber: string;
-  command: 'connect' | 'disconnect';
-  status: 'queued' | 'executing' | 'executed' | 'failed' | 'expired';
-  createdBy: string;
+  meterAccountNo: string;
+  type: CommandType;
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'expired';
   createdAt: string;
-  scheduledFor?: string;
   executedAt?: string;
-  expiresAt?: string;
-  attempts: number;
-  maxAttempts: number;
-  error?: string;
-  metadata?: {
-    reason?: string;
-    notes?: string;
-  };
+  createdBy: string; // User email
 }
 
-const COMMANDS_STORAGE_KEY = 'hydrobox_meter_commands';
-const MAX_COMMAND_ATTEMPTS = 3;
-const COMMAND_EXPIRY_HOURS = 24;
+const COMMAND_QUEUE_KEY = 'motech_meter_commands';
 
-/**
- * Get all commands
- */
+// Get all commands
 export function getAllCommands(): MeterCommand[] {
   try {
-    const stored = localStorage.getItem(COMMANDS_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const data = localStorage.getItem(COMMAND_QUEUE_KEY);
+    return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Error loading commands:', error);
+    console.error('Failed to load commands:', error);
     return [];
   }
 }
 
-/**
- * Save commands to storage
- */
+// Save commands
 function saveCommands(commands: MeterCommand[]): void {
-  localStorage.setItem(COMMANDS_STORAGE_KEY, JSON.stringify(commands));
-}
-
-/**
- * Get commands for a specific meter
- */
-export function getMeterCommands(meterId: string): MeterCommand[] {
-  const allCommands = getAllCommands();
-  return allCommands.
-  filter((cmd) => cmd.meterId === meterId).
-  sort(
-    (a, b) =>
-    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
-}
-
-/**
- * Get active command for a meter (queued or executing)
- */
-export function getActiveMeterCommand(meterId: string): MeterCommand | null {
-  const commands = getMeterCommands(meterId);
-  return (
-    commands.find(
-      (cmd) => cmd.status === 'queued' || cmd.status === 'executing'
-    ) || null);
-
-}
-
-/**
- * Get next queued command for a meter
- */
-export function getNextQueuedCommand(meterId: string): MeterCommand | null {
-  const commands = getMeterCommands(meterId);
-  return commands.find((cmd) => cmd.status === 'queued') || null;
-}
-
-/**
- * Create a new command
- */
-export function createCommand(
-meterId: string,
-meterNumber: string,
-command: 'connect' | 'disconnect',
-createdBy: string,
-metadata?: {reason?: string;notes?: string;},
-scheduledFor?: string)
-: MeterCommand | {error: string;} {
-  // Check if there's already an active command
-  const activeCommand = getActiveMeterCommand(meterId);
-
-  if (activeCommand) {
-    return {
-      error: `Cannot create command. Another command is ${activeCommand.status}. Please wait for it to complete.`
-    };
+  try {
+    localStorage.setItem(COMMAND_QUEUE_KEY, JSON.stringify(commands));
+  } catch (error) {
+    console.error('Failed to save commands:', error);
   }
+}
 
-  const now = new Date();
-  const expiresAt = new Date(
-    now.getTime() + COMMAND_EXPIRY_HOURS * 60 * 60 * 1000
-  );
+// Add a command to the queue
+export function queueCommand(
+meterAccountNo: string,
+type: CommandType,
+userEmail: string)
+: MeterCommand {
+  const commands = getAllCommands();
 
   const newCommand: MeterCommand = {
-    id: crypto.randomUUID(),
-    meterId,
-    meterNumber,
-    command,
+    id: `cmd_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    meterAccountNo,
+    type,
     status: 'queued',
-    createdBy,
-    createdAt: now.toISOString(),
-    scheduledFor: scheduledFor || now.toISOString(),
-    expiresAt: expiresAt.toISOString(),
-    attempts: 0,
-    maxAttempts: MAX_COMMAND_ATTEMPTS,
-    metadata
+    createdAt: new Date().toISOString(),
+    createdBy: userEmail
   };
 
-  const allCommands = getAllCommands();
-  allCommands.push(newCommand);
-  saveCommands(allCommands);
+  commands.push(newCommand);
+  saveCommands(commands);
 
-  logSecurityEvent('METER_COMMAND_CREATED', {
-    commandId: newCommand.id,
-    meterId,
-    command,
-    createdBy
-  });
+  // Trigger processing check
+  processQueue(meterAccountNo);
 
   return newCommand;
 }
 
-/**
- * Update command status
- */
+// Get commands for a specific meter
+export function getMeterCommands(meterAccountNo: string): MeterCommand[] {
+  const commands = getAllCommands();
+  return commands.
+  filter((c) => c.meterAccountNo === meterAccountNo).
+  sort(
+    (a, b) =>
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  ); // Newest first
+}
+
+// Process the queue for a specific meter
+// Ensures serial execution: Only one 'processing' command at a time
+export function processQueue(meterAccountNo: string): void {
+  const commands = getAllCommands();
+  const meterCommands = commands.
+  filter(
+    (c) =>
+    c.meterAccountNo === meterAccountNo && (
+    c.status === 'queued' || c.status === 'processing')
+  ).
+  sort(
+    (a, b) =>
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  ); // Oldest first
+
+  if (meterCommands.length === 0) return;
+
+  // Check if any command is currently processing
+  const processingCmd = meterCommands.find((c) => c.status === 'processing');
+
+  if (processingCmd) {
+    // If a command is processing, we wait.
+    // In a real app, we'd check for timeout here.
+    // For simulation, we'll simulate execution completion if enough time passed
+    const processingTime =
+    new Date().getTime() - new Date(processingCmd.createdAt).getTime();
+    if (processingTime > 5000) {
+      // Simulate 5s execution time
+      completeCommand(processingCmd.id, 'completed');
+    }
+    return;
+  }
+
+  // If no command is processing, pick the next queued one
+  const nextCmd = meterCommands.find((c) => c.status === 'queued');
+  if (nextCmd) {
+    updateCommandStatus(nextCmd.id, 'processing');
+
+    // Simulate NB-IoT latency
+    setTimeout(() => {
+      // Re-trigger process to complete it
+      processQueue(meterAccountNo);
+    }, 5000);
+  }
+}
+
+// Update command status
 export function updateCommandStatus(
 commandId: string,
-status: MeterCommand['status'],
-error?: string)
-: boolean {
-  const allCommands = getAllCommands();
-  const commandIndex = allCommands.findIndex((cmd) => cmd.id === commandId);
+status: 'queued' | 'processing' | 'completed' | 'failed' | 'expired')
+: void {
+  const commands = getAllCommands();
+  const cmdIndex = commands.findIndex((c) => c.id === commandId);
 
-  if (commandIndex === -1) return false;
+  if (cmdIndex !== -1) {
+    commands[cmdIndex].status = status;
+    if (status === 'completed' || status === 'failed' || status === 'expired') {
+      commands[cmdIndex].executedAt = new Date().toISOString();
+    }
+    saveCommands(commands);
 
-  const command = allCommands[commandIndex];
-  command.status = status;
+    // If completed, check if we need to expire subsequent conflicting commands?
+    // The requirement: "if executed successfully, the second command in line automatically expires"
+    // We will implement this logic here.
+    if (status === 'completed') {
+      const completedCmd = commands[cmdIndex];
+      // Find next queued command for this meter
+      const nextCmds = commands.filter(
+        (c) =>
+        c.meterAccountNo === completedCmd.meterAccountNo &&
+        c.status === 'queued' &&
+        new Date(c.createdAt).getTime() >
+        new Date(completedCmd.createdAt).getTime()
+      );
 
-  if (status === 'executing') {
-    command.attempts += 1;
-  }
+      // If there is a next command, and we want to expire it based on the rule:
+      // "if executed successfully, the second command in line automatically expires"
+      // This is a bit ambiguous. Does it mean ALL subsequent commands? Or just the immediate next one?
+      // I'll assume it means if we have a queue like [ON, OFF, ON], and the first ON finishes,
+      // maybe the OFF expires? That seems destructive.
+      // Let's interpret "second command in line" strictly.
+      if (nextCmds.length > 0) {
+        // Sort by time
+        nextCmds.sort(
+          (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        const nextCmd = nextCmds[0];
 
-  if (status === 'executed') {
-    command.executedAt = new Date().toISOString();
-
-    // Expire all other queued commands for this meter
-    allCommands.forEach((cmd) => {
-      if (
-      cmd.meterId === command.meterId &&
-      cmd.id !== commandId &&
-      cmd.status === 'queued')
-      {
-        cmd.status = 'expired';
-        logSecurityEvent('METER_COMMAND_EXPIRED', {
-          commandId: cmd.id,
-          meterId: cmd.meterId,
-          reason: 'previous_command_executed'
-        });
+        // Expire the next command
+        // updateCommandStatus(nextCmd.id, 'expired') // Recursive call, be careful
+        // Let's just update it in memory and save
+        const nextCmdIndex = commands.findIndex((c) => c.id === nextCmd.id);
+        if (nextCmdIndex !== -1) {
+          commands[nextCmdIndex].status = 'expired';
+          commands[nextCmdIndex].executedAt = new Date().toISOString();
+          saveCommands(commands);
+        }
       }
-    });
-  }
+    }
 
-  if (status === 'failed') {
-    command.error = error;
-
-    // If max attempts reached, mark as failed permanently
-    if (command.attempts >= command.maxAttempts) {
-      logSecurityEvent('METER_COMMAND_MAX_ATTEMPTS', {
-        commandId,
-        meterId: command.meterId,
-        attempts: command.attempts
-      });
-    } else {
-      // Reset to queued for retry
-      command.status = 'queued';
+    // Trigger next item in queue
+    if (status === 'completed' || status === 'failed' || status === 'expired') {
+      // We need to process the queue again to pick up the next item (if any wasn't expired)
+      // Use setTimeout to break call stack
+      setTimeout(() => {
+        const currentCmd = commands[cmdIndex];
+        processQueue(currentCmd.meterAccountNo);
+      }, 100);
     }
   }
-
-  saveCommands(allCommands);
-
-  logSecurityEvent('METER_COMMAND_STATUS_UPDATED', {
-    commandId,
-    meterId: command.meterId,
-    status,
-    attempts: command.attempts
-  });
-
-  return true;
 }
 
-/**
- * Process expired commands
- */
-export function processExpiredCommands(): number {
-  const allCommands = getAllCommands();
-  const now = new Date();
-  let expiredCount = 0;
-
-  allCommands.forEach((cmd) => {
-    if (
-    (cmd.status === 'queued' || cmd.status === 'executing') &&
-    cmd.expiresAt &&
-    new Date(cmd.expiresAt) < now)
-    {
-      cmd.status = 'expired';
-      expiredCount++;
-
-      logSecurityEvent('METER_COMMAND_EXPIRED', {
-        commandId: cmd.id,
-        meterId: cmd.meterId,
-        reason: 'timeout'
-      });
-    }
-  });
-
-  if (expiredCount > 0) {
-    saveCommands(allCommands);
-  }
-
-  return expiredCount;
+// Helper to complete a command (used in simulation)
+function completeCommand(commandId: string, status: 'completed' | 'failed') {
+  updateCommandStatus(commandId, status);
 }
-
-/**
- * Cancel a queued command
- */
-export function cancelCommand(commandId: string): boolean {
-  const allCommands = getAllCommands();
-  const commandIndex = allCommands.findIndex((cmd) => cmd.id === commandId);
-
-  if (commandIndex === -1) return false;
-
-  const command = allCommands[commandIndex];
-
-  if (command.status !== 'queued') {
-    return false; // Can only cancel queued commands
-  }
-
-  command.status = 'expired';
-  saveCommands(allCommands);
-
-  logSecurityEvent('METER_COMMAND_CANCELLED', {
-    commandId,
-    meterId: command.meterId
-  });
-
-  return true;
-}
-
-/**
- * Get command statistics for a meter
- */
-export function getMeterCommandStats(meterId: string): {
-  total: number;
-  queued: number;
-  executing: number;
-  executed: number;
-  failed: number;
-  expired: number;
-} {
-  const commands = getMeterCommands(meterId);
-
-  return {
-    total: commands.length,
-    queued: commands.filter((cmd) => cmd.status === 'queued').length,
-    executing: commands.filter((cmd) => cmd.status === 'executing').length,
-    executed: commands.filter((cmd) => cmd.status === 'executed').length,
-    failed: commands.filter((cmd) => cmd.status === 'failed').length,
-    expired: commands.filter((cmd) => cmd.status === 'expired').length
-  };
-}
-
-/**
- * Simulate command execution (for demo purposes)
- * In production, this would communicate with the actual NBIoT/LoRa system
- */
-export function simulateCommandExecution(commandId: string): void {
-  setTimeout(() => {
-    updateCommandStatus(commandId, 'executing');
-
-    // Simulate network delay
-    setTimeout(() => {
-      // 90% success rate for simulation
-      const success = Math.random() > 0.1;
-
-      if (success) {
-        updateCommandStatus(commandId, 'executed');
-      } else {
-        updateCommandStatus(commandId, 'failed', 'Communication timeout');
-      }
-    }, 3000);
-  }, 1000);
-}
-
-/**
- * Clean up old commands (older than 30 days)
- */
-export function cleanupOldCommands(): number {
-  const allCommands = getAllCommands();
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const filteredCommands = allCommands.filter((cmd) => {
-    return new Date(cmd.createdAt) > thirtyDaysAgo;
-  });
-
-  const removedCount = allCommands.length - filteredCommands.length;
-
-  if (removedCount > 0) {
-    saveCommands(filteredCommands);
-    logSecurityEvent('COMMANDS_CLEANUP', { removedCount });
-  }
-
-  return removedCount;
-}
-
-// Auto-process expired commands on load
-processExpiredCommands();

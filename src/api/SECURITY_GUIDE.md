@@ -1,8 +1,7 @@
-
 # API Security Implementation Guide
 
 ## Overview
-Comprehensive security guide for the Hydrobox SmartMeter API, covering IoT device authentication, data protection, and threat mitigation.
+Comprehensive security guide for the MoTech Electrical and Electronics Engineering Solutions SmartMeter API, covering IoT device authentication, data protection, and threat mitigation.
 
 ## Table of Contents
 1. [Authentication & Authorization](#authentication--authorization)
@@ -27,7 +26,7 @@ Meters must authenticate using THREE factors:
 
 2. **X.509 Certificate** (What you are)
    - Device-specific certificate
-   - Signed by Hydrobox CA
+   - Signed by MoTech CA
    - 2048-bit RSA or 256-bit ECC
    - Certificate pinning on device
 
@@ -93,8 +92,8 @@ const jwtConfig = {
   secret: process.env.JWT_SECRET,
   expiresIn: '8h',
   algorithm: 'HS256',
-  issuer: 'hydrobox-api',
-  audience: 'hydrobox-dashboard'
+  issuer: 'motech-api',
+  audience: 'motech-dashboard'
 }
 
 // Generate JWT

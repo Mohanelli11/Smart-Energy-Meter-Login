@@ -9,7 +9,7 @@
  */
 export function encryptData(
 data: string,
-key: string = 'hydrobox-secret')
+key: string = 'motech-secret')
 : string {
   try {
     // Simple XOR encryption (for demo purposes only)
@@ -32,7 +32,7 @@ key: string = 'hydrobox-secret')
  */
 export function decryptData(
 encryptedData: string,
-key: string = 'hydrobox-secret')
+key: string = 'motech-secret')
 : string {
   try {
     const decoded = atob(encryptedData); // Base64 decode
@@ -89,7 +89,7 @@ export interface Session {
   createdAt: number;
 }
 
-const SESSION_KEY = 'hydrobox_session';
+const SESSION_KEY = 'motech_session';
 const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
 
 /**

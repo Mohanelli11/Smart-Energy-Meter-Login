@@ -8,6 +8,7 @@ interface CreateAccountModalProps {
     password: string;
     name: string;
     role: string;
+    phoneNumber: string;
   }) => void;
   isAdmin: boolean;
 }
@@ -20,6 +21,7 @@ export function CreateAccountModal({
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: '',
     role: 'user'
@@ -69,6 +71,7 @@ export function CreateAccountModal({
     if (
     !formData.name ||
     !formData.email ||
+    !formData.phoneNumber ||
     !formData.password ||
     !formData.confirmPassword)
     {
@@ -94,12 +97,14 @@ export function CreateAccountModal({
       email: formData.email.toLowerCase(),
       password: formData.password,
       name: formData.name,
-      role: formData.role
+      role: formData.role,
+      phoneNumber: formData.phoneNumber
     });
     // Reset form
     setFormData({
       name: '',
       email: '',
+      phoneNumber: '',
       password: '',
       confirmPassword: '',
       role: 'user'
@@ -175,6 +180,24 @@ export function CreateAccountModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="user@example.com"
+                required />
+
+            </div>
+
+            <div>
+              <label
+                className="block text-sm font-medium text-gray-700 mb-2"
+                htmlFor="phoneNumber">
+
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="+254700000000"
                 required />
 
             </div>

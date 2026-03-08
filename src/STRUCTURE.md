@@ -1,4 +1,3 @@
-
 # Project Structure for Deployment
 
 ## Correct File Organization
@@ -6,7 +5,7 @@
 Your project should have this structure:
 
 ```
-hydrobox-smartmeter/
+motech-smartmeter/
 ├── src/
 │   ├── components/
 │   │   ├── AddMeterForm.tsx

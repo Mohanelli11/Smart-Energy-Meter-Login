@@ -1,17 +1,20 @@
 import React from 'react';
 import { XIcon, ZapIcon, MapPinIcon, UserIcon, PhoneIcon } from 'lucide-react';
 import { MeterReports } from './MeterReports';
+import { MeterCommandControl } from './MeterCommandControl';
 interface ViewMeterModalProps {
   isOpen: boolean;
   onClose: () => void;
   meter: any;
   type: 'prepaid' | 'postpaid';
+  userEmail?: string;
 }
 export function ViewMeterModal({
   isOpen,
   onClose,
   meter,
-  type
+  type,
+  userEmail = 'unknown@motech.ke'
 }: ViewMeterModalProps) {
   if (!isOpen || !meter) return null;
   return (
@@ -53,6 +56,15 @@ export function ViewMeterModal({
                 <p className="font-semibold text-gray-900">{meter.meterNo}</p>
               </div>
             </div>
+          </div>
+
+          {/* Remote Control Section - NEW */}
+          <div>
+            <MeterCommandControl
+              meterAccountNo={meter.accountNo}
+              userEmail={userEmail}
+              currentStatus={meter.status} />
+
           </div>
 
           {/* Customer Information */}

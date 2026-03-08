@@ -28,8 +28,8 @@ export interface Meter {
   lastReport?: MeterReport;
 }
 
-const PREPAID_STORAGE_KEY = 'hydrobox_prepaid_meters';
-const POSTPAID_STORAGE_KEY = 'hydrobox_postpaid_meters';
+const PREPAID_STORAGE_KEY = 'motech_prepaid_meters';
+const POSTPAID_STORAGE_KEY = 'motech_postpaid_meters';
 
 // Generate a realistic GSM meter report
 export function generateMeterReport(): MeterReport {

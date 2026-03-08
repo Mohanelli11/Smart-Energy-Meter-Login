@@ -35,7 +35,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
     id: '1',
     role: 'assistant',
     content:
-    "Hello! I'm your AI assistant for the Hydrobox SmartMeter system. I can help you analyze consumption data, revenue insights, meter diagnostics, and more. What would you like to know?",
+    "Hello! I'm your AI assistant for the MoTech Electrical and Electronics Engineering Solutions SmartMeter system. I can help you analyze consumption data, revenue insights, meter diagnostics, and more. What would you like to know?",
     timestamp: new Date()
   }]
   );

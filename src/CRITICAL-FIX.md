@@ -1,4 +1,3 @@
-
 # 🚨 CRITICAL FIX: Blank Page Issue
 
 ## Problem Identified
@@ -93,7 +92,7 @@ git push origin main
 ## Complete File Structure (CORRECT)
 
 ```
-hydrobox-smartmeter/
+motech-smartmeter/
 ├── src/                          ← Source code directory
 │   ├── components/               ← ALL components HERE
 │   │   ├── AddMeterForm.tsx

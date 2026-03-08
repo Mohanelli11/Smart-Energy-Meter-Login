@@ -1,8 +1,7 @@
-
-# Hydrobox Backend API - Implementation Guide
+# MoTech Electrical and Electronics Engineering Solutions Backend API - Implementation Guide
 
 ## Overview
-This directory contains example backend implementations for the Hydrobox SmartMeter API. The backend handles meter communication, data processing, and serves the dashboard frontend.
+This directory contains example backend implementations for the MoTech Electrical and Electronics Engineering Solutions SmartMeter API. The backend handles meter communication, data processing, and serves the dashboard frontend.
 
 ## Technology Stack
 
@@ -337,7 +336,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://user:pass@postgres:5432/hydrobox
+      - DATABASE_URL=postgresql://user:pass@postgres:5432/motech
       - REDIS_URL=redis://redis:6379
       - RABBITMQ_URL=amqp://rabbitmq:5672
     depends_on:
@@ -350,7 +349,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=hydrobox
+      - POSTGRES_DB=motech
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=pass
 

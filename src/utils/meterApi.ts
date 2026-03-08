@@ -1,6 +1,6 @@
 /**
- * Hydrobox Meter API Client
- * Secure API client for communicating with the Hydrobox backend
+ * MoTech Electrical and Electronics Engineering Solutions Meter API Client
+ * Secure API client for communicating with the MoTech backend
  * Handles authentication, request signing, and error handling
  */
 

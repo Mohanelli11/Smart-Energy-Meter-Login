@@ -18,7 +18,8 @@ import {
   DownloadIcon,
   UserPlusIcon,
   KeyIcon,
-  BrainCircuitIcon } from
+  BrainCircuitIcon,
+  ServerIcon } from
 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { MeterTable } from './MeterTable';
@@ -31,9 +32,8 @@ import { EditMeterModal } from './EditMeterModal';
 import { DeleteConfirmModal } from './DeleteConfirmModal';
 import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
-import { AIInsights } from './AIInsights'; // Added import
-import { APIManagement } from './APIManagement';
-import { APIAccessRequest } from './APIAccessRequest';
+import { AIInsights } from './AIInsights';
+import { ApiManagement } from './ApiManagement'; // Added import
 import {
   savePrepaidMeters,
   loadPrepaidMeters,
@@ -792,13 +792,15 @@ export function Dashboard({
           </div>);
 
       case 'ai-insights':
-        // New Case
         return (
           <AIInsights
             meters={[...prepaidMetersState, ...postpaidMetersState]}
             transactions={paymentTransactionsState} />);
 
 
+      case 'api-access':
+        // New Case
+        return <ApiManagement user={user} />;
       case 'prepaid':
         return (
           <div className="bg-white p-6 rounded-lg shadow">
@@ -844,8 +846,7 @@ export function Dashboard({
               type="prepaid"
               onView={(meter) => handleViewMeter(meter, 'prepaid')}
               onEdit={(meter) => handleEditMeter(meter, 'prepaid')}
-              onDelete={(meter) => handleDeleteMeter(meter, 'prepaid')}
-              userEmail={user?.email} />
+              onDelete={(meter) => handleDeleteMeter(meter, 'prepaid')} />
 
             {renderPagination(
               prepaidPage,
@@ -899,8 +900,7 @@ export function Dashboard({
               type="postpaid"
               onView={(meter) => handleViewMeter(meter, 'postpaid')}
               onEdit={(meter) => handleEditMeter(meter, 'postpaid')}
-              onDelete={(meter) => handleDeleteMeter(meter, 'postpaid')}
-              userEmail={user?.email} />
+              onDelete={(meter) => handleDeleteMeter(meter, 'postpaid')} />
 
             {renderPagination(
               postpaidPage,
@@ -1097,17 +1097,6 @@ export function Dashboard({
             </div>
           </div>);
 
-      case 'api':
-        // API Management section - Admin only, others see request interface
-        return isAdmin ?
-        <APIManagement userEmail={user?.email} userId={user?.email} /> :
-
-        <APIAccessRequest
-          userId={user?.email}
-          userEmail={user?.email}
-          userName={user?.name} />;
-
-
       default:
         return null;
     }
@@ -1119,10 +1108,14 @@ export function Dashboard({
 
         <div className="p-4 flex items-center justify-between border-b border-blue-700">
           <div className="flex items-center">
-            <ZapIcon className="text-yellow-400 h-6 w-6" />
+            <img
+              src="/image_639ac6c2.png"
+              alt="MoTech"
+              className="h-8 w-8 rounded-full object-cover" />
+
             {!sidebarCollapsed &&
-            <span className="ml-3 text-xl font-bold">
-                Hydrobox SmartMeter
+            <span className="ml-3 text-lg font-bold leading-tight">
+                MoTech SmartMeter
               </span>
             }
           </div>
@@ -1197,22 +1190,18 @@ export function Dashboard({
               {!sidebarCollapsed && <span className="ml-3">Reports</span>}
             </button>
             <button
+              onClick={() => setActiveSection('api-access')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api-access' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+
+              <ServerIcon className="h-5 w-5" />
+              {!sidebarCollapsed && <span className="ml-3">API Access</span>}
+            </button>
+            <button
               onClick={() => setActiveSection('settings')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
 
               <SettingsIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Settings</span>}
-            </button>
-            <button
-              onClick={() => setActiveSection('api')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
-              <KeyIcon className="h-5 w-5" />
-              {!sidebarCollapsed &&
-              <span className="ml-3">
-                  {isAdmin ? 'API Management' : 'API Access'}
-                </span>
-              }
             </button>
           </nav>
         </div>
@@ -1239,10 +1228,8 @@ export function Dashboard({
           <h1 className="text-2xl font-bold text-gray-800">
             {activeSection === 'ai-insights' ?
             'AI Insights' :
-            activeSection === 'api' ?
-            isAdmin ?
-            'API Management' :
-            'API Access' :
+            activeSection === 'api-access' ?
+            'API Access Management' :
             activeSection.charAt(0).toUpperCase() +
             activeSection.slice(1).replace('-', ' ')}
           </h1>
@@ -1320,8 +1307,9 @@ export function Dashboard({
         })
         }
         meter={viewModal.meter}
-        type={viewModal.type} />
-
+        type={viewModal.type}
+        userEmail={user?.email || ''} // Pass user email for commands
+      />
 
       <EditMeterModal
         isOpen={editModal.isOpen}

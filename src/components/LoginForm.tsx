@@ -9,6 +9,7 @@ import { checkLoginRateLimit, resetRateLimit } from '../utils/rateLimiter';
 import { logSecurityEvent } from '../utils/security';
 interface LoginFormProps {
   onLogin: (userData: any) => void;
+  onForgotPassword?: () => void;
   userAccounts: Array<{
     email: string;
     password: string;
@@ -16,7 +17,11 @@ interface LoginFormProps {
     role: string;
   }>;
 }
-export function LoginForm({ onLogin, userAccounts }: LoginFormProps) {
+export function LoginForm({
+  onLogin,
+  onForgotPassword,
+  userAccounts
+}: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -180,7 +185,10 @@ export function LoginForm({ onLogin, userAccounts }: LoginFormProps) {
             <a
               href="#"
               className="font-medium text-blue-600 hover:text-blue-500"
-              onClick={(e) => e.preventDefault()}>
+              onClick={(e) => {
+                e.preventDefault();
+                if (onForgotPassword) onForgotPassword();
+              }}>
 
               Forgot your password?
             </a>

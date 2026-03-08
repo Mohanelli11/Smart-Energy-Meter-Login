@@ -1,5 +1,4 @@
-
-# Hydrobox SmartMeter System
+# MoTech Electrical and Electronics Engineering Solutions SmartMeter System
 
 A comprehensive smart metering system for energy monitoring and management, supporting both prepaid and postpaid meters with real-time data collection via NB-IoT.
 
@@ -47,8 +46,8 @@ A comprehensive smart metering system for energy monitoring and management, supp
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/hydrobox-smartmeter.git
-cd hydrobox-smartmeter
+git clone https://github.com/yourusername/motech-smartmeter.git
+cd motech-smartmeter
 ```
 
 2. Install dependencies:
@@ -78,7 +77,7 @@ The build output will be in the `dist` directory.
 - **Password**: @Testing
 
 ### User Access
-- **Email**: hydroboxkenya@gmail.com
+- **Email**: motechkenya@gmail.com
 - **Password**: @Testing
 
 ### Individual Meter Access
@@ -114,7 +113,7 @@ netlify deploy --prod
 ## Project Structure
 
 ```
-hydrobox-smartmeter/
+motech-smartmeter/
 ├── src/
 │   ├── components/
 │   │   ├── AddMeterForm.tsx
@@ -181,11 +180,11 @@ hydrobox-smartmeter/
 
 ## License
 
-This project is proprietary software owned by Hydrobox Kenya.
+This project is proprietary software owned by MoTech Electrical and Electronics Engineering Solutions.
 
 ## Support
 
-For support, email: hydroboxkenya@gmail.com
+For support, email: motechkenya@gmail.com
 
 ## Contributing
 

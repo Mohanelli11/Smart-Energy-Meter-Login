@@ -1,8 +1,7 @@
-
 # Security Implementation Guide
 
 ## Overview
-This document outlines the security measures implemented in the Hydrobox SmartMeter application following OWASP best practices.
+This document outlines the security measures implemented in the MoTech Electrical and Electronics Engineering Solutions SmartMeter application following OWASP best practices.
 
 ## Security Features Implemented
 
@@ -181,6 +180,55 @@ Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: geolocation=(), microphone=(), camera=()
 ```
 
+### 9. API Access Management (NEW)
+
+#### Implementation
+- **Location**: `utils/apiAccessStorage.ts`, `components/ApiManagement.tsx`
+- **Features**:
+  - Admin-only API key generation
+  - User request workflow (pending → approved/rejected)
+  - API key storage with localStorage persistence
+  - Request tracking and audit trail
+
+#### Access Control
+- Only admin users can access API management features directly
+- Non-admin users must request API access
+- Admin reviews and approves/rejects requests
+- Approved users receive a unique API key
+
+#### API Key Format
+```
+hb_live_[random_9_chars]_[timestamp]
+```
+
+#### Security Considerations
+- API keys are stored in localStorage (client-side demo)
+- In production, implement server-side key management
+- Keys should be rotated periodically
+- Implement rate limiting per API key
+
+### 10. Meter Remote Control Security (NEW)
+
+#### Implementation
+- **Location**: `utils/commandQueue.ts`, `components/MeterCommandControl.tsx`
+- **Features**:
+  - Command queue with serial execution
+  - Command state tracking (queued, processing, completed, expired, failed)
+  - User attribution for audit trail
+  - Automatic command expiration
+
+#### Command Queue Rules
+1. Only one command can be "processing" at a time per meter
+2. Commands are executed via NB-IoT/LoRa communication
+3. When a command completes successfully, the next queued command expires
+4. If a command is not executed by the next meter report, the next command moves to processing
+
+#### Security Measures
+- All commands are attributed to the user who initiated them
+- Command history is persisted for audit purposes
+- Commands cannot be modified once queued
+- Only authorized users can send commands
+
 ## Security Checklist
 
 ### ✅ Implemented
@@ -269,7 +317,7 @@ npm audit fix
 5. **Learn**: Update security measures
 
 ### Contact
-- Security Team: security@hydrobox.ke
+- Security Team: security@motech.ke
 - Emergency: +254-XXX-XXXXXX
 
 ## Compliance

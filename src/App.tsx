@@ -16,13 +16,15 @@ export function App() {
     email: 'mahmadstephen19@gmail.com',
     password: '@Testing',
     name: 'Mahmad Stephen',
-    role: 'admin'
+    role: 'admin',
+    phoneNumber: '+254700000000'
   },
   {
-    email: 'hydroboxkenya@gmail.com',
+    email: 'motechkenya@gmail.com',
     password: '@Testing',
-    name: 'Hydrobox Kenya',
-    role: 'user'
+    name: 'MoTech Electrical and Electronics Engineering Solutions',
+    role: 'user',
+    phoneNumber: '+254711111111'
   }]
   );
   // Generate all meters (prepaid + postpaid) for meter login
@@ -122,6 +124,18 @@ export function App() {
     setViewMode('admin');
     setCurrentMeter(null);
   };
+  const handlePasswordChange = (phone: string, newPassword: string) => {
+    setUserAccounts((prevAccounts) =>
+    prevAccounts.map((acc) =>
+    acc.phoneNumber === phone ?
+    {
+      ...acc,
+      password: newPassword
+    } :
+    acc
+    )
+    );
+  };
   const handleCreateAccount = (newAccount) => {
     // Check if email already exists
     const exists = userAccounts.find(
@@ -162,7 +176,13 @@ export function App() {
   };
   // Render based on view mode
   if (!isLoggedIn) {
-    return <LoginPage onLogin={handleLogin} userAccounts={userAccounts} />;
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onPasswordChange={handlePasswordChange}
+        userAccounts={userAccounts} />);
+
+
   }
   if (viewMode === 'meter-login') {
     return (

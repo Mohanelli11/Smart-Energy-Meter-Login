@@ -1,8 +1,8 @@
 
 {
-  "name": "hydrobox-smartmeter",
+  "name": "motech-smartmeter",
   "version": "1.0.0",
-  "description": "Hydrobox Smart Metering System - Energy monitoring and management platform",
+  "description": "MoTech Electrical and Electronics Engineering Solutions Smart Metering System - Energy monitoring and management platform",
   "private": true,
   "scripts": {
     "dev": "vite",

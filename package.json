@@ -15,7 +15,8 @@
     "lucide-react": "0.522.0",
     "recharts": "^2.12.7",
     "vite": "latest",
-    "@vitejs/plugin-react": "latest"
+    "@vitejs/plugin-react": "latest",
+    "@emotion/react": "^11.13.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.18",

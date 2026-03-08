@@ -1,8 +1,7 @@
-
-# Hydrobox SmartMeter API Documentation
+# MoTech Electrical and Electronics Engineering Solutions SmartMeter API Documentation
 
 ## Overview
-Secure REST API for bidirectional communication between the Hydrobox platform and onsite smart meters. Designed to handle infinite requests with enterprise-grade security and scalability.
+Secure REST API for bidirectional communication between the MoTech platform and onsite smart meters. Designed to handle infinite requests with enterprise-grade security and scalability.
 
 ## Architecture
 
@@ -28,8 +27,8 @@ Secure REST API for bidirectional communication between the Hydrobox platform an
 
 ## Base URL
 ```
-Production:  https://api.hydrobox.ke/v1
-Staging:     https://api-staging.hydrobox.ke/v1
+Production:  https://api.motech.ke/v1
+Staging:     https://api-staging.motech.ke/v1
 Development: http://localhost:3000/v1
 ```
 
@@ -115,7 +114,7 @@ POST /meters/register
     "device_id": "ESP-1234-001",
     "api_key": "hb_device_live_abc123xyz...",
     "mqtt_credentials": {
-      "broker": "mqtt.hydrobox.ke",
+      "broker": "mqtt.motech.ke",
       "port": 8883,
       "username": "device_ESP-1234-001",
       "password": "secure_password_here"
@@ -216,7 +215,7 @@ GET /meters/{device_id}/config
     "tariff_rate": 15.50,
     "disconnect_threshold": 0,
     "reconnect_threshold": 50,
-    "firmware_update_url": "https://firmware.hydrobox.ke/v2.1.1.bin",
+    "firmware_update_url": "https://firmware.motech.ke/v2.1.1.bin",
     "updated_at": "2025-01-11T10:00:00Z"
   }
 }
@@ -291,7 +290,7 @@ POST /dashboard/meters/{meter_id}/commands
 
 ### Connection
 ```javascript
-const ws = new WebSocket('wss://api.hydrobox.ke/v1/ws');
+const ws = new WebSocket('wss://api.motech.ke/v1/ws');
 
 // Authentication
 ws.send(JSON.stringify({
@@ -379,10 +378,10 @@ Configure webhooks to receive real-time notifications:
 
 ### JavaScript/TypeScript
 ```typescript
-import { HydroboxAPI } from '@hydrobox/sdk';
+import { MoTechAPI } from '@motech/sdk';
 
-const api = new HydroboxAPI({
-  apiKey: process.env.HYDROBOX_API_KEY,
+const api = new MoTechAPI({
+  apiKey: process.env.MOTECH_API_KEY,
   environment: 'production'
 });
 
@@ -396,9 +395,9 @@ await api.meters.sendReading('ESP-1234-001', {
 
 ### Python
 ```python
-from hydrobox import HydroboxAPI
+from motech import MoTechAPI
 
-api = HydroboxAPI(api_key=os.getenv('HYDROBOX_API_KEY'))
+api = MoTechAPI(api_key=os.getenv('MOTECH_API_KEY'))
 
 # Get meter data
 meter = api.meters.get('ESP-1234-001')
@@ -406,9 +405,9 @@ meter = api.meters.get('ESP-1234-001')
 
 ### Arduino/ESP32
 ```cpp
-#include <HydroboxMeter.h>
+#include <MoTechMeter.h>
 
-HydroboxMeter meter("ESP-1234-001", "api_key_here");
+MoTechMeter meter("ESP-1234-001", "api_key_here");
 
 void loop() {
   MeterReading reading;
@@ -430,15 +429,15 @@ API Key: hb_device_test_abc123xyz
 
 ### Sandbox Environment
 ```
-URL: https://api-sandbox.hydrobox.ke/v1
+URL: https://api-sandbox.motech.ke/v1
 ```
 
 ## Support
 
-- **Documentation**: https://docs.hydrobox.ke
-- **API Status**: https://status.hydrobox.ke
-- **Support Email**: api-support@hydrobox.ke
-- **Developer Forum**: https://community.hydrobox.ke
+- **Documentation**: https://docs.motech.ke
+- **API Status**: https://status.motech.ke
+- **Support Email**: api-support@motech.ke
+- **Developer Forum**: https://community.motech.ke
 
 ## Changelog
 

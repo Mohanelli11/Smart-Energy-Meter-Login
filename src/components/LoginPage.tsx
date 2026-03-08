@@ -1,19 +1,39 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { LoginForm } from './LoginForm';
+import { ForgotPasswordPage } from './ForgotPasswordPage';
 interface LoginPageProps {
   onLogin: (userData: any) => void;
+  onPasswordChange: (phone: string, newPassword: string) => void;
   userAccounts: Array<{
     email: string;
     password: string;
     name: string;
     role: string;
+    phoneNumber?: string;
   }>;
 }
-export function LoginPage({ onLogin, userAccounts }: LoginPageProps) {
+export function LoginPage({
+  onLogin,
+  onPasswordChange,
+  userAccounts
+}: LoginPageProps) {
+  const [view, setView] = useState<'login' | 'forgot-password'>('login');
   return (
     <div className="flex flex-col md:flex-row w-full min-h-screen bg-gray-50">
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-        <LoginForm onLogin={onLogin} userAccounts={userAccounts} />
+        {view === 'login' ?
+        <LoginForm
+          onLogin={onLogin}
+          onForgotPassword={() => setView('forgot-password')}
+          userAccounts={userAccounts} /> :
+
+
+        <ForgotPasswordPage
+          userAccounts={userAccounts}
+          onPasswordChange={onPasswordChange}
+          onBackToLogin={() => setView('login')} />
+
+        }
       </div>
       <div className="w-full md:w-1/2 bg-blue-50 flex flex-col items-center justify-center p-8">
         <div className="max-w-md w-full">
@@ -26,23 +46,12 @@ export function LoginPage({ onLogin, userAccounts }: LoginPageProps) {
           </p>
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
             <div className="flex items-center mb-4">
-              <div className="bg-blue-100 p-3 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-blue-600"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round">
+              <div className="rounded-full overflow-hidden flex-shrink-0">
+                <img
+                  src="/image_639ac6c2.png"
+                  alt="MoTech Electrical and Electronics Engineering Solutions"
+                  className="h-14 w-14 object-cover rounded-full" />
 
-                  <path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2"></path>
-                  <path d="m6 17 3.93-4.73c.3-.36.25-.92-.08-1.23L6.4 8.2a2 2 0 0 1-.69-2.65L7 3"></path>
-                  <path d="M9 19h6"></path>
-                  <path d="m15 8.7 1.75-2.8A1 1 0 0 0 16 4.5h-1.06a1 1 0 0 0-.93.65L13 7"></path>
-                  <path d="M16 19h3c.6 0 1-.4 1-1v-1a3 3 0 0 0-3-3h-1"></path>
-                </svg>
               </div>
               <h3 className="ml-4 text-xl font-medium text-gray-900">
                 Prepaid & Postpaid Energy Management

@@ -26,13 +26,15 @@ export function App() {
     email: 'mahmadstephen19@gmail.com',
     password: '@Testing',
     name: 'Mahmad Stephen',
-    role: 'admin'
+    role: 'admin',
+    phoneNumber: '+254700000000'
   },
   {
-    email: 'hydroboxkenya@gmail.com',
+    email: 'motechkenya@gmail.com',
     password: '@Testing',
-    name: 'Hydrobox Kenya',
-    role: 'user'
+    name: 'MoTech Electrical and Electronics Engineering Solutions',
+    role: 'user',
+    phoneNumber: '+254711111111'
   }]
   );
   // Load all meters from localStorage instead of generating
@@ -101,6 +103,21 @@ export function App() {
     setIsLoggedIn(false);
     setViewMode('admin');
     setCurrentMeter(null);
+  };
+  const handlePasswordChange = (phone: string, newPassword: string) => {
+    setUserAccounts((prevAccounts) =>
+    prevAccounts.map((acc) =>
+    acc.phoneNumber === phone ?
+    {
+      ...acc,
+      password: newPassword
+    } :
+    acc
+    )
+    );
+    logSecurityEvent('PASSWORD_CHANGED_VIA_OTP', {
+      phone
+    });
   };
   const handleCreateAccount = (newAccount) => {
     // SECURITY: Validate new account data
@@ -178,7 +195,13 @@ export function App() {
   };
   // Render based on view mode
   if (!isLoggedIn) {
-    return <LoginPage onLogin={handleLogin} userAccounts={userAccounts} />;
+    return (
+      <LoginPage
+        onLogin={handleLogin}
+        onPasswordChange={handlePasswordChange}
+        userAccounts={userAccounts} />);
+
+
   }
   if (viewMode === 'meter-login') {
     return (
