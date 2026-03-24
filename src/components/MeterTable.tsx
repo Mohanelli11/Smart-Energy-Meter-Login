@@ -86,7 +86,7 @@ export function MeterTable({
               <td className="px-6 py-4 whitespace-nowrap">
                 <span
                 className={`px-2 py-1 text-xs rounded-full ${getStatusColor(meter.status)}`}>
-
+                
                   {meter.status}
                 </span>
               </td>
@@ -96,21 +96,21 @@ export function MeterTable({
                   onClick={() => onView && onView(meter)}
                   className="text-blue-600 hover:text-blue-900 transition-colors"
                   title="View Details">
-
+                  
                     <EyeIcon className="h-4 w-4" />
                   </button>
                   <button
                   onClick={() => onEdit && onEdit(meter)}
                   className="text-yellow-600 hover:text-yellow-900 transition-colors"
                   title="Edit Meter">
-
+                  
                     <EditIcon className="h-4 w-4" />
                   </button>
                   <button
                   onClick={() => onDelete && onDelete(meter)}
                   className="text-red-600 hover:text-red-900 transition-colors"
                   title="Delete Meter">
-
+                  
                     <TrashIcon className="h-4 w-4" />
                   </button>
                 </div>

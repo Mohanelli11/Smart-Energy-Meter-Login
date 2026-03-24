@@ -35,7 +35,7 @@ export function StatsCard({
           <div className="flex items-center text-sm text-gray-500">
             <span
             className={`${trend.isPositive ? 'text-green-500' : 'text-red-500'} mr-1`}>
-
+            
               {trend.isPositive ? '↑' : '↓'} {trend.value}
             </span>
             <span>{trend.label}</span>

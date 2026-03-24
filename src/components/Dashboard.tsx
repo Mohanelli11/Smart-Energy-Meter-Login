@@ -358,20 +358,23 @@ export function Dashboard({
   useEffect(() => {
     const data = [];
     const allMeters = [...prepaidMetersState, ...postpaidMetersState];
-    // Generate last 7 days of data
-    for (let day = 6; day >= 0; day--) {
+    // Generate last 30 days of data
+    for (let day = 29; day >= 0; day--) {
       const date = new Date();
       date.setDate(date.getDate() - day);
       const dateStr = date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric'
       });
-      // Sum consumption from all meters for this day
-      const totalConsumption = allMeters.reduce((sum, meter) => {
-        return sum + parseFloat(meter.consumption) * (0.8 + Math.random() * 0.4);
-      }, 0);
+      const fullDateStr = date.toISOString();
+      // Generate truly non-uniform/varied consumption values per day
+      // Use a wider random multiplier so each day has a distinctly different total
+      const dailyFactor = 0.3 + Math.random() * 1.4; // Range 0.3x to 1.7x
+      const totalConsumption =
+      allMeters.length * (12 + Math.random() * 8) * dailyFactor;
       data.push({
         time: dateStr,
+        date: fullDateStr,
         consumption: totalConsumption.toFixed(2)
       });
     }
@@ -624,7 +627,7 @@ export function Dashboard({
             onClick={() => setPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             className={`px-3 py-1 border rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-
+            
             «
           </button>
           {pages.map((page, index) =>
@@ -633,7 +636,7 @@ export function Dashboard({
             onClick={() => typeof page === 'number' && setPage(page)}
             disabled={page === '...'}
             className={`px-3 py-1 border rounded-md ${page === currentPage ? 'bg-blue-600 text-white' : page === '...' ? 'cursor-default' : 'hover:bg-gray-100'}`}>
-
+            
               {page}
             </button>
           )}
@@ -641,7 +644,7 @@ export function Dashboard({
             onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             className={`px-3 py-1 border rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-
+            
             »
           </button>
         </div>
@@ -674,7 +677,7 @@ export function Dashboard({
                   isPositive: true,
                   label: 'from last month'
                 }} />
-
+              
               <StatsCard
                 title="Prepaid Meters"
                 value={prepaidMetersState.length.toLocaleString()}
@@ -686,7 +689,7 @@ export function Dashboard({
                   isPositive: true,
                   label: 'from last month'
                 }} />
-
+              
               <StatsCard
                 title="Postpaid Meters"
                 value={postpaidMetersState.length.toLocaleString()}
@@ -698,7 +701,7 @@ export function Dashboard({
                   isPositive: false,
                   label: 'from last month'
                 }} />
-
+              
               <StatsCard
                 title="Today's Revenue"
                 value="Ksh 248,750"
@@ -710,16 +713,16 @@ export function Dashboard({
                   isPositive: true,
                   label: 'from yesterday'
                 }} />
-
+              
             </div>
 
             {/* Consumption Graph Overview */}
             <div className="mb-6">
               <ConsumptionGraph
                 data={consumptionGraphData}
-                title="Total Network Consumption (Last 7 Days)"
+                title="Total Network Consumption"
                 height={350} />
-
+              
               <div className="mt-2 text-sm text-gray-600 text-center">
                 Data collected from{' '}
                 {prepaidMetersState.length + postpaidMetersState.length} meters
@@ -741,7 +744,7 @@ export function Dashboard({
                 <button
                   onClick={onMeterLogin}
                   className="px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold flex items-center">
-
+                  
                   <KeyIcon className="h-5 w-5 mr-2" />
                   Meter Login
                 </button>
@@ -810,7 +813,7 @@ export function Dashboard({
                 <button
                   onClick={() => setActiveSection('add-meter')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
-
+                  
                   <PlusCircleIcon className="h-4 w-4 mr-2" />
                   Add Meter
                 </button>
@@ -822,7 +825,7 @@ export function Dashboard({
                   })
                   }
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-
+                  
                   <FilterIcon className="h-4 w-4 mr-2" />
                   Filter
                 </button>
@@ -835,7 +838,7 @@ export function Dashboard({
                   )
                   }
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-
+                  
                   <DownloadIcon className="h-4 w-4 mr-2" />
                   Export
                 </button>
@@ -847,7 +850,7 @@ export function Dashboard({
               onView={(meter) => handleViewMeter(meter, 'prepaid')}
               onEdit={(meter) => handleEditMeter(meter, 'prepaid')}
               onDelete={(meter) => handleDeleteMeter(meter, 'prepaid')} />
-
+            
             {renderPagination(
               prepaidPage,
               filteredPrepaidMeters.length,
@@ -864,7 +867,7 @@ export function Dashboard({
                 <button
                   onClick={() => setActiveSection('add-meter')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
-
+                  
                   <PlusCircleIcon className="h-4 w-4 mr-2" />
                   Add Meter
                 </button>
@@ -876,7 +879,7 @@ export function Dashboard({
                   })
                   }
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-
+                  
                   <FilterIcon className="h-4 w-4 mr-2" />
                   Filter
                 </button>
@@ -889,7 +892,7 @@ export function Dashboard({
                   )
                   }
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-
+                  
                   <DownloadIcon className="h-4 w-4 mr-2" />
                   Export
                 </button>
@@ -901,7 +904,7 @@ export function Dashboard({
               onView={(meter) => handleViewMeter(meter, 'postpaid')}
               onEdit={(meter) => handleEditMeter(meter, 'postpaid')}
               onDelete={(meter) => handleDeleteMeter(meter, 'postpaid')} />
-
+            
             {renderPagination(
               postpaidPage,
               filteredPostpaidMeters.length,
@@ -923,7 +926,7 @@ export function Dashboard({
                   })
                   }
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-
+                  
                   <FilterIcon className="h-4 w-4 mr-2" />
                   Filter
                 </button>
@@ -936,7 +939,7 @@ export function Dashboard({
                   )
                   }
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
-
+                  
                   <DownloadIcon className="h-4 w-4 mr-2" />
                   Export
                 </button>
@@ -1000,7 +1003,7 @@ export function Dashboard({
                         )
                         }
                         className="text-blue-600 hover:text-blue-900">
-
+                        
                             Show Token
                           </button> :
 
@@ -1057,7 +1060,7 @@ export function Dashboard({
                   <button
                   onClick={() => setCreateAccountModal(true)}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
-
+                  
                     <UserPlusIcon className="h-4 w-4 mr-2" />
                     Create New Account
                   </button>
@@ -1105,14 +1108,14 @@ export function Dashboard({
     <div className="flex h-screen overflow-hidden bg-gray-100">
       <div
         className={`bg-blue-800 text-white flex-shrink-0 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
-
+        
         <div className="p-4 flex items-center justify-between border-b border-blue-700">
           <div className="flex items-center">
             <img
               src="/image_639ac6c2.png"
               alt="MoTech"
               className="h-8 w-8 rounded-full object-cover" />
-
+            
             {!sidebarCollapsed &&
             <span className="ml-3 text-lg font-bold leading-tight">
                 MoTech SmartMeter
@@ -1122,7 +1125,7 @@ export function Dashboard({
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className="text-white focus:outline-none">
-
+            
             <MenuIcon className="h-6 w-6" />
           </button>
         </div>
@@ -1132,21 +1135,21 @@ export function Dashboard({
             <button
               onClick={() => setActiveSection('dashboard')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'dashboard' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <LayoutDashboardIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
             </button>
             <button
               onClick={() => setActiveSection('ai-insights')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'ai-insights' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <BrainCircuitIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">AI Insights</span>}
             </button>
             <button
               onClick={() => setActiveSection('prepaid')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'prepaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <CoinsIcon className="h-5 w-5" />
               {!sidebarCollapsed &&
               <span className="ml-3">Prepaid Meters</span>
@@ -1155,7 +1158,7 @@ export function Dashboard({
             <button
               onClick={() => setActiveSection('postpaid')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'postpaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <FileTextIcon className="h-5 w-5" />
               {!sidebarCollapsed &&
               <span className="ml-3">Postpaid Meters</span>
@@ -1164,42 +1167,42 @@ export function Dashboard({
             <button
               onClick={() => setActiveSection('payments')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <CreditCardIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Payments</span>}
             </button>
             <button
               onClick={() => setActiveSection('add-meter')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'add-meter' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <PlusCircleIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Add Meter</span>}
             </button>
             <button
               onClick={() => setActiveSection('live-payments')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'live-payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <BoltIcon className="h-5 w-5 animate-pulse" />
               {!sidebarCollapsed && <span className="ml-3">Live Payments</span>}
             </button>
             <button
               onClick={() => setActiveSection('reports')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'reports' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <BarChart3Icon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Reports</span>}
             </button>
             <button
               onClick={() => setActiveSection('api-access')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api-access' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <ServerIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">API Access</span>}
             </button>
             <button
               onClick={() => setActiveSection('settings')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
-
+              
               <SettingsIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Settings</span>}
             </button>
@@ -1213,7 +1216,7 @@ export function Dashboard({
               src="https://via.placeholder.com/40"
               alt="User"
               className="rounded-full w-10 h-10" />
-
+            
               <div className="ml-3">
                 <div className="font-medium">{user?.name || 'Admin User'}</div>
                 <div className="text-xs text-blue-200">{user?.email}</div>
@@ -1239,7 +1242,7 @@ export function Dashboard({
                 type="text"
                 placeholder="Search..."
                 className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
+              
               <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             </div>
             <button className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
@@ -1251,7 +1254,7 @@ export function Dashboard({
             <button
               onClick={onLogout}
               className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-
+              
               <LogOutIcon className="h-4 w-4 mr-1" />
               Logout
             </button>
@@ -1259,6 +1262,12 @@ export function Dashboard({
         </header>
 
         <main className="p-6">{renderSection()}</main>
+
+        {/* Copyright Footer */}
+        <footer className="py-4 text-center text-sm text-gray-500 border-t border-gray-200 mt-auto">
+          &copy; {new Date().getFullYear()} MoTech Electrical and Electronics
+          Engineering Solutions. All rights reserved.
+        </footer>
       </div>
 
       <TokenModal
@@ -1272,7 +1281,7 @@ export function Dashboard({
         }
         token={tokenModal.token}
         amount={tokenModal.amount} />
-
+      
 
       <FilterModal
         isOpen={filterModal.isOpen}
@@ -1295,7 +1304,7 @@ export function Dashboard({
           }
         }}
         type={filterModal.type} />
-
+      
 
       <ViewMeterModal
         isOpen={viewModal.isOpen}
@@ -1323,7 +1332,7 @@ export function Dashboard({
         onSave={handleSaveEdit}
         meter={editModal.meter}
         type={editModal.type} />
-
+      
 
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
@@ -1337,14 +1346,14 @@ export function Dashboard({
         onConfirm={handleConfirmDelete}
         meterName={deleteModal.meter?.customerName || ''}
         accountNo={deleteModal.meter?.accountNo || ''} />
-
+      
 
       <CreateAccountModal
         isOpen={createAccountModal}
         onClose={() => setCreateAccountModal(false)}
         onCreateAccount={onCreateAccount}
         isAdmin={isAdmin} />
-
+      
     </div>);
 
 }

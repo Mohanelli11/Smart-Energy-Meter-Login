@@ -25,7 +25,7 @@ export function ViewMeterModal({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700">
-
+            
             <XIcon className="h-6 w-6" />
           </button>
         </div>
@@ -64,7 +64,7 @@ export function ViewMeterModal({
               meterAccountNo={meter.accountNo}
               userEmail={userEmail}
               currentStatus={meter.status} />
-
+            
           </div>
 
           {/* Customer Information */}
@@ -124,7 +124,7 @@ export function ViewMeterModal({
                 </p>
                 <p
                   className={`font-medium ${type === 'prepaid' ? parseFloat(meter.balance) > 50 ? 'text-green-600' : 'text-red-600' : 'text-blue-600'}`}>
-
+                  
                   Ksh {parseFloat(meter.balance).toLocaleString()}
                 </p>
               </div>
@@ -132,7 +132,7 @@ export function ViewMeterModal({
                 <p className="text-sm text-gray-600">Status</p>
                 <span
                   className={`inline-block px-3 py-1 text-xs rounded-full font-medium ${meter.status === 'Active' ? 'bg-green-100 text-green-800' : meter.status === 'Low Balance' ? 'bg-yellow-100 text-yellow-800' : meter.status === 'Disconnected' ? 'bg-red-100 text-red-800' : meter.status === 'Pending Bill' ? 'bg-yellow-100 text-yellow-800' : meter.status === 'Overdue' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
-
+                  
                   {meter.status}
                 </span>
               </div>
@@ -177,7 +177,7 @@ export function ViewMeterModal({
           <button
             onClick={onClose}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-
+            
             Close
           </button>
         </div>

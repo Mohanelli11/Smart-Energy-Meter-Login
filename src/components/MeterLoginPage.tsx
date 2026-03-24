@@ -55,7 +55,7 @@ export function MeterLoginPage({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g., MET-1234-2023"
                 required />
-
+              
             </div>
 
             <div>
@@ -76,14 +76,14 @@ export function MeterLoginPage({
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Enter password"
                   required />
-
+                
               </div>
             </div>
 
             <button
               type="submit"
               className="w-full flex items-center justify-center py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-
+              
               <LogInIcon className="h-5 w-5 mr-2" />
               Access Meter Dashboard
             </button>
@@ -93,7 +93,7 @@ export function MeterLoginPage({
             <button
               onClick={onBackToAdmin}
               className="text-sm text-blue-600 hover:text-blue-700">
-
+              
               ← Back to Admin Dashboard
             </button>
           </div>

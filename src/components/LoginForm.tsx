@@ -143,7 +143,7 @@ export function LoginForm({
             maxLength={254}
             disabled={isRateLimited}
             autoComplete="email" />
-
+          
         </div>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -163,7 +163,7 @@ export function LoginForm({
             maxLength={128}
             disabled={isRateLimited}
             autoComplete="current-password" />
-
+          
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -173,11 +173,11 @@ export function LoginForm({
               type="checkbox"
               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               disabled={isRateLimited} />
-
+            
             <label
               htmlFor="remember-me"
               className="ml-2 block text-sm text-gray-700">
-
+              
               Remember me
             </label>
           </div>
@@ -189,7 +189,7 @@ export function LoginForm({
                 e.preventDefault();
                 if (onForgotPassword) onForgotPassword();
               }}>
-
+              
               Forgot your password?
             </a>
           </div>
@@ -199,7 +199,7 @@ export function LoginForm({
             type="submit"
             disabled={isRateLimited}
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
-
+            
             <span className="absolute left-0 inset-y-0 flex items-center pl-3">
               <LogInIcon className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
             </span>

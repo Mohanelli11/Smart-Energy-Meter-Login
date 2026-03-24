@@ -95,7 +95,7 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
             <button
               onClick={handleExport}
               className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
-
+              
                 <DownloadIcon className="h-4 w-4 mr-1" />
                 Export CSV
               </button>
@@ -120,11 +120,11 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
                 <div
               className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => toggleExpand(`${issue.meterId}-${index}`)}>
-
+              
                   <div className="flex items-center space-x-4">
                     <div
                   className={`p-2 rounded-full ${issue.severity === 'critical' ? 'bg-red-100' : issue.severity === 'warning' ? 'bg-yellow-100' : 'bg-blue-100'}`}>
-
+                  
                       {getSeverityIcon(issue.severity)}
                     </div>
                     <div>
@@ -140,7 +140,7 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
                   <div className="flex items-center space-x-4">
                     <span
                   className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${getSeverityColor(issue.severity)}`}>
-
+                  
                       {issue.severity.toUpperCase()}
                     </span>
                     {expandedIssue === `${issue.meterId}-${index}` ?

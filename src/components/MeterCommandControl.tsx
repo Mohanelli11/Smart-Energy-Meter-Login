@@ -61,7 +61,7 @@ export function MeterCommandControl({
         <div className="flex items-center space-x-2">
           <span
             className={`px-2 py-1 text-xs rounded-full font-medium ${currentStatus === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-
+            
             Physical: {currentStatus}
           </span>
         </div>
@@ -94,13 +94,13 @@ export function MeterCommandControl({
             onClick={() => handleCommand('SWITCH_ON')}
             disabled={loading || isPending}
             className={`flex flex-col items-center justify-center w-32 h-32 rounded-xl border-2 transition-all ${isPending ? 'opacity-50 cursor-not-allowed border-gray-200 bg-gray-50' : 'border-green-100 bg-green-50 hover:bg-green-100 hover:border-green-300 cursor-pointer'}`}>
-
+            
             <PowerIcon
               className={`h-10 w-10 mb-2 ${isPending ? 'text-gray-400' : 'text-green-600'}`} />
-
+            
             <span
               className={`font-bold ${isPending ? 'text-gray-500' : 'text-green-700'}`}>
-
+              
               Switch ON
             </span>
           </button>
@@ -109,13 +109,13 @@ export function MeterCommandControl({
             onClick={() => handleCommand('SWITCH_OFF')}
             disabled={loading || isPending}
             className={`flex flex-col items-center justify-center w-32 h-32 rounded-xl border-2 transition-all ${isPending ? 'opacity-50 cursor-not-allowed border-gray-200 bg-gray-50' : 'border-red-100 bg-red-50 hover:bg-red-100 hover:border-red-300 cursor-pointer'}`}>
-
+            
             <PowerIcon
               className={`h-10 w-10 mb-2 ${isPending ? 'text-gray-400' : 'text-red-600'}`} />
-
+            
             <span
               className={`font-bold ${isPending ? 'text-gray-500' : 'text-red-700'}`}>
-
+              
               Switch OFF
             </span>
           </button>
@@ -152,7 +152,7 @@ export function MeterCommandControl({
             <div
               key={cmd.id}
               className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 text-sm">
-
+              
                   <div className="flex items-center">
                     {cmd.status === 'completed' ?
                 <CheckCircleIcon className="h-4 w-4 text-green-500 mr-3" /> :
@@ -174,7 +174,7 @@ export function MeterCommandControl({
                   </div>
                   <span
                 className={`px-2 py-0.5 text-xs rounded-full font-medium ${cmd.status === 'completed' ? 'bg-green-100 text-green-800' : cmd.status === 'failed' ? 'bg-red-100 text-red-800' : cmd.status === 'expired' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'}`}>
-
+                
                     {cmd.status}
                   </span>
                 </div>

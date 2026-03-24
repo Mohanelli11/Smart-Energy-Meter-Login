@@ -99,7 +99,7 @@ export function FilterModal({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700">
-
+            
             <XIcon className="h-6 w-6" />
           </button>
         </div>
@@ -118,7 +118,7 @@ export function FilterModal({
               })
               }
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-
+              
               <option value="">All Statuses</option>
               {statusOptions.map((status) =>
               <option key={status} value={status}>
@@ -142,7 +142,7 @@ export function FilterModal({
               })
               }
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-
+              
                 <option value="">All Locations</option>
                 {locations.map((location) =>
               <option key={location} value={location}>
@@ -170,7 +170,7 @@ export function FilterModal({
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0" />
-
+              
               </div>
 
               <div>
@@ -188,7 +188,7 @@ export function FilterModal({
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="100" />
-
+              
               </div>
 
               <div>
@@ -206,7 +206,7 @@ export function FilterModal({
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="0" />
-
+              
               </div>
 
               <div>
@@ -224,7 +224,7 @@ export function FilterModal({
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="5000" />
-
+              
               </div>
             </>
           }
@@ -245,7 +245,7 @@ export function FilterModal({
                 })
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
+              
               </div>
 
               <div>
@@ -262,7 +262,7 @@ export function FilterModal({
                 })
                 }
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
+              
               </div>
             </>
           }
@@ -272,13 +272,13 @@ export function FilterModal({
           <button
             onClick={handleReset}
             className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-
+            
             Reset Filters
           </button>
           <button
             onClick={handleApply}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-
+            
             Apply Filters
           </button>
         </div>

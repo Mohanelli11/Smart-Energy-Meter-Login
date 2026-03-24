@@ -59,7 +59,7 @@ export function MeterReports({ report, meterType }: MeterReportsProps) {
         <div className="flex items-center space-x-2">
           <span
             className={`px-3 py-1 text-xs rounded-full font-medium ${getStatusColor(report.status)}`}>
-
+            
             {report.status.toUpperCase()}
           </span>
           {isRecent &&
@@ -90,7 +90,7 @@ export function MeterReports({ report, meterType }: MeterReportsProps) {
               <SignalIcon className="h-4 w-4 mr-1 text-gray-500" />
               <span
                 className={`px-2 py-1 text-xs rounded-full font-medium ${getSignalColor(report.signalStrength)}`}>
-
+                
                 {report.signalStrength}
               </span>
             </div>

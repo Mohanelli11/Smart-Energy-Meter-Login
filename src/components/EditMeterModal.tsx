@@ -74,7 +74,7 @@ export function EditMeterModal({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700">
-
+            
             <XIcon className="h-6 w-6" />
           </button>
         </div>
@@ -85,7 +85,7 @@ export function EditMeterModal({
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="customerName">
-
+                
                 Customer Name
               </label>
               <input
@@ -95,14 +95,14 @@ export function EditMeterModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="phoneNumber">
-
+                
                 Phone Number
               </label>
               <input
@@ -111,14 +111,14 @@ export function EditMeterModal({
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="location">
-
+                
                 Location
               </label>
               <input
@@ -128,14 +128,14 @@ export function EditMeterModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="transformer">
-
+                
                 Transformer
               </label>
               <select
@@ -143,7 +143,7 @@ export function EditMeterModal({
                 value={formData.transformer}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-
+                
                 <option value="">Select Transformer</option>
                 <option value="TR-001">TR-001 (Nairobi West)</option>
                 <option value="TR-002">TR-002 (Kasarani)</option>
@@ -156,7 +156,7 @@ export function EditMeterModal({
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="customerType">
-
+                
                 Customer Type
               </label>
               <select
@@ -164,7 +164,7 @@ export function EditMeterModal({
                 value={formData.customerType}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-
+                
                 <option value="">Select Type</option>
                 <option value="tier-zero">Tier Zero (New Connection)</option>
                 <option value="existing">Existing Power</option>
@@ -175,7 +175,7 @@ export function EditMeterModal({
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="consumption">
-
+                
                 Consumption (kWh)
               </label>
               <input
@@ -186,14 +186,14 @@ export function EditMeterModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="balance">
-
+                
                 {type === 'prepaid' ? 'Balance (Ksh)' : 'Bill Amount (Ksh)'}
               </label>
               <input
@@ -204,14 +204,14 @@ export function EditMeterModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="status">
-
+                
                 Status
               </label>
               <select
@@ -220,7 +220,7 @@ export function EditMeterModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required>
-
+                
                 <option value="">Select Status</option>
                 {statusOptions.map((status) =>
                 <option key={status} value={status}>
@@ -234,7 +234,7 @@ export function EditMeterModal({
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="tariffRate">
-
+                
                 Tariff Rate (Ksh/kWh)
               </label>
               <input
@@ -244,7 +244,7 @@ export function EditMeterModal({
                 value={formData.tariffRate}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-
+              
             </div>
           </div>
 
@@ -252,7 +252,7 @@ export function EditMeterModal({
             <label
               className="block text-sm font-medium text-gray-700 mb-2"
               htmlFor="comments">
-
+              
               Comments
             </label>
             <textarea
@@ -269,13 +269,13 @@ export function EditMeterModal({
               type="button"
               onClick={onClose}
               className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-
+              
               Cancel
             </button>
             <button
               type="submit"
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-
+              
               Save Changes
             </button>
           </div>

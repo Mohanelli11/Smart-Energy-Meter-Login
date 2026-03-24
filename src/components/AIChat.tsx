@@ -4,7 +4,8 @@ import {
   SparklesIcon,
   DownloadIcon,
   Loader2Icon,
-  AlertTriangleIcon } from
+  AlertTriangleIcon,
+  PrinterIcon } from
 'lucide-react';
 import { Meter } from '../utils/meterStorage';
 import { processAIQuery } from '../utils/aiService';
@@ -27,7 +28,8 @@ const SUGGESTED_PROMPTS = [
 'Show me meters with critical issues',
 "What's the predicted consumption for next week?",
 'How many meters are currently offline?',
-"What's the average revenue per customer?"];
+"What's the average revenue per customer?",
+'Generate a maintenance ticket for meters with issues'];
 
 export function AIChat({ meters, transactions }: AIChatProps) {
   const [messages, setMessages] = useState<Message[]>([
@@ -43,6 +45,15 @@ export function AIChat({ meters, transactions }: AIChatProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState('');
   const [isRateLimited, setIsRateLimited] = useState(false);
+  const [maintenanceTicket, setMaintenanceTicket] = useState<{
+    ticketNumber: string;
+    date: string;
+    category: string;
+    description: string;
+    priority: string;
+    status: string;
+    assignedTo: string;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollToBottom = () => {
@@ -52,12 +63,43 @@ export function AIChat({ meters, transactions }: AIChatProps) {
   };
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, maintenanceTicket]);
+  const generateMaintenanceTicket = (prompt: string) => {
+    const priorities = ['High', 'Medium', 'Low'];
+    const randomPriority =
+    priorities[Math.floor(Math.random() * priorities.length)];
+    let category = 'General Maintenance';
+    if (prompt.toLowerCase().includes('consumption'))
+    category = 'Consumption Analysis';else
+    if (prompt.toLowerCase().includes('revenue'))
+    category = 'Revenue Audit';else
+    if (
+    prompt.toLowerCase().includes('offline') ||
+    prompt.toLowerCase().includes('issue'))
+
+    category = 'Meter Diagnostics';
+    setMaintenanceTicket({
+      ticketNumber: `MT-${new Date().getFullYear()}-${Math.floor(
+        Math.random() * 10000
+      ).
+      toString().
+      padStart(4, '0')}`,
+      date: new Date().toLocaleString(),
+      category,
+      description: `Automated ticket generated from AI analysis request: "${prompt}"`,
+      priority: randomPriority,
+      status: 'Open',
+      assignedTo: 'MoTech Engineering Team'
+    });
+  };
   const handleSend = async (query?: string) => {
     const messageText = query || input.trim();
     if (!messageText) return;
     setError('');
     setIsRateLimited(false);
+    if (query && SUGGESTED_PROMPTS.includes(query)) {
+      generateMaintenanceTicket(query);
+    }
     // Validate message
     const validation = validateChatMessage(messageText);
     if (!validation.valid) {
@@ -189,15 +231,28 @@ export function AIChat({ meters, transactions }: AIChatProps) {
             </p>
           </div>
         </div>
-        <button
-          onClick={exportConversation}
-          disabled={isRateLimited}
-          className="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Export Conversation">
-
-          <DownloadIcon className="h-4 w-4 mr-1" />
-          Export
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() =>
+            generateMaintenanceTicket('Manual Ticket Generation')
+            }
+            disabled={isRateLimited || isTyping}
+            className="flex items-center px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-blue-200 bg-white"
+            title="Generate Maintenance Ticket">
+            
+            <PrinterIcon className="h-4 w-4 mr-1" />
+            Generate Ticket
+          </button>
+          <button
+            onClick={exportConversation}
+            disabled={isRateLimited}
+            className="flex items-center px-3 py-1.5 text-sm text-gray-600 hover:bg-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Export Conversation">
+            
+            <DownloadIcon className="h-4 w-4 mr-1" />
+            Export
+          </button>
+        </div>
       </div>
 
       {/* Error/Rate Limit Message */}
@@ -216,16 +271,16 @@ export function AIChat({ meters, transactions }: AIChatProps) {
         <div
           key={message.id}
           className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-
+          
             <div
             className={`max-w-[80%] rounded-lg px-4 py-3 ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
-
+            
               <p className="text-sm whitespace-pre-wrap break-words">
                 {message.content}
               </p>
               <p
               className={`text-xs mt-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
-
+              
                 {message.timestamp.toLocaleTimeString()}
               </p>
             </div>
@@ -237,6 +292,88 @@ export function AIChat({ meters, transactions }: AIChatProps) {
             <div className="bg-gray-100 rounded-lg px-4 py-3 flex items-center space-x-2">
               <Loader2Icon className="h-4 w-4 text-gray-500 animate-spin" />
               <span className="text-sm text-gray-500">AI is thinking...</span>
+            </div>
+          </div>
+        }
+
+        {maintenanceTicket && !isTyping &&
+        <div className="flex justify-start mt-4">
+            <div className="maintenance-ticket-printable relative w-full max-w-md bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden">
+              {/* Watermark */}
+              <div className="absolute top-2 left-2 opacity-15 pointer-events-none z-0">
+                <img
+                src="/image_639ac6c2.png"
+                alt="MoTech Watermark"
+                className="w-24 h-24 object-contain" />
+              
+              </div>
+
+              <div className="relative z-10 p-5">
+                <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-3">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-lg">
+                      Maintenance Ticket
+                    </h4>
+                    <p className="text-sm text-gray-500">
+                      {maintenanceTicket.ticketNumber}
+                    </p>
+                  </div>
+                  <button
+                  onClick={() => window.print()}
+                  className="p-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors print:hidden"
+                  title="Print Ticket">
+                  
+                    <PrinterIcon className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-gray-500 font-medium">Date:</span>
+                    <span className="col-span-2 text-gray-900">
+                      {maintenanceTicket.date}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-gray-500 font-medium">Category:</span>
+                    <span className="col-span-2 text-gray-900">
+                      {maintenanceTicket.category}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-gray-500 font-medium">Priority:</span>
+                    <span className="col-span-2">
+                      <span
+                      className={`px-2 py-0.5 rounded text-xs font-medium ${maintenanceTicket.priority === 'High' ? 'bg-red-100 text-red-800' : maintenanceTicket.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                      
+                        {maintenanceTicket.priority}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-gray-500 font-medium">Status:</span>
+                    <span className="col-span-2 text-gray-900">
+                      {maintenanceTicket.status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <span className="text-gray-500 font-medium">
+                      Assigned To:
+                    </span>
+                    <span className="col-span-2 text-gray-900">
+                      {maintenanceTicket.assignedTo}
+                    </span>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <span className="block text-gray-500 font-medium mb-1">
+                      Description:
+                    </span>
+                    <p className="text-gray-800 bg-gray-50 p-3 rounded border border-gray-100">
+                      {maintenanceTicket.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         }
@@ -255,7 +392,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
             onClick={() => handleSend(prompt)}
             disabled={isTyping}
             className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-
+            
                 {prompt}
               </button>
           )}
@@ -281,13 +418,13 @@ export function AIChat({ meters, transactions }: AIChatProps) {
             disabled={isTyping || isRateLimited}
             maxLength={500}
             autoComplete="off" />
-
+          
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || isTyping || isRateLimited}
             className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             title="Send message">
-
+            
             <SendIcon className="h-5 w-5" />
           </button>
         </div>

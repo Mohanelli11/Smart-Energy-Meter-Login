@@ -51,7 +51,7 @@ export function LoginPage({
                   src="/image_639ac6c2.png"
                   alt="MoTech Electrical and Electronics Engineering Solutions"
                   className="h-14 w-14 object-cover rounded-full" />
-
+                
               </div>
               <h3 className="ml-4 text-xl font-medium text-gray-900">
                 Prepaid & Postpaid Energy Management
@@ -78,7 +78,7 @@ export function LoginPage({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round">
-
+                    
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                   Prepaid meter token recharge
@@ -93,7 +93,7 @@ export function LoginPage({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round">
-
+                    
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                   Postpaid billing management
@@ -108,7 +108,7 @@ export function LoginPage({
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round">
-
+                    
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
                   Real-time usage monitoring

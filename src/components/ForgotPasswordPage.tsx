@@ -103,7 +103,7 @@ export function ForgotPasswordPage({
         <button
           onClick={onBackToLogin}
           className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors">
-
+          
           <ArrowLeftIcon className="h-4 w-4 mr-1" />
           Back to Login
         </button>
@@ -150,13 +150,13 @@ export function ForgotPasswordPage({
               className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="e.g., +254700000000"
               required />
-
+            
             </div>
           </div>
           <button
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-
+          
             Send OTP
           </button>
         </form>
@@ -188,7 +188,7 @@ export function ForgotPasswordPage({
               </label>
               <span
               className={`text-sm font-medium ${timeLeft < 60 ? 'text-red-600' : 'text-gray-500'}`}>
-
+              
                 {formatTime(timeLeft)}
               </span>
             </div>
@@ -207,14 +207,14 @@ export function ForgotPasswordPage({
               placeholder="000000"
               required
               maxLength={6} />
-
+            
             </div>
           </div>
           <button
           type="submit"
           disabled={timeLeft === 0}
           className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
-
+          
             Verify Code
           </button>
           <div className="text-center">
@@ -225,7 +225,7 @@ export function ForgotPasswordPage({
               setOtp('');
             }}
             className="text-sm text-blue-600 hover:text-blue-800">
-
+            
               Didn't receive the code? Try again
             </button>
           </div>
@@ -254,7 +254,7 @@ export function ForgotPasswordPage({
               placeholder="Minimum 6 characters"
               required
               minLength={6} />
-
+            
             </div>
           </div>
           <div>
@@ -276,13 +276,13 @@ export function ForgotPasswordPage({
               placeholder="Re-enter new password"
               required
               minLength={6} />
-
+            
             </div>
           </div>
           <button
           type="submit"
           className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-
+          
             Reset Password
           </button>
         </form>
@@ -304,7 +304,7 @@ export function ForgotPasswordPage({
           <button
           onClick={onBackToLogin}
           className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-
+          
             Return to Login Now
           </button>
         </div>

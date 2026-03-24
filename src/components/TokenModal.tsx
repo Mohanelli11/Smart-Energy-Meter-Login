@@ -31,7 +31,7 @@ export function TokenModal({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700">
-
+            
             <XIcon className="h-6 w-6" />
           </button>
         </div>
@@ -49,21 +49,21 @@ export function TokenModal({
           <button
             onClick={copyToken}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
-
+            
             <CopyIcon className="h-4 w-4 mr-2" />
             Copy
           </button>
           <button
             onClick={sendToken}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center">
-
+            
             <SendIcon className="h-4 w-4 mr-2" />
             Send SMS
           </button>
           <button
             onClick={printToken}
             className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center">
-
+            
             <PrinterIcon className="h-4 w-4 mr-2" />
             Print
           </button>

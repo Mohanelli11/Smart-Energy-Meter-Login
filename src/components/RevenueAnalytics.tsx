@@ -85,7 +85,7 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
             <button
               onClick={handleExport}
               className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
-
+              
               <DownloadIcon className="h-4 w-4 mr-1" />
               Export CSV
             </button>
@@ -101,12 +101,12 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                   left: 40,
                   bottom: 5
                 }}>
-
+                
                 <CartesianGrid
                   strokeDasharray="3 3"
                   horizontal={true}
                   vertical={false} />
-
+                
                 <XAxis type="number" hide />
                 <YAxis
                   dataKey="name"
@@ -115,7 +115,7 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                   tick={{
                     fontSize: 12
                   }} />
-
+                
                 <Tooltip
                   formatter={(value: number) => [
                   `Ksh ${value.toLocaleString()}`,
@@ -124,13 +124,13 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                   cursor={{
                     fill: '#F3F4F6'
                   }} />
-
+                
                 <Bar
                   dataKey="value"
                   fill="#3B82F6"
                   radius={[0, 4, 4, 0]}
                   barSize={30}>
-
+                  
                   {topCustomerData.map((entry, index) =>
                   <Cell
                     key={`cell-${index}`}
@@ -159,7 +159,7 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                   fill="#8884d8"
                   paddingAngle={5}
                   dataKey="value">
-
+                  
                   {topCustomerData.map((entry, index) =>
                   <Cell
                     key={`cell-${index}`}
@@ -169,7 +169,7 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                 </Pie>
                 <Tooltip
                   formatter={(value: number) => `Ksh ${value.toLocaleString()}`} />
-
+                
                 <Legend />
               </PieChart>
             </ResponsiveContainer>

@@ -107,7 +107,7 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
             onClick={refreshAnalysis}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
             title="Refresh Analysis">
-
+            
             <RefreshCwIcon className="h-5 w-5" />
           </button>
         </div>
@@ -118,28 +118,28 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
         <button
           onClick={() => setActiveTab('chat')}
           className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'chat' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
-
+          
           <MessageSquareIcon className="h-4 w-4 mr-2" />
           AI Assistant
         </button>
         <button
           onClick={() => setActiveTab('consumption')}
           className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'consumption' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
-
+          
           <TrendingUpIcon className="h-4 w-4 mr-2" />
           Consumption & Trends
         </button>
         <button
           onClick={() => setActiveTab('revenue')}
           className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'revenue' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
-
+          
           <DollarSignIcon className="h-4 w-4 mr-2" />
           Revenue Analytics
         </button>
         <button
           onClick={() => setActiveTab('diagnostics')}
           className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'diagnostics' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
-
+          
           <ActivityIcon className="h-4 w-4 mr-2" />
           Meter Diagnostics
           {analysisResult.diagnostics.length > 0 &&

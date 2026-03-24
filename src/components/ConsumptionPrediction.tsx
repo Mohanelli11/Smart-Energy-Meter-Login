@@ -71,11 +71,11 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
             </h3>
             <div
               className={`h-2 w-2 rounded-full ${trend >= 0 ? 'bg-green-500' : 'bg-red-500'}`} />
-
+            
           </div>
           <p
             className={`text-2xl font-bold ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-
+            
             {trend > 0 ? '+' : ''}
             {trend.toFixed(1)}%
           </p>
@@ -107,7 +107,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
             <button
               onClick={handleExport}
               className="flex items-center px-3 py-1.5 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium transition-colors">
-
+              
               <DownloadIcon className="h-4 w-4 mr-1" />
               Export CSV
             </button>
@@ -124,7 +124,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                 left: 0,
                 bottom: 0
               }}>
-
+              
               <defs>
                 <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.8} />
@@ -139,7 +139,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                 strokeDasharray="3 3"
                 vertical={false}
                 stroke="#E5E7EB" />
-
+              
               <XAxis
                 dataKey="date"
                 tick={{
@@ -148,7 +148,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                 }}
                 axisLine={false}
                 tickLine={false} />
-
+              
               <YAxis
                 tick={{
                   fontSize: 12,
@@ -164,7 +164,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                     fill: '#9CA3AF'
                   }
                 }} />
-
+              
               <Tooltip
                 contentStyle={{
                   backgroundColor: '#fff',
@@ -176,7 +176,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                 `${value.toFixed(2)} kWh`,
                 'Consumption']
                 } />
-
+              
               <Area
                 type="monotone"
                 dataKey="actual"
@@ -185,7 +185,7 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                 fill="url(#colorActual)"
                 strokeWidth={2}
                 name="Actual Usage" />
-
+              
               <Area
                 type="monotone"
                 dataKey="predicted"
@@ -195,14 +195,14 @@ export function ConsumptionPrediction({ data }: ConsumptionPredictionProps) {
                 fill="url(#colorPredicted)"
                 strokeWidth={2}
                 name="Forecast" />
-
+              
               <Area
                 type="monotone"
                 dataKey="upperBound"
                 stroke="transparent"
                 fill="#8B5CF6"
                 fillOpacity={0.1} />
-
+              
             </AreaChart>
           </ResponsiveContainer>
         </div>

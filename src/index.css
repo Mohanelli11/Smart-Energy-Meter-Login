@@ -4,3 +4,25 @@
 @import 'tailwindcss/utilities';
 
 /* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .maintenance-ticket-printable, .maintenance-ticket-printable * {
+    visibility: visible;
+  }
+  .maintenance-ticket-printable {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important;
+  }
+  .maintenance-ticket-printable button {
+    display: none !important;
+  }
+}

@@ -116,7 +116,7 @@ export function ApiManagement({ user }: ApiManagementProps) {
             <div
               key={req.id}
               className="border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white hover:bg-gray-50 transition-colors">
-
+              
                   <div>
                     <p className="font-semibold text-gray-900">{req.name}</p>
                     <p className="text-sm text-gray-600">{req.email}</p>
@@ -129,14 +129,14 @@ export function ApiManagement({ user }: ApiManagementProps) {
                     <button
                   onClick={() => handleAction(req.id, 'approved')}
                   className="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors">
-
+                  
                       <CheckCircleIcon className="h-4 w-4 mr-1.5" />
                       Approve
                     </button>
                     <button
                   onClick={() => handleAction(req.id, 'rejected')}
                   className="flex items-center px-3 py-1.5 bg-red-100 text-red-700 text-sm rounded-md hover:bg-red-200 transition-colors">
-
+                  
                       <XCircleIcon className="h-4 w-4 mr-1.5" />
                       Reject
                     </button>
@@ -182,7 +182,7 @@ export function ApiManagement({ user }: ApiManagementProps) {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${req.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-
+                      
                         {req.status}
                       </span>
                     </td>
@@ -234,7 +234,7 @@ export function ApiManagement({ user }: ApiManagementProps) {
             <button
             onClick={handleRequestAccess}
             className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-
+            
               Request API Access
             </button>
           </div> :
@@ -242,7 +242,7 @@ export function ApiManagement({ user }: ApiManagementProps) {
         <div className="space-y-6">
             <div
             className={`p-4 rounded-lg border ${userRequest.status === 'approved' ? 'bg-green-50 border-green-200' : userRequest.status === 'rejected' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}`}>
-
+            
               <div className="flex items-start">
                 {userRequest.status === 'approved' ?
               <CheckCircleIcon className="h-5 w-5 text-green-600 mt-0.5 mr-3" /> :
@@ -254,14 +254,14 @@ export function ApiManagement({ user }: ApiManagementProps) {
                 <div>
                   <h4
                   className={`text-sm font-bold ${userRequest.status === 'approved' ? 'text-green-800' : userRequest.status === 'rejected' ? 'text-red-800' : 'text-yellow-800'}`}>
-
+                  
                     Request Status:{' '}
                     {userRequest.status.charAt(0).toUpperCase() +
                   userRequest.status.slice(1)}
                   </h4>
                   <p
                   className={`text-sm mt-1 ${userRequest.status === 'approved' ? 'text-green-700' : userRequest.status === 'rejected' ? 'text-red-700' : 'text-yellow-700'}`}>
-
+                  
                     {userRequest.status === 'approved' ?
                   'Your API access has been granted. Use the key below to authenticate your requests.' :
                   userRequest.status === 'rejected' ?
@@ -285,7 +285,7 @@ export function ApiManagement({ user }: ApiManagementProps) {
                 onClick={() => copyToClipboard(userRequest.apiKey!)}
                 className="ml-3 p-3 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg border border-gray-300 transition-colors"
                 title="Copy to clipboard">
-
+                
                     {copied ?
                 <CheckCircleIcon className="h-5 w-5 text-green-600" /> :
 

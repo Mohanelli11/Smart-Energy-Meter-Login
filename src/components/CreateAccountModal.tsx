@@ -42,7 +42,7 @@ export function CreateAccountModal({
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700">
-
+              
               <XIcon className="h-6 w-6" />
             </button>
           </div>
@@ -56,7 +56,7 @@ export function CreateAccountModal({
             <button
               onClick={onClose}
               className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-
+              
               Close
             </button>
           </div>
@@ -135,7 +135,7 @@ export function CreateAccountModal({
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700">
-
+            
             <XIcon className="h-6 w-6" />
           </button>
         </div>
@@ -152,7 +152,7 @@ export function CreateAccountModal({
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="name">
-
+                
                 Full Name
               </label>
               <input
@@ -163,14 +163,14 @@ export function CreateAccountModal({
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter full name"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="email">
-
+                
                 Email Address
               </label>
               <input
@@ -181,14 +181,14 @@ export function CreateAccountModal({
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="user@example.com"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="phoneNumber">
-
+                
                 Phone Number
               </label>
               <input
@@ -199,14 +199,14 @@ export function CreateAccountModal({
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="+254700000000"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="password">
-
+                
                 Password
               </label>
               <input
@@ -217,14 +217,14 @@ export function CreateAccountModal({
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Minimum 6 characters"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="confirmPassword">
-
+                
                 Confirm Password
               </label>
               <input
@@ -235,14 +235,14 @@ export function CreateAccountModal({
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Re-enter password"
                 required />
-
+              
             </div>
 
             <div>
               <label
                 className="block text-sm font-medium text-gray-700 mb-2"
                 htmlFor="role">
-
+                
                 Account Role
               </label>
               <select
@@ -250,7 +250,7 @@ export function CreateAccountModal({
                 value={formData.role}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-
+                
                 <option value="user">User</option>
                 <option value="admin">Administrator</option>
               </select>
@@ -262,13 +262,13 @@ export function CreateAccountModal({
               type="button"
               onClick={onClose}
               className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-
+              
               Cancel
             </button>
             <button
               type="submit"
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-
+              
               Create Account
             </button>
           </div>
