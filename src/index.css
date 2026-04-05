@@ -6,23 +6,87 @@
 /* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
 
 @media print {
+  /* Reset page margins */
+  @page {
+    margin: 0.5cm;
+  }
+  /* Hide everything first */
   body * {
     visibility: hidden;
   }
-  .maintenance-ticket-printable, .maintenance-ticket-printable * {
+  /* Show only the maintenance ticket and all its children */
+  .maintenance-ticket-printable,
+  .maintenance-ticket-printable * {
     visibility: visible;
   }
+  /* Position the ticket for printing */
   .maintenance-ticket-printable {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    max-width: 100%;
     margin: 0;
     padding: 20px;
     box-shadow: none !important;
-    border: 1px solid #e5e7eb !important;
+    border: 1px solid #e5e7eb;
+    background: white !important;
+    page-break-inside: avoid;
   }
-  .maintenance-ticket-printable button {
+  /* Hide buttons when printing */
+  button,
+  .print\\:hidden {
     display: none !important;
+  }
+  /* Ensure colors and backgrounds print correctly */
+  html,
+  body,
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  /* Force backgrounds to print */
+  .maintenance-ticket-printable,
+  .maintenance-ticket-printable * {
+    background-color: inherit !important;
+  }
+  /* Preserve specific background colors */
+  .maintenance-ticket-printable .bg-red-100 {
+    background-color: #fee2e2 !important;
+  }
+  .maintenance-ticket-printable .bg-yellow-100 {
+    background-color: #fef3c7 !important;
+  }
+  .maintenance-ticket-printable .bg-green-100 {
+    background-color: #dcfce7 !important;
+  }
+  .maintenance-ticket-printable .bg-blue-100 {
+    background-color: #dbeafe !important;
+  }
+  .maintenance-ticket-printable .bg-gray-50 {
+    background-color: #f9fafb !important;
+  }
+  .maintenance-ticket-printable .bg-blue-50 {
+    background-color: #eff6ff !important;
+  }
+  /* Preserve text colors */
+  .maintenance-ticket-printable .text-red-800 {
+    color: #991b1b !important;
+  }
+  .maintenance-ticket-printable .text-yellow-800 {
+    color: #854d0e !important;
+  }
+  .maintenance-ticket-printable .text-green-800 {
+    color: #166534 !important;
+  }
+  .maintenance-ticket-printable .text-blue-800 {
+    color: #1e40af !important;
+  }
+  .maintenance-ticket-printable .text-gray-900 {
+    color: #111827 !important;
+  }
+  .maintenance-ticket-printable .text-gray-500 {
+    color: #6b7280 !important;
   }
 }

@@ -7,7 +7,8 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   ActivityIcon,
-  DownloadIcon } from
+  DownloadIcon,
+  PrinterIcon } from
 'lucide-react';
 import { DiagnosticIssue, exportDiagnosticsReport } from '../utils/aiService';
 interface MeterDiagnosticsProps {
@@ -15,6 +16,17 @@ interface MeterDiagnosticsProps {
 }
 export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
   const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
+  const [maintenanceTicket, setMaintenanceTicket] = useState<{
+    ticketNumber: string;
+    date: string;
+    meterId: string;
+    customerName: string;
+    location: string;
+    issue: string;
+    severity: string;
+    recommendation: string;
+    steps: string[];
+  } | null>(null);
   const criticalCount = issues.filter((i) => i.severity === 'critical').length;
   const warningCount = issues.filter((i) => i.severity === 'warning').length;
   const infoCount = issues.filter((i) => i.severity === 'info').length;
@@ -47,6 +59,23 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
   };
   const handleExport = () => {
     exportDiagnosticsReport(issues);
+  };
+  const generateMaintenanceTicket = (issue: DiagnosticIssue) => {
+    setMaintenanceTicket({
+      ticketNumber: `MT-${new Date().getFullYear()}-${Math.floor(
+        Math.random() * 10000
+      ).
+      toString().
+      padStart(4, '0')}`,
+      date: new Date().toLocaleString(),
+      meterId: issue.meterId,
+      customerName: issue.customerName,
+      location: issue.location,
+      issue: issue.issue,
+      severity: issue.severity,
+      recommendation: issue.recommendation,
+      steps: issue.steps
+    });
   };
   return (
     <div className="space-y-6">
@@ -171,7 +200,11 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
                   )}
                       </ol>
                       <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end">
-                        <button className="text-xs text-blue-600 hover:text-blue-800 font-medium">
+                        <button
+                    onClick={() => generateMaintenanceTicket(issue)}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                    
+                          <PrinterIcon className="h-3 w-3 mr-1" />
                           Generate Maintenance Ticket
                         </button>
                       </div>
@@ -183,6 +216,166 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
           </div>
         }
       </div>
+
+      {/* Maintenance Ticket Modal */}
+      {maintenanceTicket &&
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="maintenance-ticket-printable relative bg-white">
+              {/* Watermark */}
+              <div className="absolute top-4 left-4 opacity-15 pointer-events-none z-0">
+                <img
+                src="/image_639ac6c2.png"
+                alt="MoTech Watermark"
+                className="w-32 h-32 object-contain" />
+              
+              </div>
+
+              <div className="relative z-10 p-8">
+                {/* Header */}
+                <div className="flex justify-between items-start border-b border-gray-200 pb-4 mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Maintenance Ticket
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {maintenanceTicket.ticketNumber}
+                    </p>
+                  </div>
+                  <div className="flex space-x-2 print:hidden">
+                    <button
+                    onClick={() => window.print()}
+                    className="p-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                    title="Print Ticket">
+                    
+                      <PrinterIcon className="h-5 w-5" />
+                    </button>
+                    <button
+                    onClick={() => setMaintenanceTicket(null)}
+                    className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded transition-colors">
+                    
+                      Close
+                    </button>
+                  </div>
+                </div>
+
+                {/* Ticket Details */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        Date & Time
+                      </p>
+                      <p className="text-sm text-gray-900">
+                        {maintenanceTicket.date}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        Severity
+                      </p>
+                      <span
+                      className={`inline-block px-2 py-1 rounded text-xs font-medium ${maintenanceTicket.severity === 'critical' ? 'bg-red-100 text-red-800' : maintenanceTicket.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'}`}>
+                      
+                        {maintenanceTicket.severity.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        Meter ID
+                      </p>
+                      <p className="text-sm text-gray-900">
+                        {maintenanceTicket.meterId}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium">
+                        Customer Name
+                      </p>
+                      <p className="text-sm text-gray-900">
+                        {maintenanceTicket.customerName}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium">
+                      Location
+                    </p>
+                    <p className="text-sm text-gray-900">
+                      {maintenanceTicket.location}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 font-medium mb-2">
+                      Issue Description
+                    </p>
+                    <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded border border-gray-200">
+                      {maintenanceTicket.issue}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-2">
+                      Recommendation
+                    </p>
+                    <p className="text-sm text-gray-900 bg-blue-50 p-3 rounded border border-blue-200">
+                      {maintenanceTicket.recommendation}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-2">
+                      Troubleshooting Steps
+                    </p>
+                    <ol className="list-decimal list-inside space-y-2 bg-gray-50 p-4 rounded border border-gray-200">
+                      {maintenanceTicket.steps.map((step, idx) =>
+                    <li key={idx} className="text-sm text-gray-700">
+                          {step}
+                        </li>
+                    )}
+                    </ol>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">
+                          Status
+                        </p>
+                        <p className="text-sm text-gray-900">Open</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">
+                          Assigned To
+                        </p>
+                        <p className="text-sm text-gray-900">
+                          MoTech Engineering Team
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="mt-8 pt-4 border-t border-gray-200 text-center">
+                  <p className="text-xs text-gray-500">
+                    MoTech Electrical and Electronics Engineering Solutions
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    This is an automated maintenance ticket. Please contact
+                    support for assistance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     </div>);
 
 }
