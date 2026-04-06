@@ -1,15 +1,91 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { MeterLoginPage } from './components/MeterLoginPage';
 import { IndividualMeterView } from './components/IndividualMeterView';
+import {
+  createSession,
+  getSession,
+  clearSession,
+  refreshSession } from
+'./utils/security';
+const SESSION_USER_KEY = 'motech_user';
+const SESSION_VIEWMODE_KEY = 'motech_viewMode';
 export function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const session = getSession();
+    if (session) {
+      refreshSession();
+      return true;
+    }
+    return false;
+  });
+  const [user, setUser] = useState(() => {
+    const session = getSession();
+    if (session) {
+      try {
+        const stored = sessionStorage.getItem(SESSION_USER_KEY);
+        if (stored) return JSON.parse(stored);
+        // Fallback: reconstruct minimal user from session
+        return {
+          email: session.email,
+          name: session.email,
+          role: session.role,
+          accountType: 'admin'
+        };
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
   const [viewMode, setViewMode] = useState<
     'admin' | 'meter-login' | 'meter-view'>(
-    'admin');
+    () => {
+      const session = getSession();
+      if (session) {
+        const stored = sessionStorage.getItem(SESSION_VIEWMODE_KEY);
+        if (
+        stored === 'admin' ||
+        stored === 'meter-login' ||
+        stored === 'meter-view')
+        {
+          return stored;
+        }
+      }
+      return 'admin';
+    });
   const [currentMeter, setCurrentMeter] = useState(null);
+  // Persist user and viewMode to sessionStorage whenever they change
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(user));
+    }
+  }, [user, isLoggedIn]);
+  useEffect(() => {
+    if (isLoggedIn) {
+      sessionStorage.setItem(SESSION_VIEWMODE_KEY, viewMode);
+    }
+  }, [viewMode, isLoggedIn]);
+  // Periodically refresh session to keep it alive while user is active
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const interval = setInterval(() => {
+      const session = getSession();
+      if (!session) {
+        // Session expired
+        setUser(null);
+        setIsLoggedIn(false);
+        setViewMode('admin');
+        setCurrentMeter(null);
+        sessionStorage.removeItem(SESSION_USER_KEY);
+        sessionStorage.removeItem(SESSION_VIEWMODE_KEY);
+      } else {
+        refreshSession();
+      }
+    }, 60000); // Check every minute
+    return () => clearInterval(interval);
+  }, [isLoggedIn]);
   // User accounts database (in a real app, this would be in a backend)
   const [userAccounts, setUserAccounts] = useState([
   {
@@ -108,14 +184,20 @@ export function App() {
       acc.password === userData.password
     );
     if (account) {
-      setUser({
+      const userObj = {
         email: account.email,
         name: account.name,
         role: account.role,
         accountType: userData.accountType
-      });
+      };
+      setUser(userObj);
       setIsLoggedIn(true);
       setViewMode('admin');
+      // Create secure session
+      createSession(account.email, account.email, account.role);
+      // Persist user data
+      sessionStorage.setItem(SESSION_USER_KEY, JSON.stringify(userObj));
+      sessionStorage.setItem(SESSION_VIEWMODE_KEY, 'admin');
     }
   };
   const handleLogout = () => {
@@ -123,6 +205,11 @@ export function App() {
     setIsLoggedIn(false);
     setViewMode('admin');
     setCurrentMeter(null);
+    // Clear session
+    clearSession();
+    sessionStorage.removeItem(SESSION_USER_KEY);
+    sessionStorage.removeItem(SESSION_VIEWMODE_KEY);
+    sessionStorage.removeItem('motech_activeSection');
   };
   const handlePasswordChange = (phone: string, newPassword: string) => {
     setUserAccounts((prevAccounts) =>

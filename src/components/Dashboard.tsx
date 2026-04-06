@@ -327,7 +327,14 @@ export function Dashboard({
   onMeterLogin
 }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeSection, setActiveSection] = useState('dashboard');
+  const [activeSection, setActiveSection] = useState(() => {
+    const stored = sessionStorage.getItem('motech_activeSection');
+    return stored || 'dashboard';
+  });
+  // Persist activeSection to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem('motech_activeSection', activeSection);
+  }, [activeSection]);
   const [tokenModal, setTokenModal] = useState({
     isOpen: false,
     token: '',
