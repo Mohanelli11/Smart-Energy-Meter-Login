@@ -3,6 +3,7 @@ import { LoginPage } from './components/LoginPage';
 import { Dashboard } from './components/Dashboard';
 import { MeterLoginPage } from './components/MeterLoginPage';
 import { IndividualMeterView } from './components/IndividualMeterView';
+import { OfflineGate } from './components/OfflineGate';
 import {
   createSession,
   getSession,
@@ -12,6 +13,20 @@ import {
 const SESSION_USER_KEY = 'motech_user';
 const SESSION_VIEWMODE_KEY = 'motech_viewMode';
 export function App() {
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+  // Listen for online/offline events
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     const session = getSession();
     if (session) {
@@ -261,6 +276,10 @@ export function App() {
   const handleBackToAdmin = () => {
     setViewMode('admin');
   };
+  // Block all access if offline
+  if (!isOnline) {
+    return <OfflineGate />;
+  }
   // Render based on view mode
   if (!isLoggedIn) {
     return (
