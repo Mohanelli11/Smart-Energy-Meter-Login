@@ -7,7 +7,6 @@ import {
   FileTextIcon,
   CreditCardIcon,
   PlusCircleIcon,
-  BoltIcon,
   BarChart3Icon,
   SettingsIcon,
   SearchIcon,
@@ -19,7 +18,8 @@ import {
   UserPlusIcon,
   KeyIcon,
   BrainCircuitIcon,
-  ServerIcon } from
+  ServerIcon,
+  GaugeIcon } from
 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { MeterTable } from './MeterTable';
@@ -34,6 +34,7 @@ import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
 import { AIInsights } from './AIInsights';
 import { ApiManagement } from './ApiManagement'; // Added import
+import { DataLogger } from './DataLogger';
 import {
   savePrepaidMeters,
   loadPrepaidMeters,
@@ -811,6 +812,8 @@ export function Dashboard({
       case 'api-access':
         // New Case
         return <ApiManagement user={user} />;
+      case 'data-logger':
+        return <DataLogger isAdmin={isAdmin} />;
       case 'prepaid':
         return (
           <div className="bg-white p-6 rounded-lg shadow">
@@ -1189,7 +1192,7 @@ export function Dashboard({
               onClick={() => setActiveSection('live-payments')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'live-payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
-              <BoltIcon className="h-5 w-5 animate-pulse" />
+              <ZapIcon className="h-5 w-5 animate-pulse" />
               {!sidebarCollapsed && <span className="ml-3">Live Payments</span>}
             </button>
             <button
@@ -1206,6 +1209,15 @@ export function Dashboard({
               <ServerIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">API Access</span>}
             </button>
+            {isAdmin &&
+            <button
+              onClick={() => setActiveSection('data-logger')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'data-logger' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              
+                <GaugeIcon className="h-5 w-5" />
+                {!sidebarCollapsed && <span className="ml-3">Data Logger</span>}
+              </button>
+            }
             <button
               onClick={() => setActiveSection('settings')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
@@ -1240,6 +1252,8 @@ export function Dashboard({
             'AI Insights' :
             activeSection === 'api-access' ?
             'API Access Management' :
+            activeSection === 'data-logger' ?
+            '3-Phase Data Logger' :
             activeSection.charAt(0).toUpperCase() +
             activeSection.slice(1).replace('-', ' ')}
           </h1>

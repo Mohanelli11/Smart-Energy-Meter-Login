@@ -24,6 +24,7 @@ interface AIChatProps {
 }
 const SUGGESTED_PROMPTS = [
 "What's the total consumption across all meters?",
+'Show analytics for meter MET-1000-2023',
 'Which customers have the highest revenue?',
 'Show me meters with critical issues',
 "What's the predicted consumption for next week?",

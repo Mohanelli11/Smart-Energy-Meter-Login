@@ -260,6 +260,111 @@ export const runDiagnostics = (meters: Meter[]): DiagnosticIssue[] => {
   });
 };
 
+// 3b. Per-Meter Analytics — look up a single meter by account no, meter no, or customer name
+export const analyzeMeterByQuery = (
+query: string,
+meters: Meter[],
+transactions: any[])
+: string | null => {
+  const lowerQuery = query.toLowerCase();
+
+  // Try to match an explicit account number (MET-XXXX-YYYY) or meter number (ESP-XXXX-001)
+  const accountMatch = query.match(/MET-\d+-\d+/i);
+  const meterMatch = query.match(/ESP-\d+-\d+/i);
+
+  let target: Meter | undefined;
+
+  if (accountMatch) {
+    target = meters.find(
+      (m) => m.accountNo.toLowerCase() === accountMatch[0].toLowerCase()
+    );
+  }
+  if (!target && meterMatch) {
+    target = meters.find(
+      (m) => m.meterNo.toLowerCase() === meterMatch[0].toLowerCase()
+    );
+  }
+  // Try to match a customer name mentioned in the query
+  if (!target) {
+    target = meters.find(
+      (m) =>
+      m.customerName &&
+      lowerQuery.includes(m.customerName.toLowerCase()) &&
+      m.customerName.length > 3
+    );
+  }
+
+  if (!target) return null;
+
+  // Gather transactions for this meter
+  const meterTxns = transactions.filter(
+    (t) => t.accountNo === target!.accountNo
+  );
+  const totalPaid = meterTxns.reduce(
+    (sum, t) => sum + parseFloat(String(t.amount).replace(/,/g, '')),
+    0
+  );
+
+  const report = target.lastReport;
+  const thd = report ?
+  (2 + Math.random() * 4).toFixed(2) // Simulated Total Harmonic Distortion %
+  : null;
+
+  const lines: string[] = [];
+  lines.push(`📊 Analytics for ${target.customerName}`);
+  lines.push(`Account No: ${target.accountNo}`);
+  lines.push(`Meter No: ${target.meterNo}`);
+  lines.push(`Location: ${target.location}`);
+  lines.push(`Type: ${target.type ? target.type.toUpperCase() : 'N/A'}`);
+  lines.push(`Status: ${target.status}`);
+  lines.push(
+    `Consumption: ${parseFloat(target.consumption || '0').toFixed(2)} kWh`
+  );
+  lines.push(
+    target.type === 'postpaid' ?
+    `Outstanding Bill: Ksh ${parseFloat(target.balance || '0').toLocaleString()}` :
+    `Balance: Ksh ${parseFloat(target.balance || '0').toLocaleString()}`
+  );
+  if (target.tariffRate) lines.push(`Tariff: ${target.tariffRate}`);
+  lines.push(
+    `Total Payments (recorded): Ksh ${totalPaid.toLocaleString()} across ${meterTxns.length} transaction(s)`
+  );
+
+  lines.push('');
+  lines.push('⚡ Live Telemetry:');
+  if (report) {
+    lines.push(`• Voltage: ${report.voltage.toFixed(1)} V`);
+    lines.push(`• Current: ${report.current.toFixed(2)} A`);
+    lines.push(`• Power Factor: ${report.powerFactor.toFixed(2)}`);
+    lines.push(`• Frequency: ${report.frequency.toFixed(2)} Hz`);
+    lines.push(`• Harmonics (THD): ${thd}%`);
+    lines.push(`• Signal Strength: ${report.signalStrength}`);
+    lines.push(`• Reporting Status: ${report.status}`);
+    lines.push(`• Last Report: ${new Date(report.timestamp).toLocaleString()}`);
+  } else {
+    lines.push('• No recent telemetry — meter is not reporting (offline).');
+  }
+
+  // Health assessment
+  lines.push('');
+  if (report) {
+    const issues: string[] = [];
+    if (report.voltage < 200 || report.voltage > 250)
+    issues.push('voltage out of range');
+    if (report.powerFactor < 0.85) issues.push('low power factor');
+    if (report.signalStrength === 'Poor') issues.push('weak signal');
+    lines.push(
+      issues.length > 0 ?
+      `🔎 Health: Attention needed — ${issues.join(', ')}.` :
+      '✅ Health: Operating within normal parameters.'
+    );
+  } else {
+    lines.push('🔎 Health: Cannot assess — no telemetry available.');
+  }
+
+  return lines.join('\n');
+};
+
 // 4. Natural Language Query Processing
 export const processAIQuery = (
 query: string,
@@ -267,6 +372,12 @@ meters: Meter[],
 transactions: any[])
 : string => {
   const lowerQuery = query.toLowerCase();
+
+  // Per-meter analytics — highest priority when a specific meter/customer is referenced
+  const meterAnalytics = analyzeMeterByQuery(query, meters, transactions);
+  if (meterAnalytics) {
+    return meterAnalytics;
+  }
 
   // Consumption queries
   if (lowerQuery.includes('consumption') || lowerQuery.includes('usage')) {

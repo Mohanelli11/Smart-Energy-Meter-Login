@@ -3,7 +3,6 @@ import {
   ZapIcon,
   LogOutIcon,
   TrendingUpIcon,
-  BoltIcon,
   DollarSignIcon,
   ClockIcon,
   ActivityIcon } from
@@ -194,7 +193,7 @@ export function IndividualMeterView({
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-gray-600">Voltage</p>
-              <BoltIcon className="h-5 w-5 text-yellow-500" />
+              <ZapIcon className="h-5 w-5 text-yellow-500" />
             </div>
             <p className="text-2xl font-bold text-gray-900">
               {currentReading.voltage.toFixed(1)} V
