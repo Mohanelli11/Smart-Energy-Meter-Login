@@ -5,7 +5,11 @@ import {
   DownloadIcon,
   Loader2Icon,
   AlertTriangleIcon,
-  PrinterIcon } from
+  PrinterIcon,
+  Volume2Icon,
+  VolumeXIcon,
+  MicIcon,
+  MicOffIcon } from
 'lucide-react';
 import { Meter } from '../utils/meterStorage';
 import { processAIQuery } from '../utils/aiService';
@@ -38,7 +42,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
     id: '1',
     role: 'assistant',
     content:
-    "Hello! I'm your AI assistant for the MoTech Electrical and Electronics Engineering Solutions SmartMeter system. I can help you analyze consumption data, revenue insights, meter diagnostics, and more. What would you like to know?",
+    "Hello! I'm your AI assistant for the MoTech Electrical and Electronics Engineering Solutions SmartMeter system. I can help you analyze consumption data, revenue insights, meter diagnostics, and more. You can also use the microphone to ask by voice, or tap the speaker on any answer to have it read aloud. What would you like to know?",
     timestamp: new Date()
   }]
   );
@@ -55,8 +59,24 @@ export function AIChat({ meters, transactions }: AIChatProps) {
     status: string;
     assignedTo: string;
   } | null>(null);
+  // Voice state
+  const [isListening, setIsListening] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [speechSupported] = useState(
+    () => typeof window !== 'undefined' && 'speechSynthesis' in window
+  );
+  const [recognitionSupported] = useState(
+    () =>
+    typeof window !== 'undefined' &&
+    Boolean(
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition
+    )
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const handleSendRef = useRef<(query?: string) => void>(() => {});
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'
@@ -65,6 +85,97 @@ export function AIChat({ meters, transactions }: AIChatProps) {
   useEffect(() => {
     scrollToBottom();
   }, [messages, maintenanceTicket]);
+  // ---- Text-to-Speech (Read Aloud) ----
+  const speak = (text: string, id: string) => {
+    if (!speechSupported) return;
+    // Toggle off if the same message is already speaking
+    if (speakingId === id) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+    setSpeakingId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+  // Stop any speech when component unmounts
+  useEffect(() => {
+    return () => {
+      if (speechSupported) window.speechSynthesis.cancel();
+    };
+  }, [speechSupported]);
+  // ---- Speech-to-Text (Voice Recording) ----
+  useEffect(() => {
+    if (!recognitionSupported) return;
+    const SpeechRecognition =
+    (window as any).SpeechRecognition ||
+    (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.onresult = (event: any) => {
+      let transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setInput(transcript);
+      // When we have a final result, auto-send the decoded query
+      const lastResult = event.results[event.results.length - 1];
+      if (lastResult && lastResult.isFinal && transcript.trim()) {
+        handleSendRef.current(transcript.trim());
+        setInput('');
+      }
+    };
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      if (
+      event.error === 'not-allowed' ||
+      event.error === 'service-not-allowed')
+      {
+        setError('Microphone access was denied. Please enable it to use voice.');
+      }
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+    recognitionRef.current = recognition;
+    return () => {
+      try {
+        recognition.stop();
+      } catch {
+
+        /* noop */}
+    };
+  }, [recognitionSupported]);
+  const toggleListening = () => {
+    if (!recognitionSupported || !recognitionRef.current) return;
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+    // Stop any ongoing speech before listening
+    if (speechSupported) {
+      window.speechSynthesis.cancel();
+      setSpeakingId(null);
+    }
+    setError('');
+    setInput('');
+    try {
+      recognitionRef.current.start();
+      setIsListening(true);
+    } catch {
+      // start() can throw if already started — reset
+      setIsListening(false);
+    }
+  };
   const generateMaintenanceTicket = (prompt: string) => {
     const priorities = ['High', 'Medium', 'Low'];
     const randomPriority =
@@ -168,6 +279,10 @@ export function AIChat({ meters, transactions }: AIChatProps) {
       }
     }, 800);
   };
+  // Keep a ref to the latest handleSend for the speech-recognition callback
+  useEffect(() => {
+    handleSendRef.current = handleSend;
+  });
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -228,7 +343,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
           <div>
             <h3 className="font-semibold text-gray-900">AI Assistant</h3>
             <p className="text-xs text-gray-500">
-              Ask me anything about your meter data
+              Ask by voice or text · answers can be read aloud
             </p>
           </div>
         </div>
@@ -279,11 +394,33 @@ export function AIChat({ meters, transactions }: AIChatProps) {
               <p className="text-sm whitespace-pre-wrap break-words">
                 {message.content}
               </p>
-              <p
-              className={`text-xs mt-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
+              <div
+              className={`flex items-center justify-between mt-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'}`}>
               
-                {message.timestamp.toLocaleTimeString()}
-              </p>
+                <p className="text-xs">
+                  {message.timestamp.toLocaleTimeString()}
+                </p>
+                {message.role === 'assistant' && speechSupported &&
+              <button
+                onClick={() => speak(message.content, message.id)}
+                className="ml-2 p-1 rounded hover:bg-gray-200 transition-colors text-gray-500"
+                title={
+                speakingId === message.id ? 'Stop reading' : 'Read aloud'
+                }
+                aria-label={
+                speakingId === message.id ?
+                'Stop reading this message' :
+                'Read this message aloud'
+                }>
+                
+                    {speakingId === message.id ?
+                <VolumeXIcon className="h-4 w-4" /> :
+
+                <Volume2Icon className="h-4 w-4" />
+                }
+                  </button>
+              }
+              </div>
             </div>
           </div>
         )}
@@ -404,6 +541,23 @@ export function AIChat({ meters, transactions }: AIChatProps) {
       {/* Input */}
       <div className="p-4 border-t border-gray-200 bg-gray-50">
         <div className="flex items-center space-x-2">
+          {recognitionSupported &&
+          <button
+            onClick={toggleListening}
+            disabled={isTyping || isRateLimited}
+            className={`p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isListening ? 'bg-red-600 text-white animate-pulse' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-100'}`}
+            title={isListening ? 'Stop listening' : 'Speak your question'}
+            aria-label={
+            isListening ? 'Stop voice recording' : 'Start voice recording'
+            }>
+            
+              {isListening ?
+            <MicOffIcon className="h-5 w-5" /> :
+
+            <MicIcon className="h-5 w-5" />
+            }
+            </button>
+          }
           <input
             ref={inputRef}
             type="text"
@@ -414,7 +568,11 @@ export function AIChat({ meters, transactions }: AIChatProps) {
               setIsRateLimited(false);
             }}
             onKeyPress={handleKeyPress}
-            placeholder="Ask about consumption, revenue, diagnostics..."
+            placeholder={
+            isListening ?
+            'Listening… speak now' :
+            'Ask about consumption, revenue, diagnostics…'
+            }
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isTyping || isRateLimited}
             maxLength={500}
@@ -431,6 +589,8 @@ export function AIChat({ meters, transactions }: AIChatProps) {
         </div>
         <p className="text-xs text-gray-500 mt-2">
           🔒 Messages are validated and rate-limited for security
+          {recognitionSupported ? ' · 🎙 Tap the mic to ask by voice' : ''}
+          {speechSupported ? ' · 🔊 Tap the speaker to hear answers' : ''}
         </p>
       </div>
     </div>);

@@ -494,8 +494,141 @@ transactions: any[])
     return `Meter Distribution:\n- Prepaid: ${prepaid} meters\n- Postpaid: ${postpaid} meters\n- Total: ${meters.length} meters`;
   }
 
-  // Default response
-  return `I can help you with:\n\n• Consumption analysis and predictions\n• Revenue insights and top customers\n• Meter status and diagnostics\n• Location-based statistics\n• Prepaid vs Postpaid breakdown\n\nTry asking: "What's the total consumption?" or "Show me critical issues"`;
+  // Data Logger queries (3-Phase Data Logger devices)
+  if (
+  lowerQuery.includes('data logger') ||
+  lowerQuery.includes('logger') ||
+  lowerQuery.includes('3-phase') ||
+  lowerQuery.includes('three phase') ||
+  lowerQuery.includes('three-phase'))
+  {
+    let loggers: any[] = [];
+    try {
+      loggers = JSON.parse(localStorage.getItem('motech_data_loggers') || '[]');
+    } catch {
+      loggers = [];
+    }
+    const online = loggers.filter((l) => l.online).length;
+    if (loggers.length === 0) {
+      return `There are no MoTech 3-Phase Data Loggers registered yet. Admins can register one from the Data Logger section. The logger monitors voltage, current, power factor, frequency, harmonics (THD), energy, load profiles, and voltage dips & swells.`;
+    }
+    return `MoTech 3-Phase Data Loggers: ${loggers.length} registered (${online} online).\n\n${loggers.
+    map(
+      (l) =>
+      `• ${l.name} (${l.serialNumber}) at ${l.location} — ${l.online ? 'Online' : 'Offline'}`
+    ).
+    join(
+      '\n'
+    )}\n\nEach logger records daily consumption, peak demand, load trends, and power quality events.`;
+  }
+
+  // Balance / outstanding / debt queries
+  if (
+  lowerQuery.includes('balance') ||
+  lowerQuery.includes('outstanding') ||
+  lowerQuery.includes('debt') ||
+  lowerQuery.includes('owe') ||
+  lowerQuery.includes('bill'))
+  {
+    const prepaid = meters.filter((m) => m.type === 'prepaid');
+    const postpaid = meters.filter((m) => m.type === 'postpaid');
+    const totalPrepaidBalance = prepaid.reduce(
+      (sum, m) => sum + parseFloat(m.balance || '0'),
+      0
+    );
+    const totalOutstanding = postpaid.reduce(
+      (sum, m) => sum + parseFloat(m.balance || '0'),
+      0
+    );
+    return `Balance Overview:\n- Prepaid credit on ${prepaid.length} meters: Ksh ${totalPrepaidBalance.toLocaleString(undefined, { maximumFractionDigits: 0 })}\n- Outstanding postpaid bills on ${postpaid.length} meters: Ksh ${totalOutstanding.toLocaleString(undefined, { maximumFractionDigits: 0 })}\n- Average prepaid balance: Ksh ${(totalPrepaidBalance / (prepaid.length || 1)).toFixed(0)}`;
+  }
+
+  // Highest / lowest consumption meter
+  if (
+  (lowerQuery.includes('highest') || lowerQuery.includes('lowest')) && (
+  lowerQuery.includes('consum') || lowerQuery.includes('usage')))
+  {
+    const sorted = [...meters].sort(
+      (a, b) =>
+      parseFloat(b.consumption || '0') - parseFloat(a.consumption || '0')
+    );
+    const top = lowerQuery.includes('lowest') ?
+    sorted[sorted.length - 1] :
+    sorted[0];
+    if (top) {
+      return `The ${lowerQuery.includes('lowest') ? 'lowest' : 'highest'} consuming meter is ${top.customerName} (${top.accountNo}) at ${top.location} with ${parseFloat(top.consumption || '0').toFixed(2)} kWh.`;
+    }
+  }
+
+  // Transformer queries
+  if (lowerQuery.includes('transformer')) {
+    const withTransformer = meters.filter((m) => m.transformer);
+    const counts = new Map<string, number>();
+    withTransformer.forEach((m) =>
+    counts.set(m.transformer!, (counts.get(m.transformer!) || 0) + 1)
+    );
+    if (counts.size === 0) {
+      return `No transformer assignments are recorded on the current meters.`;
+    }
+    return `Transformer distribution:\n\n${Array.from(counts.entries()).
+    map(([t, c]) => `• ${t}: ${c} meter(s)`).
+    join('\n')}`;
+  }
+
+  // Count / how many (generic)
+  if (
+  lowerQuery.includes('how many') ||
+  lowerQuery.includes('count') ||
+  lowerQuery.includes('number of'))
+  {
+    const prepaid = meters.filter((m) => m.type === 'prepaid').length;
+    const postpaid = meters.filter((m) => m.type === 'postpaid').length;
+    return `The system currently manages ${meters.length} meters in total — ${prepaid} prepaid and ${postpaid} postpaid — across ${transactions.length} recorded transactions.`;
+  }
+
+  // System overview / summary / help
+  if (
+  lowerQuery.includes('summary') ||
+  lowerQuery.includes('overview') ||
+  lowerQuery.includes('everything') ||
+  lowerQuery.includes('system') ||
+  lowerQuery.includes('report'))
+  {
+    return buildSystemSnapshot(meters, transactions);
+  }
+
+  // Default response — give a real system snapshot rather than only help text
+  return `${buildSystemSnapshot(meters, transactions)}\n\nYou can ask me about a specific meter (e.g. "Show analytics for MET-1000-2023"), consumption, revenue, balances, diagnostics, locations, transformers, or the 3-Phase Data Loggers.`;
+};
+
+// Build a concise, accurate snapshot of the entire system from live data
+export const buildSystemSnapshot = (
+meters: Meter[],
+transactions: any[])
+: string => {
+  const prepaid = meters.filter((m) => m.type === 'prepaid');
+  const postpaid = meters.filter((m) => m.type === 'postpaid');
+  const active = meters.filter((m) => m.status === 'Active').length;
+  const disconnected = meters.filter((m) => m.status === 'Disconnected').length;
+  const offline = meters.filter((m) => !m.lastReport).length;
+  const totalConsumption = meters.reduce(
+    (sum, m) => sum + parseFloat(m.consumption || '0'),
+    0
+  );
+  const totalRevenue = transactions.reduce(
+    (sum, t) => sum + parseFloat(String(t.amount).replace(/,/g, '')),
+    0
+  );
+  let loggers = 0;
+  try {
+    loggers = JSON.parse(
+      localStorage.getItem('motech_data_loggers') || '[]'
+    ).length;
+  } catch {
+    loggers = 0;
+  }
+
+  return `📋 MoTech SmartMeter System Snapshot\n- Total meters: ${meters.length} (${prepaid.length} prepaid, ${postpaid.length} postpaid)\n- Active: ${active} · Disconnected: ${disconnected} · Offline: ${offline}\n- Total consumption: ${totalConsumption.toFixed(2)} kWh\n- Total recorded revenue: Ksh ${totalRevenue.toLocaleString()}\n- Transactions on record: ${transactions.length}\n- 3-Phase Data Loggers registered: ${loggers}`;
 };
 
 // Export functions for reports
