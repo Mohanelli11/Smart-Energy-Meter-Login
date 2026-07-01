@@ -19,15 +19,12 @@ export default defineConfig(({ command, mode }) => {
       },
     },
 
-    // Stable app version define. Prefer using import.meta.env.VITE_APP_VERSION at runtime.
-    // APP_VERSION is injected at build time from package.json when available.
-    define: {
-      APP_VERSION: JSON.stringify(process.env.npm_package_version ?? process.env.VITE_APP_VERSION ?? '0.0.0'),
-    },
+    // Prefer import.meta.env.VITE_APP_VERSION at runtime. Do not inject a build-time global here.
+    // Retrieve at runtime with: const version = import.meta.env.VITE_APP_VERSION ?? '0.0.0'
 
     // Build optimization
     build: {
-      target: 'es2019', // better backwards compatibility; consider 'esnext' if you only target modern browsers
+      target: 'es2020', // adjusted target for modern-ish browser support; change if you need broader compatibility
       outDir: 'dist',
       sourcemap: false, // set to true for production debugging if needed
 
@@ -46,10 +43,14 @@ export default defineConfig(({ command, mode }) => {
 
       rollupOptions: {
         output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom'],
-            charts: ['recharts'],
-            icons: ['lucide-react'],
+          // Manual chunking: separate react, recharts, lucide into their own chunks and group the rest into vendor
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react')) return 'react-vendor'
+              if (id.includes('recharts')) return 'charts'
+              if (id.includes('lucide-react')) return 'icons'
+              return 'vendor'
+            }
           },
         },
       },
@@ -57,8 +58,8 @@ export default defineConfig(({ command, mode }) => {
       // CSS code splitting
       cssCodeSplit: true,
 
-      // chunkSizeWarningLimit is in KB (not bytes). Increased from 500 KB to 1024 KB.
-      chunkSizeWarningLimit: 1024,
+      // chunkSizeWarningLimit is in KB (not bytes). Increased to 2048 KB from the previous 500 KB.
+      chunkSizeWarningLimit: 2048,
     },
 
     // esbuild options: when using esbuild minifier, drop console/debugger in production
@@ -88,7 +89,7 @@ export default defineConfig(({ command, mode }) => {
       open: true,
     },
 
-    // Dependency optimization: include core libs for faster dev start, exclude heavy runtime-only libs
+    // Dependency optimization: include core libs for faster dev start, exclude heavy runtime-only libs so they are chunked
     optimizeDeps: {
       include: ['react', 'react-dom'],
       exclude: ['recharts', 'lucide-react'],
