@@ -1,8 +1,7 @@
-// Tailwind config — switched to CommonJS for broader toolchain compatibility
+// Tailwind config — using ESM for consistency with package.json type: "module"
 // - Adds dark mode, theme extensions, a safelist for dynamic classes, and useful plugins.
-// - If you use ESM ("type": "module" in package.json), consider using tailwind.config.mjs instead.
 
-module.exports = {
+export default {
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
@@ -31,4 +30,4 @@ module.exports = {
     require('@tailwindcss/forms'),
     require('@tailwindcss/typography'),
   ],
-};
+}
