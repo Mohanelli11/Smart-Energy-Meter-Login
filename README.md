@@ -137,8 +137,8 @@ This project is proprietary software owned by **MoTech Electrical and Electronic
 
 ## 📧 Support
 
-For support, contact: **motechkenya@gmail.com**
+For support, contact: **motechembeddedengineering@gmail.com**
 
 ---
 
-**Design Source**: [Magic Patterns](https://www.magicpatterns.com/c/kcerttjjwdwdzpgvldzwgj)
+**Design Source**: [MOTECH KENYA].
