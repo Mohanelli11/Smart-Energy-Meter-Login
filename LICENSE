@@ -57,14 +57,14 @@ authorised representative of MOTECH Embedded, you are expressly prohibited from:
 Employees, contractors, and authorised contributors of MOTECH Embedded who have
 been granted access to this repository may access, review, and modify the Software
 solely for the internal development, testing, integration, and deployment purposes
-of MOTECH ROAMFi Embedded and its direct clients, subject to any applicable employment
+of MOTECH Embedded and its direct clients, subject to any applicable employment
 contract, contractor agreement, or non-disclosure agreement in force.
 
 4. OPEN-SOURCE COMPONENTS
 
 The Software may incorporate open-source components governed by their own separate
 license terms (including but not limited to Apache License 2.0 and MIT License).
-Such components remain subject to their original license terms. MOTECH ROAMFi Embedded's
+Such components remain subject to their original license terms. MOTECH Embedded's
 proprietary license applies exclusively to its original work and does not supersede
 or alter the terms of any included open-source licenses. A list of third-party
 components and their applicable licenses shall be maintained in the NOTICES file
@@ -84,7 +84,7 @@ EMBEDDED BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTI
 OR PUNITIVE DAMAGES, OR DAMAGES FOR LOSS OF PROFITS, REVENUE, GOODWILL, DATA,
 BUSINESS, OR ANTICIPATED SAVINGS, ARISING OUT OF OR IN CONNECTION WITH THIS LICENSE
 OR THE USE OR INABILITY TO USE THE SOFTWARE, HOWEVER CAUSED AND UNDER ANY THEORY
-OF LIABILITY, EVEN IF NURUCORE EMBEDDED HAS BEEN ADVISED OF THE POSSIBILITY OF
+OF LIABILITY, EVEN IF MOTECH EMBEDDED HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
 
 7. CONFIDENTIALITY
