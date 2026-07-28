@@ -1,5 +1,25 @@
-// src/vite.config.ts — DEPRECATED
-// This file was intentionally removed in favor of the single root vite.config.ts at the repository root.
-// Please use /vite.config.ts instead. Keeping this placeholder to avoid accidental usage until fully removed.
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// If you want this file deleted from the repository history, run a git rm src/vite.config.ts and commit.
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  base: '/',
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          charts: ['recharts'],
+          icons: ['lucide-react']
+        }
+      }
+    }
+  },
+  server: {
+    port: 3000,
+    host: true
+  }
+});

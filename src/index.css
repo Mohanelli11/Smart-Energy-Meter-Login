@@ -5,6 +5,19 @@
 
 /* DO NOT DELETE THESE TAILWIND IMPORTS, OTHERWISE THE STYLING WILL NOT RENDER AT ALL */
 
+/* Leaflet map styles (device location map) */
+@import 'leaflet/dist/leaflet.css';
+
+/* Keep Leaflet panes below app modals/overlays */
+.leaflet-container {
+  z-index: 0;
+  font-family: inherit;
+}
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1;
+}
 @media print {
   /* Reset page margins */
   @page {

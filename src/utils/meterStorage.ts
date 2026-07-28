@@ -1,5 +1,7 @@
 // Meter storage utilities for localStorage persistence
 
+import { resolveCoordinatesSync } from './geocoding';
+
 export interface MeterReport {
   timestamp: string;
   voltage: number;
@@ -10,6 +12,7 @@ export interface MeterReport {
   signalStrength: string;
   status: 'online' | 'offline';
 }
+
 export interface Meter {
   accountNo: string;
   customerName: string;
@@ -25,7 +28,13 @@ export interface Meter {
   tariffRate?: string;
   comments?: string;
   lastReport?: MeterReport;
+  /** Geographic coordinates for map display */
+  latitude?: number;
+  longitude?: number;
+  /** Human-readable resolved address from the geocoder */
+  geoAddress?: string;
 }
+
 const PREPAID_STORAGE_KEY = 'motech_prepaid_meters';
 const POSTPAID_STORAGE_KEY = 'motech_postpaid_meters';
 
@@ -39,7 +48,9 @@ export function generateMeterReport(): MeterReport {
     powerFactor: 0.85 + Math.random() * 0.15,
     frequency: 49.8 + Math.random() * 0.4,
     consumption: 10 + Math.random() * 15,
-    signalStrength: ['Excellent', 'Good', 'Fair', 'Poor'][Math.floor(Math.random() * 4)],
+    signalStrength: ['Excellent', 'Good', 'Fair', 'Poor'][
+    Math.floor(Math.random() * 4)],
+
     status: Math.random() > 0.1 ? 'online' : 'offline'
   };
 }
@@ -95,4 +106,28 @@ export function getAllMeters(): Meter[] {
 export function clearAllMeters(): void {
   localStorage.removeItem(PREPAID_STORAGE_KEY);
   localStorage.removeItem(POSTPAID_STORAGE_KEY);
+}
+
+/**
+ * Backfill latitude/longitude on any meter that doesn't yet have coordinates.
+ * Existing coordinates are preserved. Returns a new array.
+ */
+export function withCoordinates(meters: Meter[]): Meter[] {
+  return meters.map((meter) => {
+    if (
+    typeof meter.latitude === 'number' &&
+    typeof meter.longitude === 'number')
+    {
+      return meter;
+    }
+    const coords = resolveCoordinatesSync(
+      meter.location,
+      meter.meterNo || meter.accountNo
+    );
+    return {
+      ...meter,
+      latitude: coords.latitude,
+      longitude: coords.longitude
+    };
+  });
 }

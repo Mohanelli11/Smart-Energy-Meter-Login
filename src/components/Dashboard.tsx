@@ -1,5 +1,27 @@
 import React, { useEffect, useMemo, useState, createElement } from 'react';
-import { MenuIcon, ZapIcon, LayoutDashboardIcon, CoinsIcon, FileTextIcon, CreditCardIcon, PlusCircleIcon, BarChart3Icon, SettingsIcon, SearchIcon, BellIcon, HelpCircleIcon, LogOutIcon, FilterIcon, DownloadIcon, UserPlusIcon, KeyIcon, BrainCircuitIcon, ServerIcon, GaugeIcon } from 'lucide-react';
+import {
+  MenuIcon,
+  ZapIcon,
+  LayoutDashboardIcon,
+  CoinsIcon,
+  FileTextIcon,
+  CreditCardIcon,
+  PlusCircleIcon,
+  BarChart3Icon,
+  SettingsIcon,
+  SearchIcon,
+  BellIcon,
+  HelpCircleIcon,
+  LogOutIcon,
+  FilterIcon,
+  DownloadIcon,
+  UserPlusIcon,
+  KeyIcon,
+  BrainCircuitIcon,
+  ServerIcon,
+  GaugeIcon,
+  MapPinIcon } from
+'lucide-react';
 import { StatsCard } from './StatsCard';
 import { MeterTable } from './MeterTable';
 import { AddMeterForm } from './AddMeterForm';
@@ -14,19 +36,123 @@ import { ConsumptionGraph } from './ConsumptionGraph';
 import { AIInsights } from './AIInsights';
 import { ApiManagement } from './ApiManagement'; // Added import
 import { DataLogger } from './DataLogger';
-import { savePrepaidMeters, loadPrepaidMeters, savePostpaidMeters, loadPostpaidMeters, generateMeterReport, Meter } from '../utils/meterStorage';
+import { DeviceLocations } from './DeviceLocations';
+import {
+  savePrepaidMeters,
+  loadPrepaidMeters,
+  savePostpaidMeters,
+  loadPostpaidMeters,
+  generateMeterReport,
+  withCoordinates,
+  Meter } from
+'../utils/meterStorage';
+import { resolveCoordinatesSync } from '../utils/geocoding';
 // Generate realistic data
 const generatePrepaidMeters = () => {
-  const names = ['John Mwangi', 'Sarah Wambui', 'David Omondi', 'Grace Njeri', 'Peter Kamau', 'Mary Auma', 'James Otieno', 'Jane Wanjiku', 'Paul Kariuki', 'Lucy Nyambura', 'Michael Kipchoge', 'Anne Chebet', 'Daniel Mutua', 'Faith Wanjiru', 'Samuel Ochieng', 'Rose Akinyi', 'Joseph Maina', 'Catherine Wairimu', 'Patrick Kimani', 'Elizabeth Moraa', 'Francis Kibet', 'Margaret Njoki', 'Stephen Owino', 'Joyce Wangari', 'Anthony Mwenda', 'Esther Chepkoech', 'Robert Karanja', 'Alice Adhiambo', 'George Njenga', 'Susan Jepkorir', 'Charles Wafula', 'Hannah Mumbi', 'Benjamin Koech', 'Mercy Achieng', 'Isaac Gitau', 'Beatrice Cheptoo', 'Dennis Macharia', 'Lydia Kerubo', 'Victor Onyango', 'Priscilla Wambui', 'Edwin Kiplagat', 'Agnes Wanjiru', 'Kevin Ouma', 'Eunice Chepkemoi', 'Martin Njoroge', 'Christine Nyokabi', 'Simon Tanui', 'Purity Wangui', 'Andrew Kiprono', 'Josephine Muthoni'];
-  const locations = ['Nairobi West', 'Kasarani', 'Ruiru', 'Thika', 'Juja', 'Kiambu', 'Kikuyu', 'Limuru', 'Kahawa West', 'Zimmerman', 'Roysambu', 'Embakasi', 'Donholm', 'Umoja', 'Kayole', 'Githurai', 'Kahawa Sukari', 'Mwiki', 'Kasarani', 'Njiru', 'Utawala', 'Mihango', 'Komarock', 'Buruburu', 'Makadara', 'Eastleigh', 'Pangani', 'Parklands', 'Westlands', 'Kilimani', 'Lavington', 'Kileleshwa', 'Hurlingham', 'Ngong', 'Rongai', 'Kitengela'];
-  const statuses: Array<'Active' | 'Low Balance' | 'Disconnected'> = ['Active', 'Low Balance', 'Disconnected'];
+  const names = [
+  'John Mwangi',
+  'Sarah Wambui',
+  'David Omondi',
+  'Grace Njeri',
+  'Peter Kamau',
+  'Mary Auma',
+  'James Otieno',
+  'Jane Wanjiku',
+  'Paul Kariuki',
+  'Lucy Nyambura',
+  'Michael Kipchoge',
+  'Anne Chebet',
+  'Daniel Mutua',
+  'Faith Wanjiru',
+  'Samuel Ochieng',
+  'Rose Akinyi',
+  'Joseph Maina',
+  'Catherine Wairimu',
+  'Patrick Kimani',
+  'Elizabeth Moraa',
+  'Francis Kibet',
+  'Margaret Njoki',
+  'Stephen Owino',
+  'Joyce Wangari',
+  'Anthony Mwenda',
+  'Esther Chepkoech',
+  'Robert Karanja',
+  'Alice Adhiambo',
+  'George Njenga',
+  'Susan Jepkorir',
+  'Charles Wafula',
+  'Hannah Mumbi',
+  'Benjamin Koech',
+  'Mercy Achieng',
+  'Isaac Gitau',
+  'Beatrice Cheptoo',
+  'Dennis Macharia',
+  'Lydia Kerubo',
+  'Victor Onyango',
+  'Priscilla Wambui',
+  'Edwin Kiplagat',
+  'Agnes Wanjiru',
+  'Kevin Ouma',
+  'Eunice Chepkemoi',
+  'Martin Njoroge',
+  'Christine Nyokabi',
+  'Simon Tanui',
+  'Purity Wangui',
+  'Andrew Kiprono',
+  'Josephine Muthoni'];
+
+  const locations = [
+  'Nairobi West',
+  'Kasarani',
+  'Ruiru',
+  'Thika',
+  'Juja',
+  'Kiambu',
+  'Kikuyu',
+  'Limuru',
+  'Kahawa West',
+  'Zimmerman',
+  'Roysambu',
+  'Embakasi',
+  'Donholm',
+  'Umoja',
+  'Kayole',
+  'Githurai',
+  'Kahawa Sukari',
+  'Mwiki',
+  'Kasarani',
+  'Njiru',
+  'Utawala',
+  'Mihango',
+  'Komarock',
+  'Buruburu',
+  'Makadara',
+  'Eastleigh',
+  'Pangani',
+  'Parklands',
+  'Westlands',
+  'Kilimani',
+  'Lavington',
+  'Kileleshwa',
+  'Hurlingham',
+  'Ngong',
+  'Rongai',
+  'Kitengela'];
+
+  const statuses: Array<'Active' | 'Low Balance' | 'Disconnected'> = [
+  'Active',
+  'Low Balance',
+  'Disconnected'];
+
   const meters = [];
   for (let i = 0; i < 856; i++) {
     const accountNum = 1000 + i;
     const consumption = (Math.random() * 15 + 10).toFixed(2);
     const balance = Math.random() * 200;
     let status: 'Active' | 'Low Balance' | 'Disconnected';
-    if (balance > 50) status = 'Active';else if (balance > 0) status = 'Low Balance';else status = 'Disconnected';
+    if (balance > 50) status = 'Active';else
+    if (balance > 0) status = 'Low Balance';else
+    status = 'Disconnected';
     // Generate last report for 80% of meters (simulating GSM connectivity)
     const hasReport = Math.random() > 0.2;
     meters.push({
@@ -43,9 +169,78 @@ const generatePrepaidMeters = () => {
   return meters;
 };
 const generatePostpaidMeters = () => {
-  const names = ['James Kamau', 'Grace Njeri', 'Michael Otieno', 'Nancy Wanjiru', 'David Kipchoge', 'Ruth Akinyi', 'Peter Maina', 'Caroline Chebet', 'John Mutua', 'Esther Wangari', 'Samuel Koech', 'Mary Njoki', 'Patrick Owino', 'Jane Moraa', 'Francis Karanja', 'Lucy Chepkoech', 'Robert Ochieng', 'Anne Wairimu', 'George Kibet', 'Susan Adhiambo', 'Charles Njenga', 'Margaret Jepkorir', 'Stephen Wafula', 'Joyce Mumbi', 'Anthony Kiplagat', 'Alice Achieng', 'Dennis Gitau', 'Lydia Cheptoo', 'Victor Macharia', 'Priscilla Kerubo', 'Edwin Onyango', 'Agnes Nyambura', 'Kevin Tanui', 'Eunice Njoroge', 'Martin Kiprono', 'Christine Nyokabi', 'Simon Ouma', 'Purity Chepkemoi', 'Andrew Mwenda', 'Josephine Wambui'];
-  const locations = ['Thika', 'Juja', 'Kiambu', 'Ruiru', 'Kikuyu', 'Limuru', 'Nairobi CBD', 'Industrial Area', 'South B', 'South C', 'Langata', 'Karen', 'Runda', 'Muthaiga', 'Gigiri', 'Ridgeways', 'Spring Valley', 'Loresho', 'Kitisuru', 'Nyari', 'Rosslyn', 'Runda Estate', 'Two Rivers'];
-  const statuses: Array<'Active' | 'Pending Bill' | 'Overdue'> = ['Active', 'Pending Bill', 'Overdue'];
+  const names = [
+  'James Kamau',
+  'Grace Njeri',
+  'Michael Otieno',
+  'Nancy Wanjiru',
+  'David Kipchoge',
+  'Ruth Akinyi',
+  'Peter Maina',
+  'Caroline Chebet',
+  'John Mutua',
+  'Esther Wangari',
+  'Samuel Koech',
+  'Mary Njoki',
+  'Patrick Owino',
+  'Jane Moraa',
+  'Francis Karanja',
+  'Lucy Chepkoech',
+  'Robert Ochieng',
+  'Anne Wairimu',
+  'George Kibet',
+  'Susan Adhiambo',
+  'Charles Njenga',
+  'Margaret Jepkorir',
+  'Stephen Wafula',
+  'Joyce Mumbi',
+  'Anthony Kiplagat',
+  'Alice Achieng',
+  'Dennis Gitau',
+  'Lydia Cheptoo',
+  'Victor Macharia',
+  'Priscilla Kerubo',
+  'Edwin Onyango',
+  'Agnes Nyambura',
+  'Kevin Tanui',
+  'Eunice Njoroge',
+  'Martin Kiprono',
+  'Christine Nyokabi',
+  'Simon Ouma',
+  'Purity Chepkemoi',
+  'Andrew Mwenda',
+  'Josephine Wambui'];
+
+  const locations = [
+  'Thika',
+  'Juja',
+  'Kiambu',
+  'Ruiru',
+  'Kikuyu',
+  'Limuru',
+  'Nairobi CBD',
+  'Industrial Area',
+  'South B',
+  'South C',
+  'Langata',
+  'Karen',
+  'Runda',
+  'Muthaiga',
+  'Gigiri',
+  'Ridgeways',
+  'Spring Valley',
+  'Loresho',
+  'Kitisuru',
+  'Nyari',
+  'Rosslyn',
+  'Runda Estate',
+  'Two Rivers'];
+
+  const statuses: Array<'Active' | 'Pending Bill' | 'Overdue'> = [
+  'Active',
+  'Pending Bill',
+  'Overdue'];
+
   const meters = [];
   for (let i = 0; i < 392; i++) {
     const accountNum = 5000 + i;
@@ -68,7 +263,28 @@ const generatePostpaidMeters = () => {
   return meters;
 };
 const generatePaymentTransactions = () => {
-  const names = ['John Mwangi', 'Sarah Wambui', 'David Omondi', 'Grace Njeri', 'James Kamau', 'Mary Auma', 'Peter Kariuki', 'Jane Wanjiku', 'Paul Otieno', 'Lucy Nyambura', 'Michael Kipchoge', 'Anne Chebet', 'Daniel Mutua', 'Faith Wanjiru', 'Samuel Ochieng', 'Rose Akinyi', 'Joseph Maina', 'Catherine Wairimu', 'Patrick Kimani', 'Elizabeth Moraa'];
+  const names = [
+  'John Mwangi',
+  'Sarah Wambui',
+  'David Omondi',
+  'Grace Njeri',
+  'James Kamau',
+  'Mary Auma',
+  'Peter Kariuki',
+  'Jane Wanjiku',
+  'Paul Otieno',
+  'Lucy Nyambura',
+  'Michael Kipchoge',
+  'Anne Chebet',
+  'Daniel Mutua',
+  'Faith Wanjiru',
+  'Samuel Ochieng',
+  'Rose Akinyi',
+  'Joseph Maina',
+  'Catherine Wairimu',
+  'Patrick Kimani',
+  'Elizabeth Moraa'];
+
   const transactions = [];
   const today = new Date();
   for (let i = 0; i < 124; i++) {
@@ -90,7 +306,9 @@ const generatePaymentTransactions = () => {
       customerName: names[i % names.length],
       amount: amount.toLocaleString() + '.00',
       units: isPrepaid ? units : 'N/A',
-      tokenCode: isPrepaid ? `${accountNum}-2023-${accountNum}-${String(i + 1).padStart(3, '0')}-${amount}` : 'N/A',
+      tokenCode: isPrepaid ?
+      `${accountNum}-2023-${accountNum}-${String(i + 1).padStart(3, '0')}-${amount}` :
+      'N/A',
       date: dateStr,
       status: 'Completed'
     });
@@ -127,15 +345,19 @@ export function Dashboard({
     token: '',
     amount: ''
   });
-  // Meter state with localStorage persistence
+  // Meter state with localStorage persistence.
+  // withCoordinates() backfills latitude/longitude on any meter that lacks
+  // them, so every device in the system is mappable.
   const [prepaidMetersState, setPrepaidMetersState] = useState<Meter[]>(() => {
     const stored = loadPrepaidMeters();
-    return stored || generatePrepaidMeters();
+    return withCoordinates(stored || generatePrepaidMeters());
   });
-  const [postpaidMetersState, setPostpaidMetersState] = useState<Meter[]>(() => {
-    const stored = loadPostpaidMeters();
-    return stored || generatePostpaidMeters();
-  });
+  const [postpaidMetersState, setPostpaidMetersState] = useState<Meter[]>(
+    () => {
+      const stored = loadPostpaidMeters();
+      return withCoordinates(stored || generatePostpaidMeters());
+    }
+  );
   // Save to localStorage whenever meters change
   useEffect(() => {
     savePrepaidMeters(prepaidMetersState);
@@ -162,7 +384,8 @@ export function Dashboard({
       // Generate truly non-uniform/varied consumption values per day
       // Use a wider random multiplier so each day has a distinctly different total
       const dailyFactor = 0.3 + Math.random() * 1.4; // Range 0.3x to 1.7x
-      const totalConsumption = allMeters.length * (12 + Math.random() * 8) * dailyFactor;
+      const totalConsumption =
+      allMeters.length * (12 + Math.random() * 8) * dailyFactor;
       data.push({
         time: dateStr,
         date: fullDateStr,
@@ -203,12 +426,22 @@ export function Dashboard({
   const [createAccountModal, setCreateAccountModal] = useState(false);
   // Check if user is admin
   const isAdmin = user?.email === 'mahmadstephen19@gmail.com';
-  // Add meter handler
+  // Add meter handler — automatically resolves geographic coordinates
+  // for the new device so it appears on the Device Locations map.
   const handleMeterAdded = (meter: any) => {
-    if (meter.type === 'prepaid') {
-      setPrepaidMetersState([meter, ...prepaidMetersState]);
+    const coords = resolveCoordinatesSync(
+      meter.location,
+      meter.meterNo || meter.accountNo
+    );
+    const geolocatedMeter = {
+      ...meter,
+      latitude: meter.latitude ?? coords.latitude,
+      longitude: meter.longitude ?? coords.longitude
+    };
+    if (geolocatedMeter.type === 'prepaid') {
+      setPrepaidMetersState([geolocatedMeter, ...prepaidMetersState]);
     } else {
-      setPostpaidMetersState([meter, ...postpaidMetersState]);
+      setPostpaidMetersState([geolocatedMeter, ...postpaidMetersState]);
     }
   };
   // View meter handler
@@ -230,9 +463,17 @@ export function Dashboard({
   // Save edited meter
   const handleSaveEdit = (updatedMeter: any) => {
     if (editModal.type === 'prepaid') {
-      setPrepaidMetersState(prepaidMetersState.map((m) => m.accountNo === updatedMeter.accountNo ? updatedMeter : m));
+      setPrepaidMetersState(
+        prepaidMetersState.map((m) =>
+        m.accountNo === updatedMeter.accountNo ? updatedMeter : m
+        )
+      );
     } else {
-      setPostpaidMetersState(postpaidMetersState.map((m) => m.accountNo === updatedMeter.accountNo ? updatedMeter : m));
+      setPostpaidMetersState(
+        postpaidMetersState.map((m) =>
+        m.accountNo === updatedMeter.accountNo ? updatedMeter : m
+        )
+      );
     }
   };
   // Delete meter handler
@@ -247,14 +488,26 @@ export function Dashboard({
   const handleConfirmDelete = () => {
     if (deleteModal.meter) {
       if (deleteModal.type === 'prepaid') {
-        setPrepaidMetersState(prepaidMetersState.filter((m) => m.accountNo !== deleteModal.meter.accountNo));
+        setPrepaidMetersState(
+          prepaidMetersState.filter(
+            (m) => m.accountNo !== deleteModal.meter.accountNo
+          )
+        );
       } else {
-        setPostpaidMetersState(postpaidMetersState.filter((m) => m.accountNo !== deleteModal.meter.accountNo));
+        setPostpaidMetersState(
+          postpaidMetersState.filter(
+            (m) => m.accountNo !== deleteModal.meter.accountNo
+          )
+        );
       }
     }
   };
   // Apply filters
-  const applyFilters = (data: any[], filters: any, type: 'prepaid' | 'postpaid' | 'payments') => {
+  const applyFilters = (
+  data: any[],
+  filters: any,
+  type: 'prepaid' | 'postpaid' | 'payments') =>
+  {
     let filtered = [...data];
     if (filters.status) {
       filtered = filtered.filter((item) => item.status === filters.status);
@@ -263,16 +516,26 @@ export function Dashboard({
       filtered = filtered.filter((item) => item.location === filters.location);
     }
     if (filters.consumptionMin) {
-      filtered = filtered.filter((item) => parseFloat(item.consumption) >= parseFloat(filters.consumptionMin));
+      filtered = filtered.filter(
+        (item) =>
+        parseFloat(item.consumption) >= parseFloat(filters.consumptionMin)
+      );
     }
     if (filters.consumptionMax) {
-      filtered = filtered.filter((item) => parseFloat(item.consumption) <= parseFloat(filters.consumptionMax));
+      filtered = filtered.filter(
+        (item) =>
+        parseFloat(item.consumption) <= parseFloat(filters.consumptionMax)
+      );
     }
     if (filters.balanceMin) {
-      filtered = filtered.filter((item) => parseFloat(item.balance) >= parseFloat(filters.balanceMin));
+      filtered = filtered.filter(
+        (item) => parseFloat(item.balance) >= parseFloat(filters.balanceMin)
+      );
     }
     if (filters.balanceMax) {
-      filtered = filtered.filter((item) => parseFloat(item.balance) <= parseFloat(filters.balanceMax));
+      filtered = filtered.filter(
+        (item) => parseFloat(item.balance) <= parseFloat(filters.balanceMax)
+      );
     }
     if (filters.dateFrom && type === 'payments') {
       const fromDate = new Date(filters.dateFrom);
@@ -290,20 +553,37 @@ export function Dashboard({
     }
     return filtered;
   };
-  const filteredPrepaidMeters = useMemo(() => applyFilters(prepaidMetersState, prepaidFilters, 'prepaid'), [prepaidMetersState, prepaidFilters]);
-  const filteredPostpaidMeters = useMemo(() => applyFilters(postpaidMetersState, postpaidFilters, 'postpaid'), [postpaidMetersState, postpaidFilters]);
-  const filteredPaymentTransactions = useMemo(() => applyFilters(paymentTransactionsState, paymentsFilters, 'payments'), [paymentTransactionsState, paymentsFilters]);
+  const filteredPrepaidMeters = useMemo(
+    () => applyFilters(prepaidMetersState, prepaidFilters, 'prepaid'),
+    [prepaidMetersState, prepaidFilters]
+  );
+  const filteredPostpaidMeters = useMemo(
+    () => applyFilters(postpaidMetersState, postpaidFilters, 'postpaid'),
+    [postpaidMetersState, postpaidFilters]
+  );
+  const filteredPaymentTransactions = useMemo(
+    () => applyFilters(paymentTransactionsState, paymentsFilters, 'payments'),
+    [paymentTransactionsState, paymentsFilters]
+  );
   // Export to Excel (CSV format)
-  const exportToExcel = (data: any[], filename: string, type: 'prepaid' | 'postpaid' | 'payments') => {
+  const exportToExcel = (
+  data: any[],
+  filename: string,
+  type: 'prepaid' | 'postpaid' | 'payments') =>
+  {
     let csv = '';
     if (type === 'prepaid' || type === 'postpaid') {
       csv = 'Account No.,Customer Name,Meter No.,Location,Consumption (kWh),';
-      csv += type === 'prepaid' ? 'Balance (Ksh),Status\n' : 'Bill Amount (Ksh),Status\n';
+      csv +=
+      type === 'prepaid' ?
+      'Balance (Ksh),Status\n' :
+      'Bill Amount (Ksh),Status\n';
       data.forEach((item) => {
         csv += `${item.accountNo},${item.customerName},${item.meterNo},${item.location},${item.consumption},${item.balance},${item.status}\n`;
       });
     } else {
-      csv = 'Transaction ID,Account No.,Customer,Amount (Ksh),Units (kWh),Token Code,Date,Status\n';
+      csv =
+      'Transaction ID,Account No.,Customer,Amount (Ksh),Units (kWh),Token Code,Date,Status\n';
       data.forEach((item) => {
         csv += `${item.transactionId},${item.accountNo},${item.customerName},${item.amount},${item.units},${item.tokenCode},${item.date},${item.status}\n`;
       });
@@ -328,20 +608,33 @@ export function Dashboard({
   };
   const prepaidMeters = getPaginatedData(filteredPrepaidMeters, prepaidPage);
   const postpaidMeters = getPaginatedData(filteredPostpaidMeters, postpaidPage);
-  const paymentTransactions = getPaginatedData(filteredPaymentTransactions, paymentsPage);
+  const paymentTransactions = getPaginatedData(
+    filteredPaymentTransactions,
+    paymentsPage
+  );
   // Pagination helpers
-  const getTotalPages = (totalItems: number) => Math.ceil(totalItems / itemsPerPage);
-  const renderPagination = (currentPage: number, totalItems: number, setPage: (page: number) => void) => {
+  const getTotalPages = (totalItems: number) =>
+  Math.ceil(totalItems / itemsPerPage);
+  const renderPagination = (
+  currentPage: number,
+  totalItems: number,
+  setPage: (page: number) => void) =>
+  {
     const totalPages = getTotalPages(totalItems);
     const pages = [];
     pages.push(1);
     if (currentPage > 3) pages.push('...');
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+    for (
+    let i = Math.max(2, currentPage - 1);
+    i <= Math.min(totalPages - 1, currentPage + 1);
+    i++)
+    {
       pages.push(i);
     }
     if (currentPage < totalPages - 2) pages.push('...');
     if (totalPages > 1) pages.push(totalPages);
-    return <div className="mt-4 flex justify-between items-center">
+    return (
+      <div className="mt-4 flex justify-between items-center">
         <div className="text-sm text-gray-500">
           Showing{' '}
           <span className="font-medium">
@@ -354,20 +647,33 @@ export function Dashboard({
           of <span className="font-medium">{totalItems}</span> results
         </div>
         <div className="flex space-x-2">
-          <button onClick={() => setPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className={`px-3 py-1 border rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+          <button
+            onClick={() => setPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className={`px-3 py-1 border rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
             
             «
           </button>
-          {pages.map((page, index) => <button key={index} onClick={() => typeof page === 'number' && setPage(page)} disabled={page === '...'} className={`px-3 py-1 border rounded-md ${page === currentPage ? 'bg-blue-600 text-white' : page === '...' ? 'cursor-default' : 'hover:bg-gray-100'}`}>
+          {pages.map((page, index) =>
+          <button
+            key={index}
+            onClick={() => typeof page === 'number' && setPage(page)}
+            disabled={page === '...'}
+            className={`px-3 py-1 border rounded-md ${page === currentPage ? 'bg-blue-600 text-white' : page === '...' ? 'cursor-default' : 'hover:bg-gray-100'}`}>
             
               {page}
-            </button>)}
-          <button onClick={() => setPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className={`px-3 py-1 border rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+            </button>
+          )}
+          <button
+            onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            className={`px-3 py-1 border rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
             
             »
           </button>
         </div>
-      </div>;
+      </div>);
+
   };
   const showToken = (token: string, amount: string) => {
     setTokenModal({
@@ -379,37 +685,67 @@ export function Dashboard({
   const renderSection = () => {
     switch (activeSection) {
       case 'dashboard':
-        return <div>
+        return (
+          <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              <StatsCard title="Total Meters" value={(prepaidMetersState.length + postpaidMetersState.length).toLocaleString()} icon={<ZapIcon className="h-6 w-6" />} iconBgColor="bg-blue-100" iconColor="text-blue-600" trend={{
-              value: '12%',
-              isPositive: true,
-              label: 'from last month'
-            }} />
+              <StatsCard
+                title="Total Meters"
+                value={(
+                prepaidMetersState.length + postpaidMetersState.length).
+                toLocaleString()}
+                icon={<ZapIcon className="h-6 w-6" />}
+                iconBgColor="bg-blue-100"
+                iconColor="text-blue-600"
+                trend={{
+                  value: '12%',
+                  isPositive: true,
+                  label: 'from last month'
+                }} />
               
-              <StatsCard title="Prepaid Meters" value={prepaidMetersState.length.toLocaleString()} icon={<CoinsIcon className="h-6 w-6" />} iconBgColor="bg-green-100" iconColor="text-green-600" trend={{
-              value: '8%',
-              isPositive: true,
-              label: 'from last month'
-            }} />
+              <StatsCard
+                title="Prepaid Meters"
+                value={prepaidMetersState.length.toLocaleString()}
+                icon={<CoinsIcon className="h-6 w-6" />}
+                iconBgColor="bg-green-100"
+                iconColor="text-green-600"
+                trend={{
+                  value: '8%',
+                  isPositive: true,
+                  label: 'from last month'
+                }} />
               
-              <StatsCard title="Postpaid Meters" value={postpaidMetersState.length.toLocaleString()} icon={<FileTextIcon className="h-6 w-6" />} iconBgColor="bg-purple-100" iconColor="text-purple-600" trend={{
-              value: '3%',
-              isPositive: false,
-              label: 'from last month'
-            }} />
+              <StatsCard
+                title="Postpaid Meters"
+                value={postpaidMetersState.length.toLocaleString()}
+                icon={<FileTextIcon className="h-6 w-6" />}
+                iconBgColor="bg-purple-100"
+                iconColor="text-purple-600"
+                trend={{
+                  value: '3%',
+                  isPositive: false,
+                  label: 'from last month'
+                }} />
               
-              <StatsCard title="Today's Revenue" value="Ksh 248,750" icon={<CreditCardIcon className="h-6 w-6" />} iconBgColor="bg-yellow-100" iconColor="text-yellow-600" trend={{
-              value: '15%',
-              isPositive: true,
-              label: 'from yesterday'
-            }} />
+              <StatsCard
+                title="Today's Revenue"
+                value="Ksh 248,750"
+                icon={<CreditCardIcon className="h-6 w-6" />}
+                iconBgColor="bg-yellow-100"
+                iconColor="text-yellow-600"
+                trend={{
+                  value: '15%',
+                  isPositive: true,
+                  label: 'from yesterday'
+                }} />
               
             </div>
 
             {/* Consumption Graph Overview */}
             <div className="mb-6">
-              <ConsumptionGraph data={consumptionGraphData} title="Total Network Consumption" height={350} />
+              <ConsumptionGraph
+                data={consumptionGraphData}
+                title="Total Network Consumption"
+                height={350} />
               
               <div className="mt-2 text-sm text-gray-600 text-center">
                 Data collected from{' '}
@@ -429,7 +765,9 @@ export function Dashboard({
                     Login to view detailed meter readings and consumption data
                   </p>
                 </div>
-                <button onClick={onMeterLogin} className="px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold flex items-center">
+                <button
+                  onClick={onMeterLogin}
+                  className="px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold flex items-center">
                   
                   <KeyIcon className="h-5 w-5 mr-2" />
                   Meter Login
@@ -478,86 +816,162 @@ export function Dashboard({
                 </div>
               </div>
             </div>
-          </div>;
+          </div>);
+
       case 'ai-insights':
-        return <AIInsights meters={[...prepaidMetersState, ...postpaidMetersState]} transactions={paymentTransactionsState} />;
+        return (
+          <AIInsights
+            meters={[...prepaidMetersState, ...postpaidMetersState]}
+            transactions={paymentTransactionsState} />);
+
+
       case 'api-access':
         // New Case
         return <ApiManagement user={user} />;
       case 'data-logger':
         return <DataLogger isAdmin={isAdmin} />;
+      case 'device-locations':
+        return (
+          <DeviceLocations
+            prepaidMeters={prepaidMetersState}
+            postpaidMeters={postpaidMetersState} />);
+
+
       case 'prepaid':
-        return <div className="bg-white p-6 rounded-lg shadow">
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">Prepaid Meters</h2>
               <div className="flex space-x-3">
-                <button onClick={() => setActiveSection('add-meter')} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+                <button
+                  onClick={() => setActiveSection('add-meter')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
                   
                   <PlusCircleIcon className="h-4 w-4 mr-2" />
                   Add Meter
                 </button>
-                <button onClick={() => setFilterModal({
-                isOpen: true,
-                type: 'prepaid'
-              })} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                <button
+                  onClick={() =>
+                  setFilterModal({
+                    isOpen: true,
+                    type: 'prepaid'
+                  })
+                  }
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                   
                   <FilterIcon className="h-4 w-4 mr-2" />
                   Filter
                 </button>
-                <button onClick={() => exportToExcel(filteredPrepaidMeters, 'prepaid_meters', 'prepaid')} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                <button
+                  onClick={() =>
+                  exportToExcel(
+                    filteredPrepaidMeters,
+                    'prepaid_meters',
+                    'prepaid'
+                  )
+                  }
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                   
                   <DownloadIcon className="h-4 w-4 mr-2" />
                   Export
                 </button>
               </div>
             </div>
-            <MeterTable meters={prepaidMeters} type="prepaid" onView={(meter) => handleViewMeter(meter, 'prepaid')} onEdit={(meter) => handleEditMeter(meter, 'prepaid')} onDelete={(meter) => handleDeleteMeter(meter, 'prepaid')} />
+            <MeterTable
+              meters={prepaidMeters}
+              type="prepaid"
+              onView={(meter) => handleViewMeter(meter, 'prepaid')}
+              onEdit={(meter) => handleEditMeter(meter, 'prepaid')}
+              onDelete={(meter) => handleDeleteMeter(meter, 'prepaid')} />
             
-            {renderPagination(prepaidPage, filteredPrepaidMeters.length, setPrepaidPage)}
-          </div>;
+            {renderPagination(
+              prepaidPage,
+              filteredPrepaidMeters.length,
+              setPrepaidPage
+            )}
+          </div>);
+
       case 'postpaid':
-        return <div className="bg-white p-6 rounded-lg shadow">
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">Postpaid Meters</h2>
               <div className="flex space-x-3">
-                <button onClick={() => setActiveSection('add-meter')} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+                <button
+                  onClick={() => setActiveSection('add-meter')}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
                   
                   <PlusCircleIcon className="h-4 w-4 mr-2" />
                   Add Meter
                 </button>
-                <button onClick={() => setFilterModal({
-                isOpen: true,
-                type: 'postpaid'
-              })} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                <button
+                  onClick={() =>
+                  setFilterModal({
+                    isOpen: true,
+                    type: 'postpaid'
+                  })
+                  }
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                   
                   <FilterIcon className="h-4 w-4 mr-2" />
                   Filter
                 </button>
-                <button onClick={() => exportToExcel(filteredPostpaidMeters, 'postpaid_meters', 'postpaid')} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                <button
+                  onClick={() =>
+                  exportToExcel(
+                    filteredPostpaidMeters,
+                    'postpaid_meters',
+                    'postpaid'
+                  )
+                  }
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                   
                   <DownloadIcon className="h-4 w-4 mr-2" />
                   Export
                 </button>
               </div>
             </div>
-            <MeterTable meters={postpaidMeters} type="postpaid" onView={(meter) => handleViewMeter(meter, 'postpaid')} onEdit={(meter) => handleEditMeter(meter, 'postpaid')} onDelete={(meter) => handleDeleteMeter(meter, 'postpaid')} />
+            <MeterTable
+              meters={postpaidMeters}
+              type="postpaid"
+              onView={(meter) => handleViewMeter(meter, 'postpaid')}
+              onEdit={(meter) => handleEditMeter(meter, 'postpaid')}
+              onDelete={(meter) => handleDeleteMeter(meter, 'postpaid')} />
             
-            {renderPagination(postpaidPage, filteredPostpaidMeters.length, setPostpaidPage)}
-          </div>;
+            {renderPagination(
+              postpaidPage,
+              filteredPostpaidMeters.length,
+              setPostpaidPage
+            )}
+          </div>);
+
       case 'payments':
-        return <div className="bg-white p-6 rounded-lg shadow">
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold">Payment Transactions</h2>
               <div className="flex space-x-3">
-                <button onClick={() => setFilterModal({
-                isOpen: true,
-                type: 'payments'
-              })} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                <button
+                  onClick={() =>
+                  setFilterModal({
+                    isOpen: true,
+                    type: 'payments'
+                  })
+                  }
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                   
                   <FilterIcon className="h-4 w-4 mr-2" />
                   Filter
                 </button>
-                <button onClick={() => exportToExcel(filteredPaymentTransactions, 'payment_transactions', 'payments')} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
+                <button
+                  onClick={() =>
+                  exportToExcel(
+                    filteredPaymentTransactions,
+                    'payment_transactions',
+                    'payments'
+                  )
+                  }
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center">
                   
                   <DownloadIcon className="h-4 w-4 mr-2" />
                   Export
@@ -595,7 +1009,8 @@ export function Dashboard({
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {paymentTransactions.map((transaction, index) => <tr key={index}>
+                  {paymentTransactions.map((transaction, index) =>
+                  <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {transaction.transactionId}
                       </td>
@@ -612,10 +1027,21 @@ export function Dashboard({
                         {transaction.units}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {transaction.tokenCode !== 'N/A' ? <button onClick={() => showToken(transaction.tokenCode, `Ksh ${transaction.amount}`)} className="text-blue-600 hover:text-blue-900">
+                        {transaction.tokenCode !== 'N/A' ?
+                      <button
+                        onClick={() =>
+                        showToken(
+                          transaction.tokenCode,
+                          `Ksh ${transaction.amount}`
+                        )
+                        }
+                        className="text-blue-600 hover:text-blue-900">
                         
                             Show Token
-                          </button> : 'N/A'}
+                          </button> :
+
+                      'N/A'
+                      }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {transaction.date}
@@ -625,42 +1051,55 @@ export function Dashboard({
                           {transaction.status}
                         </span>
                       </td>
-                    </tr>)}
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
-            {renderPagination(paymentsPage, filteredPaymentTransactions.length, setPaymentsPage)}
-          </div>;
+            {renderPagination(
+              paymentsPage,
+              filteredPaymentTransactions.length,
+              setPaymentsPage
+            )}
+          </div>);
+
       case 'add-meter':
         return <AddMeterForm onMeterAdded={handleMeterAdded} />;
       case 'live-payments':
         return <LivePayments />;
       case 'reports':
-        return <div className="bg-white p-6 rounded-lg shadow">
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-bold mb-4">Reports</h2>
             <p className="text-gray-600">
               Reports and analytics will appear here.
             </p>
-          </div>;
+          </div>);
+
       case 'settings':
-        return <div className="bg-white p-6 rounded-lg shadow">
+        return (
+          <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-bold mb-6">Settings</h2>
 
             {/* User Management Section - Only for Admin */}
-            {isAdmin && <div className="mb-8">
+            {isAdmin &&
+            <div className="mb-8">
                 <h3 className="text-lg font-semibold mb-4">User Management</h3>
                 <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-4">
                   <p className="text-sm text-blue-800 mb-3">
                     As an administrator, you can create new user accounts for
                     the system.
                   </p>
-                  <button onClick={() => setCreateAccountModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+                  <button
+                  onClick={() => setCreateAccountModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
                   
                     <UserPlusIcon className="h-4 w-4 mr-2" />
                     Create New Account
                   </button>
                 </div>
-              </div>}
+              </div>
+            }
 
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-4">
@@ -692,23 +1131,33 @@ export function Dashboard({
                 System preferences and configurations will appear here.
               </p>
             </div>
-          </div>;
+          </div>);
+
       default:
         return null;
     }
   };
-  return <div className="flex h-screen overflow-hidden bg-gray-100">
-      <div className={`bg-blue-800 text-white flex-shrink-0 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+  return (
+    <div className="flex h-screen overflow-hidden bg-gray-100">
+      <div
+        className={`bg-blue-800 text-white flex-shrink-0 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
         
         <div className="p-4 flex items-center justify-between border-b border-blue-700">
           <div className="flex items-center">
-            <img src="/image_639ac6c2.png" alt="MoTech" className="h-8 w-8 rounded-full object-cover" />
+            <img
+              src="/image_639ac6c2.png"
+              alt="MoTech"
+              className="h-8 w-8 rounded-full object-cover" />
             
-            {!sidebarCollapsed && <span className="ml-3 text-lg font-bold leading-tight">
+            {!sidebarCollapsed &&
+            <span className="ml-3 text-lg font-bold leading-tight">
                 MoTech SmartMeter
-              </span>}
+              </span>
+            }
           </div>
-          <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} className="text-white focus:outline-none">
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="text-white focus:outline-none">
             
             <MenuIcon className="h-6 w-6" />
           </button>
@@ -716,57 +1165,94 @@ export function Dashboard({
 
         <div className="flex-grow overflow-y-auto">
           <nav className="p-2">
-            <button onClick={() => setActiveSection('dashboard')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'dashboard' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('dashboard')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'dashboard' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <LayoutDashboardIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
             </button>
-            <button onClick={() => setActiveSection('ai-insights')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'ai-insights' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('ai-insights')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'ai-insights' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <BrainCircuitIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">AI Insights</span>}
             </button>
-            <button onClick={() => setActiveSection('prepaid')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'prepaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('prepaid')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'prepaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <CoinsIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Prepaid Meters</span>}
+              {!sidebarCollapsed &&
+              <span className="ml-3">Prepaid Meters</span>
+              }
             </button>
-            <button onClick={() => setActiveSection('postpaid')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'postpaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('postpaid')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'postpaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <FileTextIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Postpaid Meters</span>}
+              {!sidebarCollapsed &&
+              <span className="ml-3">Postpaid Meters</span>
+              }
             </button>
-            <button onClick={() => setActiveSection('payments')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('payments')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <CreditCardIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Payments</span>}
             </button>
-            <button onClick={() => setActiveSection('add-meter')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'add-meter' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('add-meter')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'add-meter' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <PlusCircleIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Add Meter</span>}
             </button>
-            <button onClick={() => setActiveSection('live-payments')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'live-payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('live-payments')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'live-payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <ZapIcon className="h-5 w-5 animate-pulse" />
               {!sidebarCollapsed && <span className="ml-3">Live Payments</span>}
             </button>
-            <button onClick={() => setActiveSection('reports')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'reports' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('device-locations')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'device-locations' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              
+              <MapPinIcon className="h-5 w-5" />
+              {!sidebarCollapsed &&
+              <span className="ml-3">Device Locations</span>
+              }
+            </button>
+            <button
+              onClick={() => setActiveSection('reports')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'reports' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <BarChart3Icon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Reports</span>}
             </button>
-            <button onClick={() => setActiveSection('api-access')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api-access' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            <button
+              onClick={() => setActiveSection('api-access')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api-access' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <ServerIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">API Access</span>}
             </button>
-            {isAdmin && <button onClick={() => setActiveSection('data-logger')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'data-logger' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+            {isAdmin &&
+            <button
+              onClick={() => setActiveSection('data-logger')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'data-logger' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
                 <GaugeIcon className="h-5 w-5" />
                 {!sidebarCollapsed && <span className="ml-3">Data Logger</span>}
-              </button>}
-            <button onClick={() => setActiveSection('settings')} className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              </button>
+            }
+            <button
+              onClick={() => setActiveSection('settings')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
               <SettingsIcon className="h-5 w-5" />
               {!sidebarCollapsed && <span className="ml-3">Settings</span>}
@@ -775,25 +1261,42 @@ export function Dashboard({
         </div>
 
         <div className="p-4 border-t border-blue-700">
-          {!sidebarCollapsed && <div className="flex items-center">
-              <img src="https://via.placeholder.com/40" alt="User" className="rounded-full w-10 h-10" />
+          {!sidebarCollapsed &&
+          <div className="flex items-center">
+              <img
+              src="https://via.placeholder.com/40"
+              alt="User"
+              className="rounded-full w-10 h-10" />
             
               <div className="ml-3">
                 <div className="font-medium">{user?.name || 'Admin User'}</div>
                 <div className="text-xs text-blue-200">{user?.email}</div>
               </div>
-            </div>}
+            </div>
+          }
         </div>
       </div>
 
       <div className="flex-1 overflow-auto">
         <header className="bg-white shadow-sm p-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            {activeSection === 'ai-insights' ? 'AI Insights' : activeSection === 'api-access' ? 'API Access Management' : activeSection === 'data-logger' ? '3-Phase Data Logger' : activeSection.charAt(0).toUpperCase() + activeSection.slice(1).replace('-', ' ')}
+            {activeSection === 'ai-insights' ?
+            'AI Insights' :
+            activeSection === 'api-access' ?
+            'API Access Management' :
+            activeSection === 'data-logger' ?
+            '3-Phase Data Logger' :
+            activeSection === 'device-locations' ?
+            'Device Locations' :
+            activeSection.charAt(0).toUpperCase() +
+            activeSection.slice(1).replace('-', ' ')}
           </h1>
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <input type="text" placeholder="Search..." className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="text"
+                placeholder="Search..."
+                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
               
               <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             </div>
@@ -803,7 +1306,9 @@ export function Dashboard({
             <button className="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200">
               <HelpCircleIcon className="h-5 w-5" />
             </button>
-            <button onClick={onLogout} className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <button
+              onClick={onLogout}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
               
               <LogOutIcon className="h-4 w-4 mr-1" />
               Logout
@@ -820,52 +1325,90 @@ export function Dashboard({
         </footer>
       </div>
 
-      <TokenModal isOpen={tokenModal.isOpen} onClose={() => setTokenModal({
-      isOpen: false,
-      token: '',
-      amount: ''
-    })} token={tokenModal.token} amount={tokenModal.amount} />
+      <TokenModal
+        isOpen={tokenModal.isOpen}
+        onClose={() =>
+        setTokenModal({
+          isOpen: false,
+          token: '',
+          amount: ''
+        })
+        }
+        token={tokenModal.token}
+        amount={tokenModal.amount} />
       
 
-      <FilterModal isOpen={filterModal.isOpen} onClose={() => setFilterModal({
-      ...filterModal,
-      isOpen: false
-    })} onApply={(filters) => {
-      if (filterModal.type === 'prepaid') {
-        setPrepaidFilters(filters);
-        setPrepaidPage(1);
-      } else if (filterModal.type === 'postpaid') {
-        setPostpaidFilters(filters);
-        setPostpaidPage(1);
-      } else {
-        setPaymentsFilters(filters);
-        setPaymentsPage(1);
-      }
-    }} type={filterModal.type} />
+      <FilterModal
+        isOpen={filterModal.isOpen}
+        onClose={() =>
+        setFilterModal({
+          ...filterModal,
+          isOpen: false
+        })
+        }
+        onApply={(filters) => {
+          if (filterModal.type === 'prepaid') {
+            setPrepaidFilters(filters);
+            setPrepaidPage(1);
+          } else if (filterModal.type === 'postpaid') {
+            setPostpaidFilters(filters);
+            setPostpaidPage(1);
+          } else {
+            setPaymentsFilters(filters);
+            setPaymentsPage(1);
+          }
+        }}
+        type={filterModal.type} />
       
 
-      <ViewMeterModal isOpen={viewModal.isOpen} onClose={() => setViewModal({
-      isOpen: false,
-      meter: null,
-      type: 'prepaid'
-    })} meter={viewModal.meter} type={viewModal.type} userEmail={user?.email || ''} // Pass user email for commands
-    />
+      <ViewMeterModal
+        isOpen={viewModal.isOpen}
+        onClose={() =>
+        setViewModal({
+          isOpen: false,
+          meter: null,
+          type: 'prepaid'
+        })
+        }
+        meter={viewModal.meter}
+        type={viewModal.type}
+        userEmail={user?.email || ''} // Pass user email for commands
+      />
 
-      <EditMeterModal isOpen={editModal.isOpen} onClose={() => setEditModal({
-      isOpen: false,
-      meter: null,
-      type: 'prepaid'
-    })} onSave={handleSaveEdit} meter={editModal.meter} type={editModal.type} />
+      <EditMeterModal
+        isOpen={editModal.isOpen}
+        onClose={() =>
+        setEditModal({
+          isOpen: false,
+          meter: null,
+          type: 'prepaid'
+        })
+        }
+        onSave={handleSaveEdit}
+        meter={editModal.meter}
+        type={editModal.type} />
       
 
-      <DeleteConfirmModal isOpen={deleteModal.isOpen} onClose={() => setDeleteModal({
-      isOpen: false,
-      meter: null,
-      type: 'prepaid'
-    })} onConfirm={handleConfirmDelete} meterName={deleteModal.meter?.customerName || ''} accountNo={deleteModal.meter?.accountNo || ''} />
+      <DeleteConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() =>
+        setDeleteModal({
+          isOpen: false,
+          meter: null,
+          type: 'prepaid'
+        })
+        }
+        onConfirm={handleConfirmDelete}
+        meterName={deleteModal.meter?.customerName || ''}
+        accountNo={deleteModal.meter?.accountNo || ''} />
       
 
-      <CreateAccountModal isOpen={createAccountModal} onClose={() => setCreateAccountModal(false)} onCreateAccount={onCreateAccount} isAdmin={isAdmin} />
+      <CreateAccountModal
+        isOpen={createAccountModal}
+        onClose={() => setCreateAccountModal(false)}
+        onCreateAccount={onCreateAccount}
+        isAdmin={isAdmin} />
       
-    </div>;
+    </div>);
+
 }
