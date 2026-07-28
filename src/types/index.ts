@@ -4,7 +4,6 @@ export interface Meter {
   customerName: string;
   type: 'prepaid' | 'postpaid';
 }
-
 export interface User {
   email: string;
   name: string;

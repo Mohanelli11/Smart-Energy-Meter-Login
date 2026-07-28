@@ -39,8 +39,7 @@ export function MeterTable({
         return 'bg-gray-100 text-gray-800';
     }
   };
-  return (
-    <div className="overflow-x-auto">
+  return <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -71,8 +70,7 @@ export function MeterTable({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {meters.map((meter, index) =>
-          <tr key={index} className="hover:bg-gray-50">
+          {meters.map((meter, index) => <tr key={index} className="hover:bg-gray-50">
               <td className="px-6 py-4 whitespace-nowrap">{meter.accountNo}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {meter.customerName}
@@ -84,41 +82,29 @@ export function MeterTable({
               </td>
               <td className="px-6 py-4 whitespace-nowrap">{meter.balance}</td>
               <td className="px-6 py-4 whitespace-nowrap">
-                <span
-                className={`px-2 py-1 text-xs rounded-full ${getStatusColor(meter.status)}`}>
+                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(meter.status)}`}>
                 
                   {meter.status}
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex space-x-3">
-                  <button
-                  onClick={() => onView && onView(meter)}
-                  className="text-blue-600 hover:text-blue-900 transition-colors"
-                  title="View Details">
+                  <button onClick={() => onView && onView(meter)} className="text-blue-600 hover:text-blue-900 transition-colors" title="View Details">
                   
                     <EyeIcon className="h-4 w-4" />
                   </button>
-                  <button
-                  onClick={() => onEdit && onEdit(meter)}
-                  className="text-yellow-600 hover:text-yellow-900 transition-colors"
-                  title="Edit Meter">
+                  <button onClick={() => onEdit && onEdit(meter)} className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Edit Meter">
                   
                     <EditIcon className="h-4 w-4" />
                   </button>
-                  <button
-                  onClick={() => onDelete && onDelete(meter)}
-                  className="text-red-600 hover:text-red-900 transition-colors"
-                  title="Delete Meter">
+                  <button onClick={() => onDelete && onDelete(meter)} className="text-red-600 hover:text-red-900 transition-colors" title="Delete Meter">
                   
                     <TrashIcon className="h-4 w-4" />
                   </button>
                 </div>
               </td>
-            </tr>
-          )}
+            </tr>)}
         </tbody>
       </table>
-    </div>);
-
+    </div>;
 }

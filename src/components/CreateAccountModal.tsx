@@ -29,8 +29,7 @@ export function CreateAccountModal({
   const [error, setError] = useState('');
   if (!isOpen) return null;
   if (!isAdmin) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center">
@@ -39,9 +38,7 @@ export function CreateAccountModal({
               </div>
               <h3 className="text-xl font-bold text-gray-900">Access Denied</h3>
             </div>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700">
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
               
               <XIcon className="h-6 w-6" />
             </button>
@@ -53,28 +50,19 @@ export function CreateAccountModal({
             </p>
           </div>
           <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+            <button onClick={onClose} className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
               
               Close
             </button>
           </div>
         </div>
-      </div>);
-
+      </div>;
   }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     // Validation
-    if (
-    !formData.name ||
-    !formData.email ||
-    !formData.phoneNumber ||
-    !formData.password ||
-    !formData.confirmPassword)
-    {
+    if (!formData.name || !formData.email || !formData.phoneNumber || !formData.password || !formData.confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -111,17 +99,14 @@ export function CreateAccountModal({
     });
     onClose();
   };
-  const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-  {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value
     });
     setError('');
   };
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  return <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center">
@@ -132,124 +117,69 @@ export function CreateAccountModal({
               Create New Account
             </h3>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             
             <XIcon className="h-6 w-6" />
           </button>
         </div>
 
-        {error &&
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+        {error && <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
             <p className="text-sm text-red-800">{error}</p>
-          </div>
-        }
+          </div>}
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 mb-6">
             <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="name">
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
                 
                 Full Name
               </label>
-              <input
-                type="text"
-                id="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter full name"
-                required />
+              <input type="text" id="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter full name" required />
               
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="email">
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
                 
                 Email Address
               </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="user@example.com"
-                required />
+              <input type="email" id="email" value={formData.email} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="user@example.com" required />
               
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="phoneNumber">
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="phoneNumber">
                 
                 Phone Number
               </label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="+254700000000"
-                required />
+              <input type="tel" id="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="+254700000000" required />
               
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="password">
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="password">
                 
                 Password
               </label>
-              <input
-                type="password"
-                id="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Minimum 6 characters"
-                required />
+              <input type="password" id="password" value={formData.password} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Minimum 6 characters" required />
               
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="confirmPassword">
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="confirmPassword">
                 
                 Confirm Password
               </label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Re-enter password"
-                required />
+              <input type="password" id="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Re-enter password" required />
               
             </div>
 
             <div>
-              <label
-                className="block text-sm font-medium text-gray-700 mb-2"
-                htmlFor="role">
+              <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="role">
                 
                 Account Role
               </label>
-              <select
-                id="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select id="role" value={formData.role} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 
                 <option value="user">User</option>
                 <option value="admin">Administrator</option>
@@ -258,22 +188,16 @@ export function CreateAccountModal({
           </div>
 
           <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            <button type="button" onClick={onClose} className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               
               Cancel
             </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               
               Create Account
             </button>
           </div>
         </form>
       </div>
-    </div>);
-
+    </div>;
 }

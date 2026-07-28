@@ -19,8 +19,7 @@ export function StatsCard({
   iconColor,
   trend
 }: StatsCardProps) {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow">
+  return <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-500">{title}</p>
@@ -30,18 +29,14 @@ export function StatsCard({
           {icon}
         </div>
       </div>
-      {trend &&
-      <div className="mt-4">
+      {trend && <div className="mt-4">
           <div className="flex items-center text-sm text-gray-500">
-            <span
-            className={`${trend.isPositive ? 'text-green-500' : 'text-red-500'} mr-1`}>
+            <span className={`${trend.isPositive ? 'text-green-500' : 'text-red-500'} mr-1`}>
             
               {trend.isPositive ? '↑' : '↓'} {trend.value}
             </span>
             <span>{trend.label}</span>
           </div>
-        </div>
-      }
-    </div>);
-
+        </div>}
+    </div>;
 }

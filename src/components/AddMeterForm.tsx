@@ -1,28 +1,14 @@
 import React, { useState } from 'react';
-import {
-  AlertTriangleIcon,
-  CheckCircleIcon,
-  ChevronRightIcon,
-  ChevronLeftIcon } from
-'lucide-react';
-import {
-  validateCustomerName,
-  validatePhoneNumber,
-  validateLocation,
-  validateSelectOption,
-  validateAccountNumber,
-  validateMeterNumber,
-  validateNumeric,
-  validateTextArea,
-  validateEmail,
-  sanitizeString } from
-'../utils/validation';
+import { AlertTriangleIcon, CheckCircleIcon, ChevronRightIcon, ChevronLeftIcon } from 'lucide-react';
+import { validateCustomerName, validatePhoneNumber, validateLocation, validateSelectOption, validateAccountNumber, validateMeterNumber, validateNumeric, validateTextArea, validateEmail, sanitizeString } from '../utils/validation';
 import { checkFormRateLimit } from '../utils/rateLimiter';
 import { logSecurityEvent } from '../utils/security';
 interface AddMeterFormProps {
   onMeterAdded: (meter: any) => void;
 }
-export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
+export function AddMeterForm({
+  onMeterAdded
+}: AddMeterFormProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     customerName: '',
@@ -42,14 +28,13 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rateLimitError, setRateLimitError] = useState('');
-  const handleChange = (
-  e: React.ChangeEvent<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
-
-  {
-    const { id, value, type } = e.target;
-    const val =
-    type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const {
+      id,
+      value,
+      type
+    } = e.target;
+    const val = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
     setFormData({
       ...formData,
       [id]: val
@@ -76,19 +61,11 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
     }
     const accVal = validateAccountNumber(formData.accountNumber);
     if (!accVal.valid) newErrors.accountNumber = accVal.error!;
-    const typeVal = validateSelectOption(formData.customerType, [
-    'tier-zero',
-    'existing']
-    );
+    const typeVal = validateSelectOption(formData.customerType, ['tier-zero', 'existing']);
     if (!typeVal.valid) newErrors.customerType = typeVal.error!;
     const emailVal = validateEmail(formData.email);
     if (!emailVal.valid) newErrors.email = emailVal.error!;
-    const transVal = validateSelectOption(formData.transformer, [
-    'TR-001',
-    'TR-002',
-    'TR-003',
-    'TR-004']
-    );
+    const transVal = validateSelectOption(formData.transformer, ['TR-001', 'TR-002', 'TR-003', 'TR-004']);
     if (!transVal.valid) newErrors.transformer = transVal.error!;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -97,12 +74,7 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
     const newErrors: Record<string, string> = {};
     const tariffVal = validateNumeric(formData.tariffRate, 0, 1000);
     if (!tariffVal.valid) newErrors.tariffRate = tariffVal.error!;
-    const meterTypeVal = validateSelectOption(formData.meterType, [
-    'prepaid-single',
-    'prepaid-three',
-    'postpaid-single',
-    'postpaid-three']
-    );
+    const meterTypeVal = validateSelectOption(formData.meterType, ['prepaid-single', 'prepaid-three', 'postpaid-single', 'postpaid-three']);
     if (!meterTypeVal.valid) newErrors.meterType = meterTypeVal.error!;
     const meterNumVal = validateMeterNumber(formData.meterNumber);
     if (!meterNumVal.valid) newErrors.meterNumber = meterNumVal.error!;
@@ -204,15 +176,12 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
   };
   const renderFieldError = (fieldName: string) => {
     if (!errors[fieldName]) return null;
-    return (
-      <p className="mt-1 text-sm text-red-600 flex items-center">
+    return <p className="mt-1 text-sm text-red-600 flex items-center">
         <AlertTriangleIcon className="h-4 w-4 mr-1" />
         {errors[fieldName]}
-      </p>);
-
+      </p>;
   };
-  return (
-    <div className="bg-white p-6 rounded-lg shadow max-w-4xl mx-auto">
+  return <div className="bg-white p-6 rounded-lg shadow max-w-4xl mx-auto">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Add New Meter</h2>
         <p className="text-gray-500">
@@ -225,36 +194,25 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between relative">
           <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 z-0"></div>
-          <div
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-blue-600 z-0 transition-all duration-300"
-            style={{
-              width: `${(step - 1) / 2 * 100}%`
-            }}>
+          <div className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-blue-600 z-0 transition-all duration-300" style={{
+          width: `${(step - 1) / 2 * 100}%`
+        }}>
           </div>
 
-          {[1, 2, 3].map((num) =>
-          <div key={num} className="relative z-10 flex flex-col items-center">
-              <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 transition-colors duration-300 ${step >= num ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-300 text-gray-400'}`}>
+          {[1, 2, 3].map((num) => <div key={num} className="relative z-10 flex flex-col items-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold border-2 transition-colors duration-300 ${step >= num ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-300 text-gray-400'}`}>
               
                 {step > num ? <CheckCircleIcon className="h-6 w-6" /> : num}
               </div>
-              <span
-              className={`mt-2 text-sm font-medium ${step >= num ? 'text-blue-600' : 'text-gray-400'}`}>
+              <span className={`mt-2 text-sm font-medium ${step >= num ? 'text-blue-600' : 'text-gray-400'}`}>
               
-                {num === 1 ?
-              'Customer Details' :
-              num === 2 ?
-              'Device Attachment' :
-              'Authorization'}
+                {num === 1 ? 'Customer Details' : num === 2 ? 'Device Attachment' : 'Authorization'}
               </span>
-            </div>
-          )}
+            </div>)}
         </div>
       </div>
 
-      {rateLimitError &&
-      <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+      {rateLimitError && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
           <div className="flex items-start">
             <AlertTriangleIcon className="h-5 w-5 text-red-600 mr-2 mt-0.5" />
             <div>
@@ -264,31 +222,21 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
               <p className="text-sm text-red-700 mt-1">{rateLimitError}</p>
             </div>
           </div>
-        </div>
-      }
+        </div>}
 
       <form onSubmit={handleSubmit}>
         {/* Step 1: Customer Details */}
-        {step === 1 &&
-        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+        {step === 1 && <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
             <h3 className="text-lg font-semibold border-b pb-2">
               Step 1: Customer Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="customerName">
+                <label className="block text-gray-700 mb-2" htmlFor="customerName">
                 
                   Customer Name <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="text"
-                id="customerName"
-                value={formData.customerName}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.customerName ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="John Doe" />
+                <input type="text" id="customerName" value={formData.customerName} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.customerName ? 'border-red-500' : 'border-gray-300'}`} placeholder="John Doe" />
               
                 {renderFieldError('customerName')}
               </div>
@@ -296,30 +244,16 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 <label className="block text-gray-700 mb-2" htmlFor="location">
                   Location <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="text"
-                id="location"
-                value={formData.location}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.location ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="Nairobi West" />
+                <input type="text" id="location" value={formData.location} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.location ? 'border-red-500' : 'border-gray-300'}`} placeholder="Nairobi West" />
               
                 {renderFieldError('location')}
               </div>
               <div>
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="phoneNumber">
+                <label className="block text-gray-700 mb-2" htmlFor="phoneNumber">
                 
                   Phone Number <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="tel"
-                id="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="+254712345678" />
+                <input type="tel" id="phoneNumber" value={formData.phoneNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'}`} placeholder="+254712345678" />
               
                 {renderFieldError('phoneNumber')}
               </div>
@@ -327,46 +261,26 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 <label className="block text-gray-700 mb-2" htmlFor="idNumber">
                   ID Number <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="text"
-                id="idNumber"
-                value={formData.idNumber}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idNumber ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="12345678" />
+                <input type="text" id="idNumber" value={formData.idNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.idNumber ? 'border-red-500' : 'border-gray-300'}`} placeholder="12345678" />
               
                 {renderFieldError('idNumber')}
               </div>
               <div>
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="accountNumber">
+                <label className="block text-gray-700 mb-2" htmlFor="accountNumber">
                 
                   House No. / Account No.{' '}
                   <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="text"
-                id="accountNumber"
-                value={formData.accountNumber}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.accountNumber ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="MET-1234-2023" />
+                <input type="text" id="accountNumber" value={formData.accountNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.accountNumber ? 'border-red-500' : 'border-gray-300'}`} placeholder="MET-1234-2023" />
               
                 {renderFieldError('accountNumber')}
               </div>
               <div>
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="customerType">
+                <label className="block text-gray-700 mb-2" htmlFor="customerType">
                 
                   Type of Customer <span className="text-red-500">*</span>
                 </label>
-                <select
-                id="customerType"
-                value={formData.customerType}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.customerType ? 'border-red-500' : 'border-gray-300'}`}>
+                <select id="customerType" value={formData.customerType} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.customerType ? 'border-red-500' : 'border-gray-300'}`}>
                 
                   <option value="">Select Type</option>
                   <option value="tier-zero">Tier Zero (New Connection)</option>
@@ -378,29 +292,17 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 <label className="block text-gray-700 mb-2" htmlFor="email">
                   Customer Email <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="customer@example.com" />
+                <input type="email" id="email" value={formData.email} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? 'border-red-500' : 'border-gray-300'}`} placeholder="customer@example.com" />
               
                 {renderFieldError('email')}
               </div>
               <div>
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="transformer">
+                <label className="block text-gray-700 mb-2" htmlFor="transformer">
                 
                   Transformer Serving Meter{' '}
                   <span className="text-red-500">*</span>
                 </label>
-                <select
-                id="transformer"
-                value={formData.transformer}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.transformer ? 'border-red-500' : 'border-gray-300'}`}>
+                <select id="transformer" value={formData.transformer} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.transformer ? 'border-red-500' : 'border-gray-300'}`}>
                 
                   <option value="">Select Transformer</option>
                   <option value="TR-001">TR-001 (Nairobi West)</option>
@@ -411,12 +313,10 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 {renderFieldError('transformer')}
               </div>
             </div>
-          </div>
-        }
+          </div>}
 
         {/* Step 2: Device Attachment */}
-        {step === 2 &&
-        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+        {step === 2 && <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
             <h3 className="text-lg font-semibold border-b pb-2">
               Step 2: Device Attachment
             </h3>
@@ -425,38 +325,21 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 <label className="block text-gray-700 mb-2">
                   Customer Name
                 </label>
-                <input
-                type="text"
-                value={formData.customerName}
-                disabled
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed" />
+                <input type="text" value={formData.customerName} disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed" />
               
               </div>
               <div>
                 <label className="block text-gray-700 mb-2">Account No.</label>
-                <input
-                type="text"
-                value={formData.accountNumber}
-                disabled
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed" />
+                <input type="text" value={formData.accountNumber} disabled className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed" />
               
               </div>
               <div>
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="tariffRate">
+                <label className="block text-gray-700 mb-2" htmlFor="tariffRate">
                 
                   Tariff to be Allocated (Ksh/kWh){' '}
                   <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="number"
-                step="0.01"
-                id="tariffRate"
-                value={formData.tariffRate}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tariffRate ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="15.50" />
+                <input type="number" step="0.01" id="tariffRate" value={formData.tariffRate} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tariffRate ? 'border-red-500' : 'border-gray-300'}`} placeholder="15.50" />
               
                 {renderFieldError('tariffRate')}
               </div>
@@ -464,11 +347,7 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 <label className="block text-gray-700 mb-2" htmlFor="meterType">
                   Meter Type <span className="text-red-500">*</span>
                 </label>
-                <select
-                id="meterType"
-                value={formData.meterType}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.meterType ? 'border-red-500' : 'border-gray-300'}`}>
+                <select id="meterType" value={formData.meterType} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.meterType ? 'border-red-500' : 'border-gray-300'}`}>
                 
                   <option value="">Select Meter Type</option>
                   <option value="prepaid-single">Prepaid - Single Phase</option>
@@ -481,29 +360,19 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 {renderFieldError('meterType')}
               </div>
               <div className="md:col-span-2">
-                <label
-                className="block text-gray-700 mb-2"
-                htmlFor="meterNumber">
+                <label className="block text-gray-700 mb-2" htmlFor="meterNumber">
                 
                   Meter Serial Number <span className="text-red-500">*</span>
                 </label>
-                <input
-                type="text"
-                id="meterNumber"
-                value={formData.meterNumber}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.meterNumber ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="ESP-1234-001" />
+                <input type="text" id="meterNumber" value={formData.meterNumber} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.meterNumber ? 'border-red-500' : 'border-gray-300'}`} placeholder="ESP-1234-001" />
               
                 {renderFieldError('meterNumber')}
               </div>
             </div>
-          </div>
-        }
+          </div>}
 
         {/* Step 3: Authorization */}
-        {step === 3 &&
-        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+        {step === 3 && <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
             <h3 className="text-lg font-semibold border-b pb-2">
               Step 3: Authorization
             </h3>
@@ -535,31 +404,18 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
               <label className="block text-gray-700 mb-2" htmlFor="comments">
                 Authorization Comments
               </label>
-              <textarea
-              id="comments"
-              rows={4}
-              value={formData.comments}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.comments ? 'border-red-500' : 'border-gray-300'}`}
-              placeholder="Enter any authorization notes or comments here...">
+              <textarea id="comments" rows={4} value={formData.comments} onChange={handleChange} className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.comments ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter any authorization notes or comments here...">
             </textarea>
               {renderFieldError('comments')}
             </div>
 
             <div className="flex items-start mt-4">
               <div className="flex items-center h-5">
-                <input
-                id="authorized"
-                type="checkbox"
-                checked={formData.authorized}
-                onChange={handleChange}
-                className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${errors.authorized ? 'border-red-500' : ''}`} />
+                <input id="authorized" type="checkbox" checked={formData.authorized} onChange={handleChange} className={`w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ${errors.authorized ? 'border-red-500' : ''}`} />
               
               </div>
               <div className="ml-3 text-sm">
-                <label
-                htmlFor="authorized"
-                className="font-medium text-gray-700">
+                <label htmlFor="authorized" className="font-medium text-gray-700">
                 
                   I authorize this meter to be added to the system
                 </label>
@@ -570,8 +426,7 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                 {renderFieldError('authorized')}
               </div>
             </div>
-          </div>
-        }
+          </div>}
 
         {/* Navigation Buttons */}
         <div className="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
@@ -580,49 +435,28 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
           </div>
 
           <div className="flex space-x-4">
-            {step > 1 &&
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={isSubmitting}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 flex items-center">
+            {step > 1 && <button type="button" onClick={handleBack} disabled={isSubmitting} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 flex items-center">
               
                 <ChevronLeftIcon className="h-4 w-4 mr-1" />
                 Back
-              </button>
-            }
+              </button>}
 
-            {step < 3 ?
-            <button
-              type="button"
-              onClick={handleNext}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
+            {step < 3 ? <button type="button" onClick={handleNext} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
               
                 Next Step
                 <ChevronRightIcon className="h-4 w-4 ml-1" />
-              </button> :
-
-            <button
-              type="submit"
-              disabled={isSubmitting || !formData.authorized}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center">
+              </button> : <button type="submit" disabled={isSubmitting || !formData.authorized} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center">
               
-                {isSubmitting ?
-              <>
+                {isSubmitting ? <>
                     <span className="animate-spin mr-2">⏳</span>
                     Processing...
-                  </> :
-
-              <>
+                  </> : <>
                     <CheckCircleIcon className="h-4 w-4 mr-2" />
                     Complete & Add Meter
-                  </>
-              }
-              </button>
-            }
+                  </>}
+              </button>}
           </div>
         </div>
       </form>
-    </div>);
-
+    </div>;
 }

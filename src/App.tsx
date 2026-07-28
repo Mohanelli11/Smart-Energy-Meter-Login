@@ -4,18 +4,11 @@ import { Dashboard } from './components/Dashboard';
 import { MeterLoginPage } from './components/MeterLoginPage';
 import { IndividualMeterView } from './components/IndividualMeterView';
 import { OfflineGate } from './components/OfflineGate';
-import {
-  createSession,
-  getSession,
-  clearSession,
-  refreshSession } from
-'./utils/security';
+import { createSession, getSession, clearSession, refreshSession } from './utils/security';
 const SESSION_USER_KEY = 'motech_user';
 const SESSION_VIEWMODE_KEY = 'motech_viewMode';
 export function App() {
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   // Listen for online/offline events
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -54,22 +47,16 @@ export function App() {
     }
     return null;
   });
-  const [viewMode, setViewMode] = useState<
-    'admin' | 'meter-login' | 'meter-view'>(
-    () => {
-      const session = getSession();
-      if (session) {
-        const stored = sessionStorage.getItem(SESSION_VIEWMODE_KEY);
-        if (
-        stored === 'admin' ||
-        stored === 'meter-login' ||
-        stored === 'meter-view')
-        {
-          return stored;
-        }
+  const [viewMode, setViewMode] = useState<'admin' | 'meter-login' | 'meter-view'>(() => {
+    const session = getSession();
+    if (session) {
+      const stored = sessionStorage.getItem(SESSION_VIEWMODE_KEY);
+      if (stored === 'admin' || stored === 'meter-login' || stored === 'meter-view') {
+        return stored;
       }
-      return 'admin';
-    });
+    }
+    return 'admin';
+  });
   const [currentMeter, setCurrentMeter] = useState(null);
   // Persist user and viewMode to sessionStorage whenever they change
   useEffect(() => {
@@ -102,48 +89,25 @@ export function App() {
     return () => clearInterval(interval);
   }, [isLoggedIn]);
   // User accounts database (in a real app, this would be in a backend)
-  const [userAccounts, setUserAccounts] = useState([
-  {
+  const [userAccounts, setUserAccounts] = useState([{
     email: 'mahmadstephen19@gmail.com',
     password: '@Testing',
     name: 'Mahmad Stephen',
     role: 'admin',
     phoneNumber: '+254700000000'
-  },
-  {
+  }, {
     email: 'motechkenya@gmail.com',
     password: '@Testing',
     name: 'MoTech Electrical and Electronics Engineering Solutions',
     role: 'user',
     phoneNumber: '+254711111111'
-  }]
-  );
+  }]);
   // Generate all meters (prepaid + postpaid) for meter login
   const [allMeters] = useState(() => {
     const meters = [];
     // Prepaid meters
-    const prepaidNames = [
-    'John Mwangi',
-    'Sarah Wambui',
-    'David Omondi',
-    'Grace Njeri',
-    'Peter Kamau',
-    'Mary Auma',
-    'James Otieno',
-    'Jane Wanjiku',
-    'Paul Kariuki',
-    'Lucy Nyambura'];
-
-    const locations = [
-    'Nairobi West',
-    'Kasarani',
-    'Ruiru',
-    'Thika',
-    'Juja',
-    'Kiambu',
-    'Kikuyu',
-    'Limuru'];
-
+    const prepaidNames = ['John Mwangi', 'Sarah Wambui', 'David Omondi', 'Grace Njeri', 'Peter Kamau', 'Mary Auma', 'James Otieno', 'Jane Wanjiku', 'Paul Kariuki', 'Lucy Nyambura'];
+    const locations = ['Nairobi West', 'Kasarani', 'Ruiru', 'Thika', 'Juja', 'Kiambu', 'Kikuyu', 'Limuru'];
     for (let i = 0; i < 856; i++) {
       const accountNum = 1000 + i;
       const consumption = (Math.random() * 15 + 10).toFixed(2);
@@ -155,23 +119,12 @@ export function App() {
         location: locations[i % locations.length],
         consumption: consumption,
         balance: balance.toFixed(2),
-        status:
-        balance > 50 ?
-        'Active' :
-        balance > 0 ?
-        'Low Balance' :
-        'Disconnected',
+        status: balance > 50 ? 'Active' : balance > 0 ? 'Low Balance' : 'Disconnected',
         type: 'prepaid'
       });
     }
     // Postpaid meters
-    const postpaidNames = [
-    'James Kamau',
-    'Grace Njeri',
-    'Michael Otieno',
-    'Nancy Wanjiru',
-    'David Kipchoge'];
-
+    const postpaidNames = ['James Kamau', 'Grace Njeri', 'Michael Otieno', 'Nancy Wanjiru', 'David Kipchoge'];
     for (let i = 0; i < 392; i++) {
       const accountNum = 5000 + i;
       const consumption = (Math.random() * 15 + 15).toFixed(2);
@@ -183,9 +136,7 @@ export function App() {
         location: locations[i % locations.length],
         consumption: consumption,
         balance: billAmount,
-        status: ['Active', 'Pending Bill', 'Overdue'][
-        Math.floor(Math.random() * 3)],
-
+        status: ['Active', 'Pending Bill', 'Overdue'][Math.floor(Math.random() * 3)],
         type: 'postpaid'
       });
     }
@@ -193,11 +144,7 @@ export function App() {
   });
   const handleLogin = (userData) => {
     // Find user in accounts
-    const account = userAccounts.find(
-      (acc) =>
-      acc.email.toLowerCase() === userData.email.toLowerCase() &&
-      acc.password === userData.password
-    );
+    const account = userAccounts.find((acc) => acc.email.toLowerCase() === userData.email.toLowerCase() && acc.password === userData.password);
     if (account) {
       const userObj = {
         email: account.email,
@@ -227,22 +174,14 @@ export function App() {
     sessionStorage.removeItem('motech_activeSection');
   };
   const handlePasswordChange = (phone: string, newPassword: string) => {
-    setUserAccounts((prevAccounts) =>
-    prevAccounts.map((acc) =>
-    acc.phoneNumber === phone ?
-    {
+    setUserAccounts((prevAccounts) => prevAccounts.map((acc) => acc.phoneNumber === phone ? {
       ...acc,
       password: newPassword
-    } :
-    acc
-    )
-    );
+    } : acc));
   };
   const handleCreateAccount = (newAccount) => {
     // Check if email already exists
-    const exists = userAccounts.find(
-      (acc) => acc.email.toLowerCase() === newAccount.email.toLowerCase()
-    );
+    const exists = userAccounts.find((acc) => acc.email.toLowerCase() === newAccount.email.toLowerCase());
     if (exists) {
       alert('An account with this email already exists.');
       return false;
@@ -282,33 +221,13 @@ export function App() {
   }
   // Render based on view mode
   if (!isLoggedIn) {
-    return (
-      <LoginPage
-        onLogin={handleLogin}
-        onPasswordChange={handlePasswordChange}
-        userAccounts={userAccounts} />);
-
-
+    return <LoginPage onLogin={handleLogin} onPasswordChange={handlePasswordChange} userAccounts={userAccounts} />;
   }
   if (viewMode === 'meter-login') {
-    return (
-      <MeterLoginPage
-        onMeterLogin={handleMeterLogin}
-        onBackToAdmin={handleBackToAdmin} />);
-
-
+    return <MeterLoginPage onMeterLogin={handleMeterLogin} onBackToAdmin={handleBackToAdmin} />;
   }
   if (viewMode === 'meter-view' && currentMeter) {
-    return (
-      <IndividualMeterView meter={currentMeter} onLogout={handleMeterLogout} />);
-
+    return <IndividualMeterView meter={currentMeter} onLogout={handleMeterLogout} />;
   }
-  return (
-    <Dashboard
-      user={user}
-      onLogout={handleLogout}
-      onCreateAccount={handleCreateAccount}
-      onMeterLogin={handleGoToMeterLogin} />);
-
-
+  return <Dashboard user={user} onLogout={handleLogout} onCreateAccount={handleCreateAccount} onMeterLogin={handleGoToMeterLogin} />;
 }

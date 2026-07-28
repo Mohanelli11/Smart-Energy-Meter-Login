@@ -7,18 +7,13 @@
  * Simple encryption for localStorage (client-side only)
  * Note: This is NOT secure for sensitive data - use backend encryption for production
  */
-export function encryptData(
-data: string,
-key: string = 'motech-secret')
-: string {
+export function encryptData(data: string, key: string = 'motech-secret'): string {
   try {
     // Simple XOR encryption (for demo purposes only)
     // In production, use proper encryption library or backend encryption
     let encrypted = '';
     for (let i = 0; i < data.length; i++) {
-      encrypted += String.fromCharCode(
-        data.charCodeAt(i) ^ key.charCodeAt(i % key.length)
-      );
+      encrypted += String.fromCharCode(data.charCodeAt(i) ^ key.charCodeAt(i % key.length));
     }
     return btoa(encrypted); // Base64 encode
   } catch (error) {
@@ -30,17 +25,12 @@ key: string = 'motech-secret')
 /**
  * Simple decryption for localStorage
  */
-export function decryptData(
-encryptedData: string,
-key: string = 'motech-secret')
-: string {
+export function decryptData(encryptedData: string, key: string = 'motech-secret'): string {
   try {
     const decoded = atob(encryptedData); // Base64 decode
     let decrypted = '';
     for (let i = 0; i < decoded.length; i++) {
-      decrypted += String.fromCharCode(
-        decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length)
-      );
+      decrypted += String.fromCharCode(decoded.charCodeAt(i) ^ key.charCodeAt(i % key.length));
     }
     return decrypted;
   } catch (error) {
@@ -55,9 +45,7 @@ key: string = 'motech-secret')
 export function generateSecureToken(length: number = 32): string {
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
-    ''
-  );
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -88,18 +76,13 @@ export interface Session {
   expiresAt: number;
   createdAt: number;
 }
-
 const SESSION_KEY = 'motech_session';
 const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
 
 /**
  * Create a new session
  */
-export function createSession(
-userId: string,
-email: string,
-role: string)
-: Session {
+export function createSession(userId: string, email: string, role: string): Session {
   const session: Session = {
     userId,
     email,
@@ -112,7 +95,6 @@ role: string)
   // Store encrypted session
   const encrypted = encryptData(JSON.stringify(session));
   localStorage.setItem(SESSION_KEY, encrypted);
-
   return session;
 }
 
@@ -123,7 +105,6 @@ export function getSession(): Session | null {
   try {
     const encrypted = localStorage.getItem(SESSION_KEY);
     if (!encrypted) return null;
-
     const decrypted = decryptData(encrypted);
     const session: Session = JSON.parse(decrypted);
 
@@ -132,7 +113,6 @@ export function getSession(): Session | null {
       clearSession();
       return null;
     }
-
     return session;
   } catch (error) {
     console.error('Session retrieval error:', error);
@@ -165,17 +145,9 @@ export function refreshSession(): void {
  * These should be set on the server side
  */
 export const CSP_HEADERS = {
-  'Content-Security-Policy': [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Note: Remove unsafe-* in production
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: https:",
-  "font-src 'self' data:",
-  "connect-src 'self'",
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'"].
-  join('; ')
+  'Content-Security-Policy': ["default-src 'self'", "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  // Note: Remove unsafe-* in production
+  "style-src 'self' 'unsafe-inline'", "img-src 'self' data: https:", "font-src 'self' data:", "connect-src 'self'", "frame-ancestors 'none'", "base-uri 'self'", "form-action 'self'"].join('; ')
 };
 
 /**
@@ -203,17 +175,7 @@ export function preventClickjacking(): void {
  * Detect and prevent common XSS patterns
  */
 export function detectXSS(input: string): boolean {
-  const xssPatterns = [
-  /<script[^>]*>.*?<\/script>/gi,
-  /javascript:/gi,
-  /on\w+\s*=/gi,
-  /<iframe/gi,
-  /<object/gi,
-  /<embed/gi,
-  /eval\(/gi,
-  /expression\(/gi];
-
-
+  const xssPatterns = [/<script[^>]*>.*?<\/script>/gi, /javascript:/gi, /on\w+\s*=/gi, /<iframe/gi, /<object/gi, /<embed/gi, /eval\(/gi, /expression\(/gi];
   return xssPatterns.some((pattern) => pattern.test(input));
 }
 
