@@ -1,10 +1,6 @@
-export const routeConfig = [{
-  path: '/dashboard',
-  protected: true
-}, {
-  path: '/meters',
-  protected: true
-}, {
-  path: '/login',
-  protected: false
-}];
+export const ROUTES = {
+  login: '/login',
+  meterLogin: '/meter-login',
+  dashboard: '/dashboard',
+  meter: '/meter',
+} as const;

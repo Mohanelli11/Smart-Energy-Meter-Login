@@ -1,4 +1,4 @@
-// Authentication feature module
-// Login, session handling and role management will migrate here.
-
-export const authenticationFeature = 'authentication';
+export { AuthProvider } from './AuthProvider';
+export { useAuth } from './hooks/useAuth';
+export * from './types';
+export * as authService from './services/auth.service';

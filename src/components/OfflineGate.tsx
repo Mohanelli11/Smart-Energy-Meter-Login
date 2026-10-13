@@ -1,4 +1,3 @@
-import React from 'react';
 import { WifiOffIcon, RefreshCwIcon } from 'lucide-react';
 export function OfflineGate() {
   return (

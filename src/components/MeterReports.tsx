@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   SignalIcon,
   WifiIcon,
@@ -11,7 +10,7 @@ interface MeterReportsProps {
   report: MeterReport | undefined;
   meterType: 'prepaid' | 'postpaid';
 }
-export function MeterReports({ report, meterType }: MeterReportsProps) {
+export function MeterReports({ report }: MeterReportsProps) {
   if (!report) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">

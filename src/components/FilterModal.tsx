@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { XIcon } from 'lucide-react';
 interface FilterModalProps {
   isOpen: boolean;

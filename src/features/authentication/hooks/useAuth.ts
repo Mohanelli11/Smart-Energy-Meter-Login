@@ -1,8 +1,8 @@
-import { initialAuthState } from '../../../store/auth.store';
-export function useAuth() {
-  return {
-    ...initialAuthState,
-    login: async () => undefined,
-    logout: () => undefined
-  };
+import { useContext } from 'react';
+import { AuthContext, type AuthContextValue } from '../AuthProvider';
+
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>.');
+  return ctx;
 }

@@ -1,37 +1,23 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LoginForm } from './LoginForm';
 import { ForgotPasswordPage } from './ForgotPasswordPage';
-interface LoginPageProps {
-  onLogin: (userData: any) => void;
-  onPasswordChange: (phone: string, newPassword: string) => void;
-  userAccounts: Array<{
-    email: string;
-    password: string;
-    name: string;
-    role: string;
-    phoneNumber?: string;
-  }>;
-}
-export function LoginPage({
-  onLogin,
-  onPasswordChange,
-  userAccounts
-}: LoginPageProps) {
+export function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [view, setView] = useState<'login' | 'forgot-password'>('login');
+  const from = (location.state as { from?: string } | null)?.from ?? '/dashboard';
+
   return (
     <div className="flex flex-col md:flex-row w-full min-h-screen bg-gray-50">
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
         {view === 'login' ?
         <LoginForm
-          onLogin={onLogin}
-          onForgotPassword={() => setView('forgot-password')}
-          userAccounts={userAccounts} /> :
+          onSuccess={() => navigate(from, { replace: true })}
+          onForgotPassword={() => setView('forgot-password')} /> :
 
 
-        <ForgotPasswordPage
-          userAccounts={userAccounts}
-          onPasswordChange={onPasswordChange}
-          onBackToLogin={() => setView('login')} />
+        <ForgotPasswordPage onBackToLogin={() => setView('login')} />
 
         }
       </div>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SparklesIcon, PrinterIcon, DownloadIcon } from 'lucide-react';
 interface ChatHeaderProps {
   isRateLimited: boolean;

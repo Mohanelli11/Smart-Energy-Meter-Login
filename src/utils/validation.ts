@@ -260,8 +260,8 @@ export function validateLocation(location: string): {
  */
 export function validateNumeric(
 value: string,
-min: number = 0,
-max: number = 999999)
+min = 0,
+max = 999999)
 : {valid: boolean;error?: string;} {
   if (!value || typeof value !== 'string') {
     return { valid: false, error: 'Value is required' };
@@ -289,7 +289,7 @@ max: number = 999999)
  */
 export function validateTextArea(
 text: string,
-maxLength: number = 1000)
+maxLength = 1000)
 : {valid: boolean;error?: string;} {
   if (!text) {
     return { valid: true }; // Optional field

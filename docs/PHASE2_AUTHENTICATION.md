@@ -1,19 +1,9 @@
-# Phase 2 Authentication Architecture
+# Authentication architecture
 
-## Objective
-Introduce the authentication foundation for the MoTech Smart Energy Platform.
+Status: **implemented** (see `server/` and `src/features/authentication/`).
 
-## Implemented
-- Role model
-- Authentication types
-- Auth service foundation
-- Auth state foundation
-- Protected route foundation
-- Route configuration
+- Server-side credential verification (scrypt), cookie sessions with rotating refresh tokens and reuse detection.
+- SMS one-time-code password reset, lockout and per-IP rate limiting, role model with admin-only account creation.
+- Frontend: `AuthProvider` / `useAuth`, `react-router` routes, `ProtectedRoute` with role checks.
 
-## Future Implementation
-- JWT authentication
-- Refresh tokens
-- Backend authentication API
-- Multi-factor authentication
-- Permission matrix
+Still to do: multi-factor authentication, a persistent database `Store`, shared (Redis) lockout/session state, and moving the remaining demo data behind the API.

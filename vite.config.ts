@@ -1,98 +1,66 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// Merged and standardized Vite config (root)
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const isProd = mode === 'production'
 
   return {
     plugins: [react()],
-
-    // Serve and build from the site root
     base: '/',
 
-    // Path aliases for cleaner imports
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
       },
     },
 
-    // Prefer import.meta.env.VITE_APP_VERSION at runtime. Do not inject a build-time global here.
-    // Retrieve at runtime with: const version = import.meta.env.VITE_APP_VERSION ?? '0.0.0'
-
-    // Build optimization
     build: {
-      target: 'es2020', // adjusted target for modern-ish browser support; change if you need broader compatibility
+      target: 'es2020',
       outDir: 'dist',
-      sourcemap: false, // set to true for production debugging if needed
-
-      // Use terser for production to allow advanced options (drop_console), esbuild otherwise for speed
+      sourcemap: false,
+      // terser lets us strip console.* from production bundles
       minify: isProd ? 'terser' : 'esbuild',
-
-      // Terser options applied only when minify === 'terser'
-      terserOptions: isProd
-        ? {
-            compress: {
-              // Remove console.* calls in production only
-              drop_console: true,
-            },
-          }
-        : undefined,
-
+      terserOptions: isProd ? { compress: { drop_console: true, drop_debugger: true } } : undefined,
       rollupOptions: {
         output: {
-          // Manual chunking: separate react, recharts, lucide into their own chunks and group the rest into vendor
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              if (id.includes('react')) return 'react-vendor'
-              if (id.includes('recharts')) return 'charts'
-              if (id.includes('lucide-react')) return 'icons'
-              return 'vendor'
-            }
+          manualChunks(id: string) {
+            if (!id.includes('node_modules')) return undefined
+            if (id.includes('/recharts/') || id.includes('/d3-')) return 'charts'
+            if (id.includes('/lucide-react/')) return 'icons'
+            if (id.includes('/leaflet/') || id.includes('/react-leaflet/')) return 'maps'
+            // Everything else stays with Rollup's default splitting to avoid circular chunks
+            return undefined
           },
         },
       },
-
-      // CSS code splitting
       cssCodeSplit: true,
-
-      // chunkSizeWarningLimit is in KB (not bytes). Increased to 2048 KB from the previous 500 KB.
-      chunkSizeWarningLimit: 2048,
+      chunkSizeWarningLimit: 1024,
     },
 
-    // esbuild options: when using esbuild minifier, drop console/debugger in production
-    esbuild: isProd ? { drop: ['console', 'debugger'] } : {},
-
-    // Development server configuration
     server: {
       port: 3000,
-      strictPort: true, // fail if port is unavailable instead of trying another
-      open: true, // automatically open in browser
-      host: true, // allow network access
-      cors: true,
-
-      // Example proxy for API forwarding during development. Update target to your API server.
+      strictPort: true,
+      host: true,
+      // Same-origin API during development so httpOnly cookies work without CORS.
       proxy: {
         '/api': {
-          target: 'http://localhost:5000',
-          changeOrigin: true,
-          rewrite: (p) => p.replace(/^\/api/, ''),
+          target: process.env.VITE_DEV_API_TARGET || 'http://localhost:4000',
+          changeOrigin: false,
         },
       },
     },
 
-    // Preview server (for testing production build)
     preview: {
       port: 4173,
-      open: true,
     },
 
-    // Dependency optimization: include core libs for faster dev start, exclude heavy runtime-only libs so they are chunked
-    optimizeDeps: {
-      include: ['react', 'react-dom'],
-      exclude: ['recharts', 'lucide-react'],
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setup.ts'],
+      css: false,
+      include: ['src/**/*.test.{ts,tsx}'],
     },
   }
 })

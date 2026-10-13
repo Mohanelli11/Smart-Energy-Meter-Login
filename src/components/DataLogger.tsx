@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   GaugeIcon,
   ActivityIcon,
@@ -87,8 +87,8 @@ map((l) => {
 });
 // Simulated live telemetry generators
 const rnd = (min: number, max: number) => min + Math.random() * (max - min);
+/** Access gate. Kept separate from the body so the body's hooks always run in the same order. */
 export function DataLogger({ isAdmin }: DataLoggerProps) {
-  // Admin gate
   if (!isAdmin) {
     return (
       <div className="bg-white p-10 rounded-lg shadow text-center">
@@ -103,6 +103,9 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
       </div>);
 
   }
+  return <DataLoggerPanel />;
+}
+function DataLoggerPanel() {
   const [loggers, setLoggers] = useState<LoggerDevice[]>(() => {
     const stored = loadLoggers();
     return stored && stored.length > 0 ? stored : seedLoggers();
