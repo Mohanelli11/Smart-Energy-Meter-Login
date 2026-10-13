@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, createElement } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   SendIcon,
   SparklesIcon,
@@ -76,7 +76,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
-  const handleSendRef = useRef<(query?: string) => void>(() => {});
+  const handleSendRef = useRef<(query?: string) => void>(() => undefined);
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
       behavior: 'smooth'

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { ADMIN_ROLES, hasRole, type Role } from '../features/authentication/types';
 import {
   ShieldIcon,
   KeyIcon,
@@ -20,13 +21,12 @@ interface ApiManagementProps {
   user: {
     email: string;
     name: string;
-    role: string;
+    role: Role;
   };
 }
 export function ApiManagement({ user }: ApiManagementProps) {
-  // Use email check for admin consistency with the rest of the app
-  const isAdmin =
-  user.email === 'mahmadstephen19@gmail.com' || user.role === 'admin';
+  // Authorisation comes from the server-assigned role, never from a hardcoded email
+  const isAdmin = hasRole(user.role, ADMIN_ROLES);
   const [requests, setRequests] = useState<ApiRequest[]>([]);
   const [userRequest, setUserRequest] = useState<ApiRequest | undefined>(
     undefined

@@ -1,4 +1,3 @@
-import React from 'react';
 import { EyeIcon, EditIcon, TrashIcon } from 'lucide-react';
 interface Meter {
   accountNo: string;

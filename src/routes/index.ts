@@ -1,4 +1,3 @@
-// Route configuration foundation.
-// React Router integration will be introduced during application migration.
-
-export const routesVersion = 'phase1';
+export { AppRoutes } from './AppRoutes';
+export { ProtectedRoute } from './ProtectedRoute';
+export { ROUTES } from './route.config';

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   BarChart,
   Bar,
@@ -131,7 +130,7 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                   radius={[0, 4, 4, 0]}
                   barSize={30}>
                   
-                  {topCustomerData.map((entry, index) =>
+                  {topCustomerData.map((_entry, index) =>
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]} />
@@ -160,7 +159,7 @@ export function RevenueAnalytics({ data }: RevenueAnalyticsProps) {
                   paddingAngle={5}
                   dataKey="value">
                   
-                  {topCustomerData.map((entry, index) =>
+                  {topCustomerData.map((_entry, index) =>
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]} />

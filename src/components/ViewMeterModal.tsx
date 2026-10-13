@@ -1,5 +1,4 @@
-import React from 'react';
-import { XIcon, ZapIcon, MapPinIcon, UserIcon, PhoneIcon } from 'lucide-react';
+import { XIcon, ZapIcon, MapPinIcon, UserIcon } from 'lucide-react';
 import { MeterReports } from './MeterReports';
 import { MeterCommandControl } from './MeterCommandControl';
 interface ViewMeterModalProps {

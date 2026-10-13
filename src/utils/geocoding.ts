@@ -93,7 +93,7 @@ const FALLBACK_CENTER: Coordinates = { latitude: -1.2864, longitude: 36.8172 };
 export function scatterCoordinates(
 base: Coordinates,
 seed: string,
-radiusKm: number = 1.2)
+radiusKm = 1.2)
 : Coordinates {
   let hash = 0;
   for (let i = 0; i < seed.length; i++) {
@@ -165,7 +165,7 @@ export function geocodeFromGazetteer(location: string): GeoLocation | null {
  */
 export async function geocodeLocation(
 location: string,
-countryHint: string = 'Kenya')
+countryHint = 'Kenya')
 : Promise<GeoLocation> {
   const key = location.trim().toLowerCase();
 

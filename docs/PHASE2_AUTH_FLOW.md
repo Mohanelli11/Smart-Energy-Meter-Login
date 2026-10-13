@@ -1,34 +1,11 @@
-# Phase 2 Authentication Flow
+# Authentication flow
 
-## Objective
+```
+Browser ──POST /api/auth/login──▶ API  verify scrypt hash, lockout check
+        ◀─ Set-Cookie (httpOnly access + refresh) ─┘
+Browser ──any request (cookies sent automatically)──▶ API  verifies access JWT
+        ◀─ 401 ─ client calls /auth/refresh once ─ retries, else routes to /login
+Logout  ──POST /api/auth/logout──▶ API  revokes refresh family, clears cookies
+```
 
-Establish the authentication foundation for the MoTech Smart Energy Platform.
-
-## Implemented Components
-
-- Authentication data model
-- Role-based user model
-- Token persistence service
-- Authentication state foundation
-- Login workflow foundation
-- Permission helpers
-- Protected route foundation
-
-## Authentication Flow
-
-User
-  -> Login Form
-  -> Authentication Service
-  -> Token Storage
-  -> Auth State
-  -> Protected Application Areas
-
-## Security Roadmap
-
-Future enhancements:
-
-- JWT refresh token rotation
-- Backend identity service
-- Multi-factor authentication
-- Permission matrix
-- Audit logging
+Password reset: `request` (SMS code) → `verify` (code → single-use reset token) → `confirm` (new password; all sessions revoked).

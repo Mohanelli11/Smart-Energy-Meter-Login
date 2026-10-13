@@ -1,6 +1,6 @@
 /**
- * Client-Side Rate Limiting Implementation
- * Prevents abuse and DoS attacks on the client side
+ * Client-side UX throttling (chat, forms, exports). NOT a security control: it resets on refresh.
+ * Login and password-reset throttling are enforced by the server (see server/src/lockout.ts)
  * Following OWASP best practices for rate limiting
  */
 
@@ -134,13 +134,6 @@ const rateLimiter = new RateLimiter();
 
 // Predefined rate limit configurations
 export const RATE_LIMITS = {
-  // Login attempts: 5 attempts per 15 minutes, block for 30 minutes
-  LOGIN: {
-    maxAttempts: 5,
-    windowMs: 15 * 60 * 1000,
-    blockDurationMs: 30 * 60 * 1000
-  },
-
   // AI Chat: 20 messages per minute, block for 2 minutes
   CHAT: {
     maxAttempts: 20,
@@ -171,16 +164,6 @@ export const RATE_LIMITS = {
 };
 
 /**
- * Check login rate limit
- */
-export function checkLoginRateLimit(email: string) {
-  return rateLimiter.checkLimit(
-    `login:${email.toLowerCase()}`,
-    RATE_LIMITS.LOGIN
-  );
-}
-
-/**
  * Check chat rate limit
  */
 export function checkChatRateLimit(userId: string) {
@@ -200,7 +183,7 @@ export function checkFormRateLimit(formType: string, userId: string) {
 /**
  * Check account creation rate limit
  */
-export function checkAccountCreateRateLimit(ip: string = 'default') {
+export function checkAccountCreateRateLimit(ip = 'default') {
   return rateLimiter.checkLimit(`account:${ip}`, RATE_LIMITS.ACCOUNT_CREATE);
 }
 

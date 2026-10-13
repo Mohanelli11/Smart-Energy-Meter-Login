@@ -22,6 +22,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Skipped until DD_API_KEY / DD_APP_KEY are configured as repository secrets
+    if: ${{ vars.DATADOG_ENABLED == 'true' }}
 
     steps:
     - uses: actions/checkout@v4

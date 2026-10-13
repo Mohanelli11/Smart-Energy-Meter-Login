@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   AlertTriangleIcon,
   CheckCircleIcon,
@@ -29,7 +29,6 @@ export function MeterDiagnostics({ issues }: MeterDiagnosticsProps) {
   } | null>(null);
   const criticalCount = issues.filter((i) => i.severity === 'critical').length;
   const warningCount = issues.filter((i) => i.severity === 'warning').length;
-  const infoCount = issues.filter((i) => i.severity === 'info').length;
   const toggleExpand = (id: string) => {
     setExpandedIssue(expandedIssue === id ? null : id);
   };

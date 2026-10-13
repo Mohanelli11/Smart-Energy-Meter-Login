@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, createElement } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   MenuIcon,
   ZapIcon,
@@ -35,6 +35,7 @@ import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
 import { AIInsights } from './AIInsights';
 import { ApiManagement } from './ApiManagement'; // Added import
+import { ADMIN_ROLES, hasRole, type NewAccountInput } from '../features/authentication/types';
 import { DataLogger } from './DataLogger';
 import { DeviceLocations } from './DeviceLocations';
 import {
@@ -139,10 +140,6 @@ const generatePrepaidMeters = () => {
   'Rongai',
   'Kitengela'];
 
-  const statuses: Array<'Active' | 'Low Balance' | 'Disconnected'> = [
-  'Active',
-  'Low Balance',
-  'Disconnected'];
 
   const meters = [];
   for (let i = 0; i < 856; i++) {
@@ -321,8 +318,8 @@ const generatePaymentTransactions = () => {
 };
 interface DashboardProps {
   user: any;
-  onLogout: () => void;
-  onCreateAccount: (account: any) => boolean;
+  onLogout: () => void | Promise<void>;
+  onCreateAccount: (account: NewAccountInput) => Promise<{ ok: true } | { ok: false; error: string }>;
   onMeterLogin: () => void;
 }
 export function Dashboard({
@@ -418,14 +415,18 @@ export function Dashboard({
     meter: null,
     type: 'prepaid' as 'prepaid' | 'postpaid'
   });
-  const [deleteModal, setDeleteModal] = useState({
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    meter: any | null;
+    type: 'prepaid' | 'postpaid';
+  }>({
     isOpen: false,
     meter: null,
-    type: 'prepaid' as 'prepaid' | 'postpaid'
+    type: 'prepaid'
   });
   const [createAccountModal, setCreateAccountModal] = useState(false);
   // Check if user is admin
-  const isAdmin = user?.email === 'mahmadstephen19@gmail.com';
+  const isAdmin = hasRole(user?.role, ADMIN_ROLES);
   // Add meter handler — automatically resolves geographic coordinates
   // for the new device so it appears on the Device Locations map.
   const handleMeterAdded = (meter: any) => {
@@ -490,13 +491,13 @@ export function Dashboard({
       if (deleteModal.type === 'prepaid') {
         setPrepaidMetersState(
           prepaidMetersState.filter(
-            (m) => m.accountNo !== deleteModal.meter.accountNo
+            (m) => m.accountNo !== deleteModal.meter?.accountNo
           )
         );
       } else {
         setPostpaidMetersState(
           postpaidMetersState.filter(
-            (m) => m.accountNo !== deleteModal.meter.accountNo
+            (m) => m.accountNo !== deleteModal.meter?.accountNo
           )
         );
       }
