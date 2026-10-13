@@ -32,11 +32,13 @@ export function LoginPage() {
           </p>
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
             <div className="flex items-center mb-4">
-              <div className="rounded-full overflow-hidden flex-shrink-0">
+              <div className="rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
                 <img
-                  src="/image_639ac6c2.png"
+                  src="/icon-192.png"
                   alt="MoTech Electrical and Electronics Engineering Solutions"
-                  className="h-14 w-14 object-cover rounded-full" />
+                  width={56}
+                  height={56}
+                  className="h-14 w-14 object-cover" />
                 
               </div>
               <h3 className="ml-4 text-xl font-medium text-gray-900">
