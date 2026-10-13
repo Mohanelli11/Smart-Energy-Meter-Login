@@ -6,6 +6,13 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
   ],
+  overrides: [
+    {
+      // Tooling/config files run in Node, not the browser
+      files: ['*.config.js', '*.config.ts', '*.config.cjs', '.eslintrc.cjs'],
+      env: { node: true },
+    },
+  ],
   ignorePatterns: ['dist', 'coverage', 'server', 'node_modules', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh'],
