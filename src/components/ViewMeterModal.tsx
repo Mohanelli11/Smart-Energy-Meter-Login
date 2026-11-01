@@ -1,6 +1,7 @@
 import { XIcon, ZapIcon, MapPinIcon, UserIcon } from 'lucide-react';
 import { MeterReports } from './MeterReports';
 import { MeterCommandControl } from './MeterCommandControl';
+import type { MeterReport } from '../utils/meterStorage';
 
 // Constants
 const DEFAULT_USER_EMAIL = 'unknown@motech.ke';
@@ -23,13 +24,14 @@ interface Meter {
   transformer?: string;
   tariffRate?: string | number;
   comments?: string;
-  lastReport?: Record<string, any>;
+  lastReport?: MeterReport;
 }
 
 interface ViewMeterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  meter: Meter;
+  /** null while the modal is closed. */
+  meter: Meter | null;
   type: 'prepaid' | 'postpaid';
   userEmail?: string;
 }
