@@ -64,6 +64,13 @@ Full endpoint list: [`server/README.md`](server/README.md).
 2. Deploy the web app (`npm run build` → `dist/`). `netlify.toml` includes security headers (CSP, HSTS, etc.). Proxy `/api/*` to the API so cookies are same-site.
 3. **Storage:** the server persists users/meters to a JSON file behind a small `Store` interface (`server/src/store.ts`). For production, implement that interface on a real database and run a shared lockout/session store if you run more than one API instance.
 
+### Hosting the auth API on Render (matches the GitHub Pages dashboard)
+
+1. Render dashboard -> **New -> Blueprint** -> pick this repo (it reads `render.yaml`). Fill in `ADMIN_EMAIL` and `ADMIN_PHONE` when asked.
+2. In the service's **Settings -> Custom Domains** add `api.motechenergyembedded.com`, then add the DNS record Render shows (a CNAME for `api`).
+3. Open the service **Shell** and run `npm run seed` once. It prints the first super-admin password a single time - save it.
+4. The web app is built with `VITE_API_BASE_URL=https://api.motechenergyembedded.com/api` (set in `.github/workflows/pages.yml`).
+
 ## Known limitations
 
 - The dashboard's meter lists, payments and telemetry are still simulated client-side demo data; only authentication and account creation use the API.
