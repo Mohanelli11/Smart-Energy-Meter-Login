@@ -329,10 +329,31 @@ export function Dashboard({
   onMeterLogin
 }: DashboardProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // Phones/tablets (< 1024px): the sidebar is a slide-in drawer instead of a fixed column.
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window === 'undefined' || !window.matchMedia ? true : window.matchMedia('(min-width: 1024px)').matches
+  );
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  // Icon-only mode only applies on desktop; the drawer always shows labels.
+  const collapsed = sidebarCollapsed && isDesktop;
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onChange = (e: MediaQueryListEvent) => {
+      setIsDesktop(e.matches);
+      if (e.matches) setMobileNavOpen(false);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
   const [activeSection, setActiveSection] = useState(() => {
     const stored = sessionStorage.getItem('motech_activeSection');
     return stored || 'dashboard';
   });
+  // Close the mobile menu drawer once a page has been chosen.
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [activeSection]);
   // Persist activeSection to sessionStorage
   useEffect(() => {
     sessionStorage.setItem('motech_activeSection', activeSection);
@@ -363,6 +384,14 @@ export function Dashboard({
     savePostpaidMeters(postpaidMetersState);
   }, [postpaidMetersState]);
   const [paymentTransactionsState] = useState(generatePaymentTransactions());
+  // Everything the AI assistant can read: every meter tagged with its type, plus all payments.
+  const aiMeters = useMemo(
+    () => [
+      ...prepaidMetersState.map((m: any) => ({ ...m, type: 'prepaid' as const })),
+      ...postpaidMetersState.map((m: any) => ({ ...m, type: 'postpaid' as const }))
+    ],
+    [prepaidMetersState, postpaidMetersState]
+  );
   // Consumption graph data
   const [consumptionGraphData, setConsumptionGraphData] = useState<any[]>([]);
   // Generate consumption graph data from all meters
@@ -822,7 +851,7 @@ export function Dashboard({
       case 'ai-insights':
         return (
           <AIInsights
-            meters={[...prepaidMetersState, ...postpaidMetersState]}
+            meters={aiMeters}
             transactions={paymentTransactionsState} />);
 
 
@@ -840,10 +869,10 @@ export function Dashboard({
 
       case 'prepaid':
         return (
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-6">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
               <h2 className="text-xl font-bold">Prepaid Meters</h2>
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setActiveSection('add-meter')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
@@ -894,10 +923,10 @@ export function Dashboard({
 
       case 'postpaid':
         return (
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-6">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
               <h2 className="text-xl font-bold">Postpaid Meters</h2>
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() => setActiveSection('add-meter')}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center">
@@ -948,10 +977,10 @@ export function Dashboard({
 
       case 'payments':
         return (
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-6">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
               <h2 className="text-xl font-bold">Payment Transactions</h2>
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={() =>
                   setFilterModal({
@@ -1139,9 +1168,16 @@ export function Dashboard({
     }
   };
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-[100dvh] overflow-hidden bg-gray-100">
+      {/* Backdrop behind the mobile drawer */}
+      {mobileNavOpen &&
       <div
-        className={`bg-blue-800 text-white flex-shrink-0 flex flex-col transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+        onClick={() => setMobileNavOpen(false)}
+        aria-hidden="true" />
+      }
+      <div
+        className={`bg-blue-800 text-white flex-shrink-0 flex flex-col transition-all duration-300 fixed inset-y-0 left-0 z-40 w-64 max-w-[85vw] lg:static lg:z-auto lg:max-w-none ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 ${collapsed ? 'lg:w-20' : 'lg:w-64'}`}>
         
         <div className="p-4 flex items-center justify-between border-b border-blue-700">
           <div className="flex items-center">
@@ -1150,14 +1186,14 @@ export function Dashboard({
               alt="MoTech"
               className="h-8 w-8 rounded-full object-cover" />
             
-            {!sidebarCollapsed &&
+            {!collapsed &&
             <span className="ml-3 text-lg font-bold leading-tight">
                 MoTech SmartMeter
               </span>
             }
           </div>
           <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            onClick={() => (isDesktop ? setSidebarCollapsed(!sidebarCollapsed) : setMobileNavOpen(false))}
             className="text-white focus:outline-none">
             
             <MenuIcon className="h-6 w-6" />
@@ -1165,122 +1201,129 @@ export function Dashboard({
         </div>
 
         <div className="flex-grow overflow-y-auto">
-          <nav className="p-2">
+          <nav className="p-2" onClick={() => setMobileNavOpen(false)}>
             <button
               onClick={() => setActiveSection('dashboard')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'dashboard' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'dashboard' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <LayoutDashboardIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
+              {!collapsed && <span className="ml-3">Dashboard</span>}
             </button>
             <button
               onClick={() => setActiveSection('ai-insights')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'ai-insights' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'ai-insights' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <BrainCircuitIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">AI Insights</span>}
+              {!collapsed && <span className="ml-3">AI Insights</span>}
             </button>
             <button
               onClick={() => setActiveSection('prepaid')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'prepaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'prepaid' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <CoinsIcon className="h-5 w-5" />
-              {!sidebarCollapsed &&
+              {!collapsed &&
               <span className="ml-3">Prepaid Meters</span>
               }
             </button>
             <button
               onClick={() => setActiveSection('postpaid')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'postpaid' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'postpaid' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <FileTextIcon className="h-5 w-5" />
-              {!sidebarCollapsed &&
+              {!collapsed &&
               <span className="ml-3">Postpaid Meters</span>
               }
             </button>
             <button
               onClick={() => setActiveSection('payments')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'payments' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <CreditCardIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Payments</span>}
+              {!collapsed && <span className="ml-3">Payments</span>}
             </button>
             <button
               onClick={() => setActiveSection('add-meter')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'add-meter' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'add-meter' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <PlusCircleIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Add Meter</span>}
+              {!collapsed && <span className="ml-3">Add Meter</span>}
             </button>
             <button
               onClick={() => setActiveSection('live-payments')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'live-payments' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'live-payments' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <ZapIcon className="h-5 w-5 animate-pulse" />
-              {!sidebarCollapsed && <span className="ml-3">Live Payments</span>}
+              {!collapsed && <span className="ml-3">Live Payments</span>}
             </button>
             <button
               onClick={() => setActiveSection('device-locations')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'device-locations' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'device-locations' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <MapPinIcon className="h-5 w-5" />
-              {!sidebarCollapsed &&
+              {!collapsed &&
               <span className="ml-3">Device Locations</span>
               }
             </button>
             <button
               onClick={() => setActiveSection('reports')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'reports' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'reports' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <BarChart3Icon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Reports</span>}
+              {!collapsed && <span className="ml-3">Reports</span>}
             </button>
             <button
               onClick={() => setActiveSection('api-access')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api-access' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'api-access' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <ServerIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">API Access</span>}
+              {!collapsed && <span className="ml-3">API Access</span>}
             </button>
             {isAdmin &&
             <button
               onClick={() => setActiveSection('data-logger')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'data-logger' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'data-logger' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
                 <GaugeIcon className="h-5 w-5" />
-                {!sidebarCollapsed && <span className="ml-3">Data Logger</span>}
+                {!collapsed && <span className="ml-3">Data Logger</span>}
               </button>
             }
             <button
               onClick={() => setActiveSection('settings')}
-              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'settings' ? 'bg-blue-700' : ''} ${collapsed ? 'justify-center' : ''}`}>
               
               <SettingsIcon className="h-5 w-5" />
-              {!sidebarCollapsed && <span className="ml-3">Settings</span>}
+              {!collapsed && <span className="ml-3">Settings</span>}
             </button>
           </nav>
         </div>
 
         <div className="p-4 border-t border-blue-700">
-          {!sidebarCollapsed &&
+          {!collapsed &&
           <div className="flex items-center">
               <img
               src="https://via.placeholder.com/40"
               alt="User"
               className="rounded-full w-10 h-10" />
             
-              <div className="ml-3">
-                <div className="font-medium">{user?.name || 'Admin User'}</div>
-                <div className="text-xs text-blue-200">{user?.email}</div>
+              <div className="ml-3 min-w-0">
+                <div className="font-medium truncate">{user?.name || 'Admin User'}</div>
+                <div className="text-xs text-blue-200 truncate" title={user?.email}>{user?.email}</div>
               </div>
             </div>
           }
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto">
-        <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">
+      <div className="flex-1 min-w-0 overflow-auto">
+        <header className="bg-white shadow-sm p-3 sm:p-4 flex flex-wrap gap-2 justify-between items-center">
+          <div className="flex items-center min-w-0">
+            <button
+              onClick={() => setMobileNavOpen(true)}
+              className="mr-3 p-2 rounded-md text-gray-700 hover:bg-gray-100 lg:hidden"
+              aria-label="Open menu">
+              <MenuIcon className="h-6 w-6" />
+            </button>
+          <h1 className="text-lg sm:text-2xl font-bold text-gray-800 truncate">
             {activeSection === 'ai-insights' ?
             'AI Insights' :
             activeSection === 'api-access' ?
@@ -1292,8 +1335,9 @@ export function Dashboard({
             activeSection.charAt(0).toUpperCase() +
             activeSection.slice(1).replace('-', ' ')}
           </h1>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
+          </div>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="relative hidden md:block">
               <input
                 type="text"
                 placeholder="Search..."
@@ -1317,7 +1361,7 @@ export function Dashboard({
           </div>
         </header>
 
-        <main className="p-6">{renderSection()}</main>
+        <main className="p-3 sm:p-6">{renderSection()}</main>
 
         {/* Copyright Footer */}
         <footer className="py-4 text-center text-sm text-gray-500 border-t border-gray-200 mt-auto">

@@ -12,8 +12,8 @@ import {
   MicOffIcon } from
 'lucide-react';
 import { Meter } from '../utils/meterStorage';
-import { processAIQuery } from '../utils/aiService';
-import { validateChatMessage, sanitizeHTML } from '../utils/validation';
+import { processAIQuery } from '../utils/aiQueryEngine';
+import { validateChatMessage, sanitizeString } from '../utils/validation';
 import { checkChatRateLimit, checkExportRateLimit } from '../utils/rateLimiter';
 import { logSecurityEvent } from '../utils/security';
 interface Message {
@@ -234,7 +234,8 @@ export function AIChat({ meters, transactions }: AIChatProps) {
       return;
     }
     // Sanitize message for display
-    const sanitizedMessage = sanitizeHTML(messageText);
+    // React escapes text when rendering, so only strip dangerous input here (no HTML entities).
+    const sanitizedMessage = sanitizeString(messageText);
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -253,11 +254,10 @@ export function AIChat({ meters, transactions }: AIChatProps) {
     setTimeout(() => {
       try {
         const response = processAIQuery(sanitizedMessage, meters, transactions);
-        const sanitizedResponse = sanitizeHTML(response);
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: sanitizedResponse,
+          content: response,
           timestamp: new Date()
         };
         setMessages((prev) => [...prev, assistantMessage]);
@@ -277,7 +277,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
       } finally {
         setIsTyping(false);
       }
-    }, 800);
+    }, 0);
   };
   // Keep a ref to the latest handleSend for the speech-recognition callback
   useEffect(() => {
@@ -333,9 +333,9 @@ export function AIChat({ meters, transactions }: AIChatProps) {
     }
   };
   return (
-    <div className="flex flex-col h-[calc(100vh-300px)] bg-white rounded-lg border border-gray-200 shadow-sm">
+    <div className="flex flex-col h-[calc(100dvh-190px)] min-h-[440px] sm:h-[calc(100dvh-300px)] bg-white rounded-lg border border-gray-200 shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+      <div className="flex flex-wrap items-center justify-between gap-2 p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="flex items-center">
           <div className="p-2 bg-blue-100 rounded-lg mr-3">
             <SparklesIcon className="h-5 w-5 text-blue-600" />
@@ -382,14 +382,14 @@ export function AIChat({ meters, transactions }: AIChatProps) {
       }
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4">
         {messages.map((message) =>
         <div
           key={message.id}
           className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
           
             <div
-            className={`max-w-[80%] rounded-lg px-4 py-3 ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
+            className={`max-w-[92%] sm:max-w-[80%] rounded-lg px-3 sm:px-4 py-3 ${message.role === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
             
               <p className="text-sm whitespace-pre-wrap break-words">
                 {message.content}
@@ -539,7 +539,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
       }
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+      <div className="p-3 sm:p-4 border-t border-gray-200 bg-gray-50">
         <div className="flex items-center space-x-2">
           {recognitionSupported &&
           <button
@@ -573,7 +573,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
             'Listening… speak now' :
             'Ask about consumption, revenue, diagnostics…'
             }
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 min-w-0 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={isTyping || isRateLimited}
             maxLength={500}
             autoComplete="off" />
@@ -581,7 +581,7 @@ export function AIChat({ meters, transactions }: AIChatProps) {
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || isTyping || isRateLimited}
-            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="flex-shrink-0 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             title="Send message">
             
             <SendIcon className="h-5 w-5" />

@@ -46,23 +46,23 @@ export function ConsumptionGraph({
     });
   }, [data, dateFrom, dateTo]);
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
         <h3 className="text-lg font-semibold">{title}</h3>
-        <div className="flex items-center space-x-2 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-sm max-w-full">
           <CalendarIcon className="h-4 w-4 text-gray-500" />
           <input
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            className="border border-gray-300 rounded px-2 py-1 min-w-0 focus:outline-none focus:ring-1 focus:ring-blue-500" />
           
           <span className="text-gray-500">to</span>
           <input
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            className="border border-gray-300 rounded px-2 py-1 min-w-0 focus:outline-none focus:ring-1 focus:ring-blue-500" />
           
         </div>
       </div>
