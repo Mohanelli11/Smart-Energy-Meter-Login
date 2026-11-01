@@ -430,5 +430,3 @@ class MeterAPIClient {
 // Export singleton instance
 export const meterAPI = new MeterAPIClient();
 
-// Export types
-export type { APIResponse, MeterReading, MeterCommand, MeterStatus };

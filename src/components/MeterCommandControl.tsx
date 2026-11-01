@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   PowerIcon,
   RefreshCwIcon,
@@ -10,8 +10,7 @@ import {
 import {
   queueCommand,
   getMeterCommands,
-  MeterCommand,
-  processQueue } from
+  MeterCommand } from
 '../utils/commandQueue';
 interface MeterCommandControlProps {
   meterAccountNo: string;
@@ -48,9 +47,9 @@ export function MeterCommandControl({
   };
   // Determine effective status based on queue
   const latestCommand = commands.length > 0 ? commands[0] : null;
-  const isPending =
+  const isPending = Boolean(
   latestCommand && (
-  latestCommand.status === 'queued' || latestCommand.status === 'processing');
+  latestCommand.status === 'queued' || latestCommand.status === 'processing'));
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
       <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">

@@ -3,8 +3,11 @@ import {
   AlertTriangleIcon,
   CheckCircleIcon,
   ChevronRightIcon,
-  ChevronLeftIcon } from
+  ChevronLeftIcon,
+  MapPinIcon,
+  Loader2Icon } from
 'lucide-react';
+import { geocodeDevice } from '../utils/geocoding';
 import {
   validateCustomerName,
   validatePhoneNumber,
@@ -42,6 +45,15 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [rateLimitError, setRateLimitError] = useState('');
+  // Resolved geographic coordinates for the new device
+  const [geoStatus, setGeoStatus] = useState<'idle' | 'resolving' | 'done'>(
+    'idle'
+  );
+  const [resolvedGeo, setResolvedGeo] = useState<{
+    latitude: number;
+    longitude: number;
+    displayName?: string;
+  } | null>(null);
   const handleChange = (
   e: React.ChangeEvent<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -119,11 +131,34 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  // Resolve the device's coordinates from its location name
+  const resolveDeviceLocation = async () => {
+    setGeoStatus('resolving');
+    try {
+      const geo = await geocodeDevice(
+        formData.location,
+        formData.meterNumber || formData.accountNumber
+      );
+      setResolvedGeo({
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+        displayName: geo.displayName
+      });
+    } catch (error) {
+      console.error('Failed to resolve device location:', error);
+      setResolvedGeo(null);
+    } finally {
+      setGeoStatus('done');
+    }
+  };
+
   const handleNext = () => {
     if (step === 1 && validateStep1()) {
       setStep(2);
     } else if (step === 2 && validateStep2()) {
       setStep(3);
+      // Auto-resolve coordinates as the user reaches the authorization step
+      resolveDeviceLocation();
     }
   };
   const handleBack = () => {
@@ -176,7 +211,11 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
       transformer: sanitizedData.transformer,
       customerType: sanitizedData.customerType,
       tariffRate: sanitizedData.tariffRate,
-      comments: sanitizedData.comments
+      comments: sanitizedData.comments,
+      // Geographic coordinates resolved from the location
+      latitude: resolvedGeo?.latitude,
+      longitude: resolvedGeo?.longitude,
+      geoAddress: resolvedGeo?.displayName
     };
     onMeterAdded(newMeter);
     logSecurityEvent('METER_ADDED', {
@@ -200,6 +239,8 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
       authorized: false
     });
     setStep(1);
+    setResolvedGeo(null);
+    setGeoStatus('idle');
     setIsSubmitting(false);
   };
   const renderFieldError = (fieldName: string) => {
@@ -529,6 +570,51 @@ export function AddMeterForm({ onMeterAdded }: AddMeterFormProps) {
                   {formData.transformer})
                 </li>
               </ul>
+            </div>
+
+            {/* Auto-resolved device coordinates */}
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <h4 className="font-semibold text-gray-900 mb-2 flex items-center text-sm">
+                <MapPinIcon className="h-4 w-4 mr-2 text-blue-600" />
+                Device Geolocation
+              </h4>
+              {geoStatus === 'resolving' &&
+            <p className="text-sm text-gray-500 flex items-center">
+                  <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
+                  Resolving coordinates for "{formData.location}"…
+                </p>
+            }
+              {geoStatus === 'done' && resolvedGeo &&
+            <div className="text-sm space-y-1">
+                  <p className="text-gray-700">
+                    <span className="text-gray-500">Latitude:</span>{' '}
+                    <span className="font-mono">
+                      {resolvedGeo.latitude.toFixed(6)}
+                    </span>
+                  </p>
+                  <p className="text-gray-700">
+                    <span className="text-gray-500">Longitude:</span>{' '}
+                    <span className="font-mono">
+                      {resolvedGeo.longitude.toFixed(6)}
+                    </span>
+                  </p>
+                  {resolvedGeo.displayName &&
+              <p className="text-gray-500 text-xs pt-1">
+                      Resolved as: {resolvedGeo.displayName}
+                    </p>
+              }
+                  <p className="text-green-700 text-xs flex items-center pt-1">
+                    <CheckCircleIcon className="h-3.5 w-3.5 mr-1" />
+                    This device will appear on the Device Locations map.
+                  </p>
+                </div>
+            }
+              {geoStatus === 'done' && !resolvedGeo &&
+            <p className="text-sm text-yellow-700">
+                  Could not resolve exact coordinates. The device will be placed
+                  using its service-area centre and can be refined later.
+                </p>
+            }
             </div>
 
             <div>

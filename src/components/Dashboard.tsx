@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, createElement } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   MenuIcon,
   ZapIcon,
@@ -19,7 +19,8 @@ import {
   KeyIcon,
   BrainCircuitIcon,
   ServerIcon,
-  GaugeIcon } from
+  GaugeIcon,
+  MapPinIcon } from
 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { MeterTable } from './MeterTable';
@@ -34,15 +35,19 @@ import { CreateAccountModal } from './CreateAccountModal';
 import { ConsumptionGraph } from './ConsumptionGraph';
 import { AIInsights } from './AIInsights';
 import { ApiManagement } from './ApiManagement'; // Added import
+import { ADMIN_ROLES, hasRole, type NewAccountInput } from '../features/authentication/types';
 import { DataLogger } from './DataLogger';
+import { DeviceLocations } from './DeviceLocations';
 import {
   savePrepaidMeters,
   loadPrepaidMeters,
   savePostpaidMeters,
   loadPostpaidMeters,
   generateMeterReport,
+  withCoordinates,
   Meter } from
 '../utils/meterStorage';
+import { resolveCoordinatesSync } from '../utils/geocoding';
 // Generate realistic data
 const generatePrepaidMeters = () => {
   const names = [
@@ -135,10 +140,6 @@ const generatePrepaidMeters = () => {
   'Rongai',
   'Kitengela'];
 
-  const statuses: Array<'Active' | 'Low Balance' | 'Disconnected'> = [
-  'Active',
-  'Low Balance',
-  'Disconnected'];
 
   const meters = [];
   for (let i = 0; i < 856; i++) {
@@ -317,8 +318,8 @@ const generatePaymentTransactions = () => {
 };
 interface DashboardProps {
   user: any;
-  onLogout: () => void;
-  onCreateAccount: (account: any) => boolean;
+  onLogout: () => void | Promise<void>;
+  onCreateAccount: (account: NewAccountInput) => Promise<{ ok: true } | { ok: false; error: string }>;
   onMeterLogin: () => void;
 }
 export function Dashboard({
@@ -341,15 +342,17 @@ export function Dashboard({
     token: '',
     amount: ''
   });
-  // Meter state with localStorage persistence
+  // Meter state with localStorage persistence.
+  // withCoordinates() backfills latitude/longitude on any meter that lacks
+  // them, so every device in the system is mappable.
   const [prepaidMetersState, setPrepaidMetersState] = useState<Meter[]>(() => {
     const stored = loadPrepaidMeters();
-    return stored || generatePrepaidMeters();
+    return withCoordinates(stored || generatePrepaidMeters());
   });
   const [postpaidMetersState, setPostpaidMetersState] = useState<Meter[]>(
     () => {
       const stored = loadPostpaidMeters();
-      return stored || generatePostpaidMeters();
+      return withCoordinates(stored || generatePostpaidMeters());
     }
   );
   // Save to localStorage whenever meters change
@@ -412,20 +415,34 @@ export function Dashboard({
     meter: null,
     type: 'prepaid' as 'prepaid' | 'postpaid'
   });
-  const [deleteModal, setDeleteModal] = useState({
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    meter: any | null;
+    type: 'prepaid' | 'postpaid';
+  }>({
     isOpen: false,
     meter: null,
-    type: 'prepaid' as 'prepaid' | 'postpaid'
+    type: 'prepaid'
   });
   const [createAccountModal, setCreateAccountModal] = useState(false);
   // Check if user is admin
-  const isAdmin = user?.email === 'mahmadstephen19@gmail.com';
-  // Add meter handler
+  const isAdmin = hasRole(user?.role, ADMIN_ROLES);
+  // Add meter handler — automatically resolves geographic coordinates
+  // for the new device so it appears on the Device Locations map.
   const handleMeterAdded = (meter: any) => {
-    if (meter.type === 'prepaid') {
-      setPrepaidMetersState([meter, ...prepaidMetersState]);
+    const coords = resolveCoordinatesSync(
+      meter.location,
+      meter.meterNo || meter.accountNo
+    );
+    const geolocatedMeter = {
+      ...meter,
+      latitude: meter.latitude ?? coords.latitude,
+      longitude: meter.longitude ?? coords.longitude
+    };
+    if (geolocatedMeter.type === 'prepaid') {
+      setPrepaidMetersState([geolocatedMeter, ...prepaidMetersState]);
     } else {
-      setPostpaidMetersState([meter, ...postpaidMetersState]);
+      setPostpaidMetersState([geolocatedMeter, ...postpaidMetersState]);
     }
   };
   // View meter handler
@@ -474,13 +491,13 @@ export function Dashboard({
       if (deleteModal.type === 'prepaid') {
         setPrepaidMetersState(
           prepaidMetersState.filter(
-            (m) => m.accountNo !== deleteModal.meter.accountNo
+            (m) => m.accountNo !== deleteModal.meter?.accountNo
           )
         );
       } else {
         setPostpaidMetersState(
           postpaidMetersState.filter(
-            (m) => m.accountNo !== deleteModal.meter.accountNo
+            (m) => m.accountNo !== deleteModal.meter?.accountNo
           )
         );
       }
@@ -814,6 +831,13 @@ export function Dashboard({
         return <ApiManagement user={user} />;
       case 'data-logger':
         return <DataLogger isAdmin={isAdmin} />;
+      case 'device-locations':
+        return (
+          <DeviceLocations
+            prepaidMeters={prepaidMetersState}
+            postpaidMeters={postpaidMetersState} />);
+
+
       case 'prepaid':
         return (
           <div className="bg-white p-6 rounded-lg shadow">
@@ -1196,6 +1220,15 @@ export function Dashboard({
               {!sidebarCollapsed && <span className="ml-3">Live Payments</span>}
             </button>
             <button
+              onClick={() => setActiveSection('device-locations')}
+              className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'device-locations' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
+              
+              <MapPinIcon className="h-5 w-5" />
+              {!sidebarCollapsed &&
+              <span className="ml-3">Device Locations</span>
+              }
+            </button>
+            <button
               onClick={() => setActiveSection('reports')}
               className={`w-full flex items-center p-3 rounded mb-2 hover:bg-blue-700 ${activeSection === 'reports' ? 'bg-blue-700' : ''} ${sidebarCollapsed ? 'justify-center' : ''}`}>
               
@@ -1254,6 +1287,8 @@ export function Dashboard({
             'API Access Management' :
             activeSection === 'data-logger' ?
             '3-Phase Data Logger' :
+            activeSection === 'device-locations' ?
+            'Device Locations' :
             activeSection.charAt(0).toUpperCase() +
             activeSection.slice(1).replace('-', ' ')}
           </h1>

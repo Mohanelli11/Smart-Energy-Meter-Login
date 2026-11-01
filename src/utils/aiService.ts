@@ -1,4 +1,4 @@
-import { Meter, MeterReport } from './meterStorage';
+import { Meter } from './meterStorage';
 
 // Types for AI Analysis
 export interface ConsumptionTrend {
@@ -84,8 +84,7 @@ export const analyzeConsumption = (meters: Meter[]): ConsumptionTrend[] => {
   const history = generateHistoricalData(meters, 30);
 
   // Calculate simple exponential smoothing for prediction (next 7 days)
-  const alpha = 0.3; // Smoothing factor
-  let lastSmoothed = history[history.length - 1].actual;
+  const lastSmoothed = history[history.length - 1].actual;
 
   const predictions: ConsumptionTrend[] = [];
   const lastDate = new Date();

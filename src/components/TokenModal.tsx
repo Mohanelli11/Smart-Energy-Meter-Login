@@ -1,4 +1,3 @@
-import React from 'react';
 import { XIcon, CopyIcon, SendIcon, PrinterIcon } from 'lucide-react';
 interface TokenModalProps {
   isOpen: boolean;

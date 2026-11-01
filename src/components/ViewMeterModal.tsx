@@ -1,4 +1,3 @@
-import React from 'react';
 import { XIcon, ZapIcon, MapPinIcon, UserIcon } from 'lucide-react';
 import { MeterReports } from './MeterReports';
 import { MeterCommandControl } from './MeterCommandControl';

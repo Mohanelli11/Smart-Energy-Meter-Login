@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { XIcon, UserPlusIcon, AlertCircleIcon } from 'lucide-react';
+import { ASSIGNABLE_ROLES, Role, type NewAccountInput } from '../features/authentication/types';
+import { checkPasswordPolicy, isValidPhone, normalizePhone, PASSWORD_HINT, PHONE_HINT } from '../utils/passwordPolicy';
 interface CreateAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateAccount: (account: {
-    email: string;
-    password: string;
-    name: string;
-    role: string;
-    phoneNumber: string;
-  }) => void;
+  onCreateAccount: (account: NewAccountInput) => Promise<{ ok: true } | { ok: false; error: string }>;
   isAdmin: boolean;
 }
 export function CreateAccountModal({
@@ -24,9 +20,10 @@ export function CreateAccountModal({
     phoneNumber: '',
     password: '',
     confirmPassword: '',
-    role: 'user'
+    role: Role.ENGINEER as string
   });
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   if (!isOpen) return null;
   if (!isAdmin) {
     return (
@@ -64,42 +61,45 @@ export function CreateAccountModal({
       </div>);
 
   }
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     setError('');
-    // Validation
-    if (
-    !formData.name ||
-    !formData.email ||
-    !formData.phoneNumber ||
-    !formData.password ||
-    !formData.confirmPassword)
-    {
+    // Quick feedback only: the server re-validates everything.
+    if (!formData.name.trim() || !formData.email || !formData.phoneNumber || !formData.password || !formData.confirmPassword) {
       setError('All fields are required');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    if (!isValidPhone(formData.phoneNumber)) {
+      setError(`Enter the phone number in international format. ${PHONE_HINT}`);
       return;
     }
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    const policy = checkPasswordPolicy(formData.password);
+    if (!policy.ok) {
+      setError(policy.error!);
       return;
     }
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    // Create account
-    onCreateAccount({
-      email: formData.email.toLowerCase(),
+    setSubmitting(true);
+    const result = await onCreateAccount({
+      email: formData.email.trim().toLowerCase(),
       password: formData.password,
-      name: formData.name,
-      role: formData.role,
-      phoneNumber: formData.phoneNumber
+      name: formData.name.trim(),
+      role: formData.role as Role,
+      phoneNumber: normalizePhone(formData.phoneNumber)
     });
+    setSubmitting(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
     // Reset form
     setFormData({
       name: '',
@@ -107,7 +107,7 @@ export function CreateAccountModal({
       phoneNumber: '',
       password: '',
       confirmPassword: '',
-      role: 'user'
+      role: Role.ENGINEER
     });
     onClose();
   };
@@ -215,9 +215,11 @@ export function CreateAccountModal({
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Minimum 6 characters"
+                placeholder="Choose a strong password"
+                autoComplete="new-password"
+                maxLength={128}
                 required />
-              
+              <p className="mt-1 text-xs text-gray-500">{PASSWORD_HINT}</p>
             </div>
 
             <div>
@@ -234,6 +236,8 @@ export function CreateAccountModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Re-enter password"
+                autoComplete="new-password"
+                maxLength={128}
                 required />
               
             </div>
@@ -251,8 +255,9 @@ export function CreateAccountModal({
                 onChange={handleChange}
                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 
-                <option value="user">User</option>
-                <option value="admin">Administrator</option>
+                {ASSIGNABLE_ROLES.map((r) =>
+                <option key={r.value} value={r.value}>{r.label}</option>
+                )}
               </select>
             </div>
           </div>
@@ -267,9 +272,10 @@ export function CreateAccountModal({
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              disabled={submitting}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
               
-              Create Account
+              {submitting ? 'Creating…' : 'Create Account'}
             </button>
           </div>
         </form>

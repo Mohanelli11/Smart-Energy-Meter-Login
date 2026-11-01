@@ -13,26 +13,19 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom"],
 
-    /* Linting */
+    /* Type checking */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
-    /* Additional safety options */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true
+
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] }
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "build"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["node_modules", "dist", "server"]
 }
