@@ -1,4 +1,3 @@
-import React from 'react';
 import { XIcon, AlertTriangleIcon } from 'lucide-react';
 interface DeleteConfirmModalProps {
   isOpen: boolean;

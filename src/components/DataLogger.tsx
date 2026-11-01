@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   GaugeIcon,
   ActivityIcon,
@@ -14,7 +14,8 @@ import {
   WifiOffIcon,
   TrendingUpIcon,
   BatteryChargingIcon,
-  WavesIcon } from
+  WavesIcon,
+  MapPinIcon } from
 'lucide-react';
 import {
   ResponsiveContainer,
@@ -28,6 +29,7 @@ import {
   Tooltip,
   Legend } from
 'recharts';
+import { geocodeDevice, resolveCoordinatesSync } from '../utils/geocoding';
 interface LoggerDevice {
   id: string;
   name: string;
@@ -36,6 +38,9 @@ interface LoggerDevice {
   gsmNumber: string;
   online: boolean;
   lastSync: string;
+  /** Geographic coordinates for the Device Locations map */
+  latitude?: number;
+  longitude?: number;
 }
 interface DataLoggerProps {
   isAdmin: boolean;
@@ -56,12 +61,13 @@ const saveLoggers = (loggers: LoggerDevice[]): void => {
     console.error('Failed to save data loggers:', error);
   }
 };
-const seedLoggers = (): LoggerDevice[] => [
+const seedLoggers = (): LoggerDevice[] =>
+[
 {
   id: 'DL-0001',
   name: 'MoTech 3-Phase Logger A',
   serialNumber: 'MT3PL-2026-0001',
-  location: 'Nairobi West Substation',
+  location: 'Nairobi West',
   gsmNumber: '+254700112233',
   online: true,
   lastSync: new Date().toLocaleString()
@@ -70,16 +76,19 @@ const seedLoggers = (): LoggerDevice[] => [
   id: 'DL-0002',
   name: 'MoTech 3-Phase Logger B',
   serialNumber: 'MT3PL-2026-0002',
-  location: 'Thika Industrial Feeder',
+  location: 'Thika',
   gsmNumber: '+254700445566',
   online: false,
   lastSync: new Date(Date.now() - 1000 * 60 * 45).toLocaleString()
-}];
-
+}].
+map((l) => {
+  const coords = resolveCoordinatesSync(l.location, l.serialNumber);
+  return { ...l, latitude: coords.latitude, longitude: coords.longitude };
+});
 // Simulated live telemetry generators
 const rnd = (min: number, max: number) => min + Math.random() * (max - min);
+/** Access gate. Kept separate from the body so the body's hooks always run in the same order. */
 export function DataLogger({ isAdmin }: DataLoggerProps) {
-  // Admin gate
   if (!isAdmin) {
     return (
       <div className="bg-white p-10 rounded-lg shadow text-center">
@@ -94,6 +103,9 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
       </div>);
 
   }
+  return <DataLoggerPanel />;
+}
+function DataLoggerPanel() {
   const [loggers, setLoggers] = useState<LoggerDevice[]>(() => {
     const stored = loadLoggers();
     return stored && stored.length > 0 ? stored : seedLoggers();
@@ -109,6 +121,7 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
     gsmNumber: ''
   });
   const [formError, setFormError] = useState('');
+  const [isGeocoding, setIsGeocoding] = useState(false);
   // Live telemetry state
   const [telemetry, setTelemetry] = useState(() => ({
     voltage: {
@@ -200,7 +213,7 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
     }
     return hours;
   }, []);
-  const handleAddLogger = () => {
+  const handleAddLogger = async () => {
     if (
     !form.name.trim() ||
     !form.serialNumber.trim() ||
@@ -210,6 +223,21 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
       setFormError('All fields are required.');
       return;
     }
+    setIsGeocoding(true);
+    // Automatically resolve the device's geographic coordinates
+    let coords: {latitude: number;longitude: number;};
+    try {
+      const geo = await geocodeDevice(
+        form.location.trim(),
+        form.serialNumber.trim()
+      );
+      coords = { latitude: geo.latitude, longitude: geo.longitude };
+    } catch {
+      coords = resolveCoordinatesSync(
+        form.location.trim(),
+        form.serialNumber.trim()
+      );
+    }
     const newLogger: LoggerDevice = {
       id: `DL-${(loggers.length + 1).toString().padStart(4, '0')}`,
       name: form.name.trim(),
@@ -217,8 +245,11 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
       location: form.location.trim(),
       gsmNumber: form.gsmNumber.trim(),
       online: true,
-      lastSync: new Date().toLocaleString()
+      lastSync: new Date().toLocaleString(),
+      latitude: coords.latitude,
+      longitude: coords.longitude
     };
+    setIsGeocoding(false);
     setLoggers([newLogger, ...loggers]);
     setForm({
       name: '',
@@ -628,15 +659,24 @@ export function DataLogger({ isAdmin }: DataLoggerProps) {
             <div className="flex justify-end space-x-3 p-5 border-t border-gray-200">
               <button
               onClick={() => setShowAddModal(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              disabled={isGeocoding}
+              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50">
               
                 Cancel
               </button>
               <button
               onClick={handleAddLogger}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              disabled={isGeocoding}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center">
               
-                Add Logger
+                {isGeocoding ?
+              <>
+                    <MapPinIcon className="h-4 w-4 mr-2 animate-pulse" />
+                    Locating device…
+                  </> :
+
+              'Add Logger'
+              }
               </button>
             </div>
           </div>
