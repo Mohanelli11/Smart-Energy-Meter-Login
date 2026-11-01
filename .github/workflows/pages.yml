@@ -29,6 +29,8 @@ jobs:
         env:
           # Auth API (see render.yaml). Same site as the dashboard so cookies are first-party.
           VITE_API_BASE_URL: https://api.motechenergyembedded.com/api
+          # Browser-only demo sign-in (no API server). Remove this line once the auth API is live.
+          VITE_DEMO_MODE: "true"
       # Single-page app: unknown paths (e.g. /login) must fall back to index.html
       - run: cp dist/index.html dist/404.html
       - uses: actions/configure-pages@v5
