@@ -72,4 +72,3 @@ Full endpoint list: [`server/README.md`](server/README.md).
 
 ## License
 
-Proprietary software of **MoTech Electrical and Electronics Engineering Solutions**. Support: motechembeddedengineering@gmail.com
