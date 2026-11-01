@@ -31,7 +31,7 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
     null
   );
   useEffect(() => {
-    // Simulate AI processing time
+    // The analysis is cheap and synchronous, so run it immediately on every data change.
     const timer = setTimeout(() => {
       const consumptionTrends = analyzeConsumption(meters);
       const revenueInsights = analyzeRevenue(meters, transactions);
@@ -43,7 +43,7 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
         lastUpdated: new Date().toLocaleTimeString()
       });
       setIsAnalyzing(false);
-    }, 1500);
+    }, 0);
     return () => clearTimeout(timer);
   }, [meters, transactions]);
   const refreshAnalysis = () => {
@@ -59,7 +59,7 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
         lastUpdated: new Date().toLocaleTimeString()
       });
       setIsAnalyzing(false);
-    }, 1000);
+    }, 150);
   };
   if (isAnalyzing || !analysisResult) {
     return (
@@ -88,9 +88,9 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center">
             <BrainCircuitIcon className="h-8 w-8 text-blue-600 mr-3" />
             AI & ML Analytics Engine
           </h1>
@@ -114,31 +114,31 @@ export function AIInsights({ meters, transactions }: AIInsightsProps) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-full sm:w-fit max-w-full overflow-x-auto whitespace-nowrap">
         <button
           onClick={() => setActiveTab('chat')}
-          className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'chat' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
+          className={`flex flex-shrink-0 items-center px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'chat' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
           
           <MessageSquareIcon className="h-4 w-4 mr-2" />
           AI Assistant
         </button>
         <button
           onClick={() => setActiveTab('consumption')}
-          className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'consumption' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
+          className={`flex flex-shrink-0 items-center px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'consumption' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
           
           <TrendingUpIcon className="h-4 w-4 mr-2" />
           Consumption & Trends
         </button>
         <button
           onClick={() => setActiveTab('revenue')}
-          className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'revenue' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
+          className={`flex flex-shrink-0 items-center px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'revenue' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
           
           <DollarSignIcon className="h-4 w-4 mr-2" />
           Revenue Analytics
         </button>
         <button
           onClick={() => setActiveTab('diagnostics')}
-          className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'diagnostics' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
+          className={`flex flex-shrink-0 items-center px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'diagnostics' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'}`}>
           
           <ActivityIcon className="h-4 w-4 mr-2" />
           Meter Diagnostics

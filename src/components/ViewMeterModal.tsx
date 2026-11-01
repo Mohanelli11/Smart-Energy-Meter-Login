@@ -76,7 +76,7 @@ function MeterHeaderCard({ meter, type }: { meter: Meter; type: 'prepaid' | 'pos
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <p className="text-sm text-gray-600">Account Number</p>
           <p className="font-semibold text-gray-900">{meter.accountNo}</p>
